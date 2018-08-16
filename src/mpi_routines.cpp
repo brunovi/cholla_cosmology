@@ -39,7 +39,7 @@ Real *send_buffer_0;
 Real *send_buffer_1;
 Real *recv_buffer_0;
 Real *recv_buffer_1;
-// For BLOCK 
+// For BLOCK
 Real *send_buffer_x0;
 Real *send_buffer_x1;
 Real *send_buffer_y0;
@@ -91,7 +91,7 @@ void InitializeChollaMPI(int *pargc, char **pargv[])
 
   /*set process ids in comm world*/
   MPI_Comm_rank(MPI_COMM_WORLD, &procID);
-  
+
   /*find number of processes in comm world*/
   MPI_Comm_size(MPI_COMM_WORLD, &nproc);
 
@@ -122,7 +122,7 @@ void InitializeChollaMPI(int *pargc, char **pargv[])
   {
     chprintf("Error allocating recv_request.\n");
     chexit(-2);
-  }  
+  }
 
   /*set up node communicator*/
   node = MPI_Comm_node(&procID_node, &nproc_node);
@@ -163,7 +163,7 @@ void DomainDecomposition(struct parameters *P, struct Header *H, int nx_gin, int
 
       break;
 
-    case BLOCK_DECOMP:    
+    case BLOCK_DECOMP:
       /*We use a block domain decomposition */
       domain_flag = 1;
 
@@ -200,17 +200,17 @@ void DomainDecomposition(struct parameters *P, struct Header *H, int nx_gin, int
 
   //printf("In DomainDecomposition: nx %d ny %d nz %d nc %d\n",H->nx,H->ny,H->nz,H->n_cells);
 
-  /* make sure the domain is specified in the makefile */ 
+  /* make sure the domain is specified in the makefile */
   if(domain_flag==0)
   {
     chprintf("Domain not specified in makefile. Aborting!\n");
     chexit(-1);
-  } 
+  }
 
 
   //Allocate communication buffers
   Allocate_MPI_Buffers(H);
-  
+
 }
 
 
@@ -221,7 +221,7 @@ void Allocate_MPI_Buffers(struct Header *H)
     case SLAB_DECOMP:
       Allocate_MPI_Buffers_SLAB(H);
       break;
-    case BLOCK_DECOMP:  
+    case BLOCK_DECOMP:
       Allocate_MPI_Buffers_BLOCK(H);
       break;
   }
@@ -259,7 +259,7 @@ void DomainDecompositionSLAB(struct parameters *P, struct Header *H, int nx_gin,
   /* find the local complex size, covering "real" (non-ghost) cells only */
 
 #ifdef   FFTW
-  n_local_complex = fftw_mpi_local_size_3d(nx_global, ny_global, nz_global, 
+  n_local_complex = fftw_mpi_local_size_3d(nx_global, ny_global, nz_global,
              world, &nx_local, &nx_local_start);
 #else   /*FFTW*/
 
@@ -275,7 +275,7 @@ void DomainDecompositionSLAB(struct parameters *P, struct Header *H, int nx_gin,
 
   for (i=0; i<nproc; i++)
   {
-    //split the x-cells close to equally 
+    //split the x-cells close to equally
     nx_local_proc[i] = nx_global / nproc;
   }
 
@@ -333,7 +333,7 @@ void DomainDecompositionSLAB(struct parameters *P, struct Header *H, int nx_gin,
     if(procID==nproc-1 && nproc!=1)
     {
       P->xl_bcnd = 5;
-    
+
       //if the global bcnd is periodic, use MPI bcnds at ends
       if(P->xu_bcnd==1) P->xu_bcnd = 5;
     }
@@ -400,9 +400,18 @@ void DomainDecompositionBLOCK(struct parameters *P, struct Header *H, int nx_gin
   //chprintf("Setting indices.\n");
   MPI_Barrier(world);
   n = 0;
-  for(i=0;i<nproc_x;i++)
+
+  //Gravity: Change the order of MPI processes asigment to match the assigment done by PFFT
+  //Original:
+  // for(i=0;i<nproc_x;i++)
+  //   for(j=0;j<nproc_y;j++)
+  //     for(k=0;k<nproc_z;k++)
+  //
+
+
+  for(k=0;k<nproc_z;k++)
     for(j=0;j<nproc_y;j++)
-      for(k=0;k<nproc_z;k++)
+      for(i=0;i<nproc_x;i++)
       {
         ix[n] = i;
         iy[n] = j;
@@ -488,7 +497,7 @@ void DomainDecompositionBLOCK(struct parameters *P, struct Header *H, int nx_gin
   }
 
 
-  //find MPI sources 
+  //find MPI sources
   for(i=0;i<6;i++)
     source[i] = dest[i];
 
@@ -672,14 +681,14 @@ void Set_Parallel_Domain(Real xmin_global, Real ymin_global, Real zmin_global, R
     zmin_local = zmin_global;
 
     /*only the x-direction properties need specification*/
-  
+
 
     /*the local domain will be xlen_global * nx_local / nx_global */
     xlen = xlen_global * ((Real) nx_local)/((Real) nx_global);
 
     /*the local minimum bound will be xmin_global + xlen_global* nx_local_start / nx_global */
     //nx_local_start is indexed from start of real cells
-    xmin_local = xmin_global + xlen_global * ((Real) nx_local_start) / ((Real) nx_global ); 
+    xmin_local = xmin_global + xlen_global * ((Real) nx_local_start) / ((Real) nx_global );
 
     //printf("xmin_global %e xlen_global %e xmin_local %e xlen %e\n",xmin_global,xlen_global,xmin_local,xlen);
 
@@ -692,7 +701,7 @@ void Set_Parallel_Domain(Real xmin_global, Real ymin_global, Real zmin_global, R
   {
     /*For a block decomposition:                    */
     /*each direction's properties need specification*/
-  
+
     /*the local domain will be xlen_global * nx_local / nx_global */
     xlen = xlen_global * ((Real) nx_local)/((Real) nx_global);
 
@@ -704,15 +713,15 @@ void Set_Parallel_Domain(Real xmin_global, Real ymin_global, Real zmin_global, R
 
     /*the local minimum bound will be xmin_global + xlen_global* nx_local_start / nx_global */
     //nx_local_start is indexed from start of real cells
-    xmin_local = xmin_global + xlen_global * ((Real) nx_local_start) / ((Real) nx_global ); 
+    xmin_local = xmin_global + xlen_global * ((Real) nx_local_start) / ((Real) nx_global );
 
     /*the local minimum bound will be ymin_global + ylen_global* ny_local_start / ny_global */
     //ny_local_start is indexed from start of real cells
-    ymin_local = ymin_global + ylen_global * ((Real) ny_local_start) / ((Real) ny_global ); 
+    ymin_local = ymin_global + ylen_global * ((Real) ny_local_start) / ((Real) ny_global );
 
     /*the local minimum bound will be zmin_global + zlen_global* nz_local_start / nz_global */
     //nz_local_start is indexed from start of real cells
-    zmin_local = zmin_global + zlen_global * ((Real) nz_local_start) / ((Real) nz_global ); 
+    zmin_local = zmin_global + zlen_global * ((Real) nz_local_start) / ((Real) nz_global );
 
     //printf("xmin_global %e xlen_global %e xmin_local %e xlen %e\n",xmin_global,xlen_global,xmin_local,xlen);
     //printf("ymin_global %e ylen_global %e ymin_local %e ylen %e\n",ymin_global,ylen_global,ymin_local,ylen);
@@ -733,13 +742,13 @@ void Set_Parallel_Domain(Real xmin_global, Real ymin_global, Real zmin_global, R
   H->ydglobal = ylen_global;
   H->zdglobal = zlen_global;
 
-  //the local domains and cell sizes 
+  //the local domains and cell sizes
   //are always set this way
   H->xblocal = xmin_local;
   H->yblocal = ymin_local;
   H->zblocal = zmin_local;
 
-  //printf("ProcessID: %d xbound: %f  xdglobal: %f  xblocal: %f\n", procID, H->xbound, H->xdglobal, H->xblocal); 
+  //printf("ProcessID: %d xbound: %f  xdglobal: %f  xblocal: %f\n", procID, H->xbound, H->xdglobal, H->xblocal);
 
   /*perform 1-D first*/
   if(H->nx > 1 && H->ny==1 && H->nz==1)
@@ -788,7 +797,7 @@ void Set_Parallel_Domain(Real xmin_global, Real ymin_global, Real zmin_global, R
   {
     chprintf("Domain properties are not specified for this decomposition. Aborting!\n");
     chexit(-1);
-  } 
+  }
 }
 
 
@@ -810,7 +819,7 @@ void Print_Domain_Properties(struct Header H)
       printf("dy %e\n",H.dy);
       printf("dz %e\n",H.dz);
       printf("*********\n");
-    } 
+    }
     fflush(stdout);
     MPI_Barrier(world);
   }
@@ -825,7 +834,7 @@ void Allocate_MPI_Buffers_SLAB(struct Header *H)
 
   send_buffer_length = bsize;
   recv_buffer_length = bsize;
-  
+
   //chprintf("Allocating MPI communication buffers (n = %ld).\n",bsize);
 
   if(!(send_buffer_0 = (Real *) malloc(bsize*sizeof(Real))))
@@ -860,7 +869,7 @@ void Allocate_MPI_Buffers_BLOCK(struct Header *H)
     chexit(-1);
   }
   // 2D
-  if (H->ny>1 && H->nz==1) { 
+  if (H->ny>1 && H->nz==1) {
     xbsize = H->n_fields*H->n_ghost*(H->ny-2*H->n_ghost);
     ybsize = H->n_fields*H->n_ghost*(H->nx);
     zbsize = 1;
@@ -875,7 +884,7 @@ void Allocate_MPI_Buffers_BLOCK(struct Header *H)
   x_buffer_length = xbsize;
   y_buffer_length = ybsize;
   z_buffer_length = zbsize;
-  
+
   chprintf("Allocating MPI communication buffers (nx = %ld, ny = %ld, nz = %ld).\n", xbsize, ybsize, zbsize);
 
   if(!(send_buffer_x0 = (Real *) malloc(xbsize*sizeof(Real))))
@@ -941,7 +950,7 @@ void Allocate_MPI_Buffers_BLOCK(struct Header *H)
       chexit(-1);
     }
   }
-  
+
 }
 
 /* find the greatest prime factor of an integer */
