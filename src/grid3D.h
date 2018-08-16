@@ -80,7 +80,7 @@ struct Rotation
 
 struct Header
 {
-  /*! \var n_cells 
+  /*! \var n_cells
   *  \brief Total number of cells in the grid (including ghost cells) */
   int n_cells;
 
@@ -131,7 +131,7 @@ struct Header
   /*! \var domlen_y */
   /*  \brief Local domain length in y-direction */
   Real domlen_y;
-   
+
   /*! \var domlen_z */
   /*  \brief Local domain length in z-direction */
   Real domlen_z;
@@ -171,7 +171,7 @@ struct Header
   /*! \var dz
   *  \brief z-width of cells */
   Real dz;
-      
+
   /*! \var t
   *  \brief Simulation time */
   Real t;
@@ -230,22 +230,22 @@ class Grid3D
        *  \brief Array containing the density of each cell in the grid */
       Real *density;
 
-      /*! \var momentum_x 
+      /*! \var momentum_x
        *  \brief Array containing the momentum in the x direction of each cell in the grid */
       Real *momentum_x;
 
-      /*! \var momentum_y 
+      /*! \var momentum_y
        *  \brief Array containing the momentum in the y direction of each cell in the grid */
       Real *momentum_y;
 
-      /*! \var momentum_z 
+      /*! \var momentum_z
        *  \brief Array containing the momentum in the z direction of each cell in the grid */
-      Real *momentum_z;			
+      Real *momentum_z;
 
-      /*! \var Energy 
+      /*! \var Energy
        *  \brief Array containing the total Energy of each cell in the grid */
       Real *Energy;
-      
+
       #ifdef DE
       /*! \var GasEnergy
        *  \brief Array containing the internal energy of each cell, only tracked separately when using
@@ -269,7 +269,7 @@ class Grid3D
     /*! \fn void Initialize(int nx_in, int ny_in, int nz_in)
      *  \brief Initialize the grid. */
     void Initialize(struct parameters *P);
- 
+
     /*! \fn void AllocateMemory(void)
      *  \brief Allocate memory for the d, m, E arrays. */
     void AllocateMemory(void);
@@ -279,7 +279,7 @@ class Grid3D
     void Set_Initial_Conditions(parameters P);
 
     /*! \fn void Get_Position(long i, long j, long k, Real *xpos, Real *ypos, Real *zpos)
-     *  \brief Get the cell-centered position based on cell index */ 
+     *  \brief Get the cell-centered position based on cell index */
     void Get_Position(long i, long j, long k, Real *xpos, Real *ypos, Real *zpos);
 
     /*! \fn void Set_Domain_Properties(struct parameters P)
@@ -291,7 +291,7 @@ class Grid3D
     void set_dt(Real dti);
 
     /*! \fn Real calc_dti_CPU()
-     *  \brief Calculate the maximum inverse timestep, according to the CFL condition (Toro 6.17). */ 
+     *  \brief Calculate the maximum inverse timestep, according to the CFL condition (Toro 6.17). */
     Real calc_dti_CPU();
 
     /*! \fn void Update_Grid(void)
@@ -317,7 +317,7 @@ class Grid3D
 
     /*! \fn void Write_Projection_HDF5(hid_t file_id)
      *  \brief Write projected density and temperature data to a file. */
-    void Write_Projection_HDF5(hid_t file_id);    
+    void Write_Projection_HDF5(hid_t file_id);
 
     /*! \fn void Write_Header_Rotated_HDF5(hid_t file_id)
      *  \brief Write the relevant header info to the HDF5 file for rotated projection. */
@@ -325,11 +325,11 @@ class Grid3D
 
     /*! \fn void Write_Rotated_Projection_HDF5(hid_t file_id)
      *  \brief Write rotated projected data to a file, at the current simulation time. */
-    void Write_Rotated_Projection_HDF5(hid_t file_id);   
+    void Write_Rotated_Projection_HDF5(hid_t file_id);
 
     /*! \fn void Write_Slices_HDF5(hid_t file_id)
      *  \brief Write xy, xz, and yz slices of all data to a file. */
-    void Write_Slices_HDF5(hid_t file_id);    
+    void Write_Slices_HDF5(hid_t file_id);
 
 #endif
 
@@ -340,7 +340,7 @@ class Grid3D
     /*! \fn Read_Grid_Binary(FILE *fp)
      *  \brief Read in grid data from a binary file. */
     void Read_Grid_Binary(FILE *fp);
-    
+
 #ifdef HDF5
     /*! \fn void Read_Grid_HDF5(hid_t file_id)
      *  \brief Read in grid data from an hdf5 file. */
@@ -393,7 +393,7 @@ class Grid3D
 
     /*! \fn void Gresho()
      *  \brief Initialize the grid with the 2D Gresho problem described in LW03. */
-    void Gresho();    
+    void Gresho();
 
     /*! \fn void Implosion_2D()
      *  \brief Implosion test described in Liska, 2003. */
@@ -413,11 +413,11 @@ class Grid3D
 
     /*! \fn void Disk_2D()
      *  \brief Initialize the grid with a 2D disk following a Kuzmin profile. */
-    void Disk_2D();    
+    void Disk_2D();
 
     /*! \fn void Disk_3D(parameters P)
      *  \brief Initialize the grid with a 3D disk following a Miyamoto-Nagai profile. */
-    void Disk_3D(parameters P);    
+    void Disk_3D(parameters P);
 
     /*! \fn void Set_Boundary_Conditions(parameters P)
      *  \brief Set the boundary conditions based on info in the parameters structure. */
@@ -441,7 +441,7 @@ class Grid3D
     int  Set_Boundary_Mapping(int ig, int jg, int kg, int flags[], Real *a);
 
     /*! \fn int Find_Index(int ig, int nx, int flag, int face, Real *a)
-     *  \brief Given a ghost cell index and boundary flag, 
+     *  \brief Given a ghost cell index and boundary flag,
         return the index of the corresponding real cell. */
     int  Find_Index(int ig, int nx, int flag, int face, Real *a);
 
@@ -450,9 +450,13 @@ class Grid3D
     void Custom_Boundary(char bcnd[MAXLEN]);
 
     /*! \fn void Noh_Boundary()
-     *  \brief Apply analytic boundary conditions to +x, +y (and +z) faces, 
+     *  \brief Apply analytic boundary conditions to +x, +y (and +z) faces,
         as per the Noh problem in Liska, 2003, or in Stone, 2008. */
     void Noh_Boundary();
+
+    /*! \fn void Sphere_3D()
+     *  \brief Spherical overdensity and overpressure causing an spherical explosion */
+     void Sphere_explosion_3D();
 
 
 #ifdef   MPI_CHOLLA
