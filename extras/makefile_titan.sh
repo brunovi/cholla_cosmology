@@ -66,7 +66,7 @@ CUDA_LIBS = -L$(CUDATOOLKIT_HOME)/lib64/ -lcuda -lcudart
 endif
 
 ifeq ($(OUTPUT),-DHDF5)
-HDF5_INCLUDE = -I$(HDF5_DIR)/include
+HDF5_INCL = -I$(HDF5_DIR)/include
 HDF5_LIBS = -L$(HDF5_DIR)/lib -lhdf5
 endif
 
