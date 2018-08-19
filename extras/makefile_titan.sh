@@ -90,11 +90,12 @@ NVCCFLAGS = $(FLAGS) -m64 -fmad=false -ccbin=$(CC) -arch=compute_35
 %.o:	%.cu
 		$(NVCC) $(NVCCFLAGS) --device-c $(NVINCL)  -c $< -o $@
 
+src/gpuCode.o:	$(CUOBJS)
+$(NVCC) -arch=compute_35 -dlink $(CUOBJS) -o src/gpuCode.o
+
 $(EXEC): $(OBJS) src/gpuCode.o
 	 	 $(CXX) $(OBJS) src/gpuCode.o $(LIBS) -o $(EXEC)
 
-src/gpuCode.o:	$(CUOBJS)
-		$(NVCC) -arch=compute_35 -dlink $(CUOBJS) -o src/gpuCode.o
 
 
 
