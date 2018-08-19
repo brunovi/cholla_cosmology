@@ -1033,7 +1033,7 @@ void Grid3D::Sphere_explosion_3D()
         C.Energy[id] = energy;
 
         #ifdef DE
-        C.GasEnergy[id] = pressure/(gamma-1);
+        C.GasEnergy[id] = pressure/(gama-1);
         #endif
       }
     }
