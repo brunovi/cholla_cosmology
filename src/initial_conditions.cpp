@@ -1003,8 +1003,8 @@ void Grid3D::Sphere_explosion_3D()
   center_y = 0.5;
   center_z = 0.5;
   overDensity = 1;
-  overPressure = 1;
-  vx = 0;
+  overPressure = 10;
+  vx = 10;
   vy = 0;
   vz = 0;
 
@@ -1017,7 +1017,7 @@ void Grid3D::Sphere_explosion_3D()
         // // get the centered cell positions at (i,j,k)
         Get_Position(i, j, k, &x_pos, &y_pos, &z_pos);
         density = 0.1;
-        pressure = 0.01;
+        pressure = 1;
 
         r = sqrt( (x_pos-center_x)*(x_pos-center_x) + (y_pos-center_y)*(y_pos-center_y) + (z_pos-center_z)*(z_pos-center_z) );
         if ( r < 0.2 ){
