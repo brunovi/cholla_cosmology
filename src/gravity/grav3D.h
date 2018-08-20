@@ -53,7 +53,7 @@ class Grav3D
   // int n_ghost_potential;
 
   int n_cells;
-  // int n_cells_potential;
+  int n_cells_potential;
 
   struct Fields
   {
@@ -82,12 +82,12 @@ class Grav3D
 
   void Copy_global_parameters( Real dx_in, Real dy_in, Real dz_in, Real Lx, Real Ly, Real Lz );
   // /*! \fn void AllocateMemory(void)
-  //  *  \brief Allocate memory for the d, m, E arrays. */
-  // void AllocateMemory_CPU(void);
+
+  void AllocateMemory_CPU(void);
   // void AllocateMemory_GPU(void);
   //
   // // void CopyDensityFromHost( Grid3D G );
-  // void Initialize_values_CPU();
+  void Initialize_values_CPU();
   // void Initialize_values_GPU();
   //
   // #ifdef HDF5
@@ -115,7 +115,7 @@ class Grav3D
   //
   // /*! \fn void FreeMemory(void)
   //  *  \brief Free the memory for the density array. */
-  // void FreeMemory_CPU(void);
+  void FreeMemory_CPU(void);
   // void FreeMemory_GPU(void);
 
 };

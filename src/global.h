@@ -2,8 +2,8 @@
  *  /brief Declarations of global variables and functions. */
 
 
-#ifndef GLOBAL_H 
-#define GLOBAL_H 
+#ifndef GLOBAL_H
+#define GLOBAL_H
 
 #ifdef COOLING_CPU
 #include <gsl/gsl_spline.h>
@@ -32,7 +32,7 @@ typedef double Real;
 #define TIME_UNIT 3.15569e10 // 1 kyr in s
 #define LENGTH_UNIT 3.08567758e21 // 1 kpc in cm
 #define MASS_UNIT 1.98855e33 // 1 solar mass in grams
-#define DENSITY_UNIT (MASS_UNIT/(LENGTH_UNIT*LENGTH_UNIT*LENGTH_UNIT)) 
+#define DENSITY_UNIT (MASS_UNIT/(LENGTH_UNIT*LENGTH_UNIT*LENGTH_UNIT))
 #define VELOCITY_UNIT (LENGTH_UNIT/TIME_UNIT)
 #define ENERGY_UNIT (DENSITY_UNIT*VELOCITY_UNIT*VELOCITY_UNIT)
 #define PRESSURE_UNIT (DENSITY_UNIT*VELOCITY_UNIT*VELOCITY_UNIT)
@@ -42,6 +42,9 @@ typedef double Real;
 #define NSCALARS 1
 #endif
 
+#ifdef GRAVITY
+#define N_GHOST_POTENTIAL 2
+#endif
 
 #define SIGN(a) ( ((a) < 0.) ? -1. : 1. )
 
@@ -71,7 +74,7 @@ extern float *heating_table;
 extern void Set_Gammas(Real gamma_in);
 
 /*! \fn double get_time(void)
- *  \brief Returns the current clock time. */ 
+ *  \brief Returns the current clock time. */
 extern double get_time(void);
 
 /*! \fn int sgn
