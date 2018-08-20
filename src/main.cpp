@@ -16,8 +16,11 @@
 
 #ifdef GRAVITY
 #include "gravity/gravity_functions.h"
-#define OUTPUT_POTENTIAL
-#define OUTPUT_GRAVITY_DENSITY
+#ifdef POTENTIAL_CUFFT
+#include "gravity/potential_CUFFT_3D.h"
+#endif
+
+
 #endif
 
 #define OUTPUT
@@ -91,7 +94,12 @@ int main(int argc, char *argv[])
 
   #ifdef GRAVITY
   G.Grav.Initialize( G.H.xdglobal, G.H.ydglobal, G.H.zdglobal, P.nx, P.ny, P.nz, G.H.nx_real, G.H.ny_real, G.H.nz_real, G.H.dx, G.H.dy, G.H.dz  );
-  Compute_Gravitational_Potential( G );
+
+  #ifdef POTENTIAL_CUFFT
+  Potential_CUFFT_3D p_solver;
+  p_solver.Initialize( G.Grav );
+  #endif
+  Compute_Gravitational_Potential( G, p_solver );
   #endif
 
 

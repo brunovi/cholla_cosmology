@@ -52,7 +52,7 @@ void Grav3D::Initialize( Real Lx, Real Ly, Real Lz, int nx, int ny, int nz, int 
       Lbox_x, Lbox_y, Lbox_z, nx_local, ny_local, nz_local,   nx_total, ny_total, nz_total );
   chprintf( " dx:%f  dy:%f  dz:%f\n", dx, dy, dz );
   chprintf( " N ghost potential: %d\n", N_GHOST_POTENTIAL);
-  chprintf( "\n" );
+  // chprintf( "\n" );
 
 }
 
