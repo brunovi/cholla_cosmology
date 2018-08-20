@@ -1004,7 +1004,7 @@ void Grid3D::Sphere_explosion_3D()
   center_z = 0.5;
   overDensity = 1;
   overPressure = 10;
-  vx = 10;
+  vx = 0;
   vy = 0;
   vz = 0;
 
