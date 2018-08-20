@@ -174,13 +174,6 @@ void Grid3D::Initialize(struct parameters *P)
   // allocate memory
   AllocateMemory();
 
-  #ifdef GRAVITY
-  //Initialize Gravity
-  Grav.Initialize( H.xdglobal, H.ydglobal, H.zdglobal, nx_in, ny_in, nz_in, H.nx_real, H.ny_real, H.nz_real, H.dx, H.dy, H.dz  );
-
-  #endif
-
-
 
 
 #ifdef ROTATED_PROJECTION

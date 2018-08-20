@@ -15,7 +15,7 @@ Grav3D::Grav3D( void ){}
 
 /*! \fn void Initialize(int nx_in, int ny_in, int nz_in)
  *  \brief Initialize the grid. */
-void Grav3D::Initialize( Real Lx, Real Ly, Real Lz, int nx, int ny, int nz, int nx_real, int ny_real, int nz_real, int dx_real, int dy_real, int dz_real )
+void Grav3D::Initialize( Real Lx, Real Ly, Real Lz, int nx, int ny, int nz, int nx_real, int ny_real, int nz_real, Real dx_real, Real dy_real, Real dz_real )
 {
 
   Lbox_x = Lx;
@@ -40,18 +40,6 @@ void Grav3D::Initialize( Real Lx, Real Ly, Real Lz, int nx, int ny, int nz, int 
   n_cells = nx_local*ny_local*nz_local;
   n_cells_potential = ( nx_local + 2*N_GHOST_POTENTIAL ) * ( ny_local + 2*N_GHOST_POTENTIAL ) * ( nz_local + 2*N_GHOST_POTENTIAL );
 
-
-}
-
-void Grav3D::Copy_global_parameters( Real dx_in, Real dy_in, Real dz_in, Real Lx, Real Ly, Real Lz ){
-  dx = dx_in;
-  dy = dy_in;
-  dz = dz_in;
-
-  Lbox_x = Lx;
-  Lbox_y = Ly;
-  Lbox_z = Lz;
-
   // Allocate memory
   AllocateMemory_CPU();
   // AllocateMemory_GPU();
@@ -60,16 +48,14 @@ void Grav3D::Copy_global_parameters( Real dx_in, Real dy_in, Real dz_in, Real Lx
   // Initialize_values_GPU();
 
 
-
   chprintf( "\nGravity Initialized: \n Lbox: %0.2f %0.2f %0.2f \n Local: %d %d %d \n Global: %d %d %d \n",
       Lbox_x, Lbox_y, Lbox_z, nx_local, ny_local, nz_local,   nx_total, ny_total, nz_total );
   chprintf( " dx:%f  dy:%f  dz:%f\n", dx, dy, dz );
   chprintf( " N ghost potential: %d\n", N_GHOST_POTENTIAL);
   chprintf( "\n" );
+
 }
 
-
-//
 void Grav3D::AllocateMemory_CPU(void)
 {
   // allocate memory for the density and potential arrays

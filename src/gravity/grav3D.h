@@ -78,11 +78,9 @@ class Grav3D
 
   /*! \fn void Initialize(int nx_in, int ny_in, int nz_in)
    *  \brief Initialize the grid. */
-  void Initialize( Real Lx, Real Ly, Real Lz, int nx_total, int ny_total, int nz_total, int nx_real, int ny_real, int nz_real, int dx_real, int dy_real, int dz_real);
+  void Initialize( Real Lx, Real Ly, Real Lz, int nx_total, int ny_total, int nz_total, int nx_real, int ny_real, int nz_real, Real dx_real, Real dy_real, Real dz_real);
 
-  void Copy_global_parameters( Real dx_in, Real dy_in, Real dz_in, Real Lx, Real Ly, Real Lz );
   // /*! \fn void AllocateMemory(void)
-
   void AllocateMemory_CPU(void);
   // void AllocateMemory_GPU(void);
   //

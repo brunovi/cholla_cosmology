@@ -84,8 +84,12 @@ int main(int argc, char *argv[])
 
 
   #ifdef GRAVITY
-  G.Grav.Copy_global_parameters(G.H.dx, G.H.dy, G.H.dz, G.H.xdglobal, G.H.ydglobal, G.H.zdglobal ) ;
+  G.Grav.Initialize( G.H.xdglobal, G.H.ydglobal, G.H.zdglobal, P.nx, P.ny, P.nz, G.H.nx_real, G.H.ny_real, G.H.nz_real, G.H.dx, G.H.dy, G.H.dz  );
+  // Compute_Gravitational_Potential( G );
   #endif
+
+
+
 
   // set boundary conditions (assign appropriate values to ghost cells)
   chprintf("Setting boundary conditions...\n");
