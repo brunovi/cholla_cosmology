@@ -14,6 +14,12 @@
 #include "io.h"
 #include "error_handling.h"
 
+#ifdef GRAVITY
+#include "gravity/gravity_functions.h"
+#define OUTPUT_POTENTIAL
+#define OUTPUT_GRAVITY_DENSITY
+#endif
+
 #define OUTPUT
 //#define CPU_TIME
 
@@ -85,7 +91,7 @@ int main(int argc, char *argv[])
 
   #ifdef GRAVITY
   G.Grav.Initialize( G.H.xdglobal, G.H.ydglobal, G.H.zdglobal, P.nx, P.ny, P.nz, G.H.nx_real, G.H.ny_real, G.H.nz_real, G.H.dx, G.H.dy, G.H.dz  );
-  // Compute_Gravitational_Potential( G );
+  Compute_Gravitational_Potential( G );
   #endif
 
 
