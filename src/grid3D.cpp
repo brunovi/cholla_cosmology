@@ -34,6 +34,11 @@
 #include "cooling_wrapper.h"
 #endif
 
+// #ifdef GRAVITY
+// #include "grav3D.h"
+// #endif
+
+
 
 
 /*! \fn Grid3D(void)
@@ -63,7 +68,7 @@ Grid3D::Grid3D(void)
 }
 
 /*! \fn void Get_Position(long i, long j, long k, Real *xpos, Real *ypos, Real *zpos)
- *  \brief Get the cell-centered position based on cell index */ 
+ *  \brief Get the cell-centered position based on cell index */
 void Grid3D::Get_Position(long i, long j, long k, Real *x_pos, Real *y_pos, Real *z_pos)
 {
 
@@ -79,7 +84,7 @@ void Grid3D::Get_Position(long i, long j, long k, Real *x_pos, Real *y_pos, Real
   *x_pos = H.xblocal + H.dx*(i-H.n_ghost) + 0.5*H.dx;
   *y_pos = H.yblocal + H.dy*(j-H.n_ghost) + 0.5*H.dy;
   *z_pos = H.zblocal + H.dz*(k-H.n_ghost) + 0.5*H.dz;
-  
+
 
 #endif  /*MPI_CHOLLA*/
 
@@ -101,7 +106,7 @@ void Grid3D::Initialize(struct parameters *P)
   // if using dual energy formalism must track internal energy - always the last field!
   #ifdef DE
   H.n_fields++;
-  #endif  
+  #endif
 
   int nx_in = P->nx;
   int ny_in = P->ny;
@@ -128,10 +133,10 @@ void Grid3D::Initialize(struct parameters *P)
 #else  /*MPI_CHOLLA*/
 
   /* perform domain decomposition
-   * and set grid dimensions      
-   * and allocate comm buffers */ 
-  DomainDecomposition(P, &H, nx_in, ny_in, nz_in); 
-  
+   * and set grid dimensions
+   * and allocate comm buffers */
+  DomainDecomposition(P, &H, nx_in, ny_in, nz_in);
+
 #endif /*MPI_CHOLLA*/
 
   // failsafe
@@ -169,9 +174,17 @@ void Grid3D::Initialize(struct parameters *P)
   // allocate memory
   AllocateMemory();
 
+  #ifdef GRAVITY
+  //Initialize Gravity
+  Grav.Initialize( H.xdglobal, H.ydglobal, H.zdglobal, nx_in, ny_in, nz_in, H.nx_real, H.ny_real, H.nz_real, H.dx, H.dy, H.dz  );
+
+  #endif
+
+
+
 
 #ifdef ROTATED_PROJECTION
-  //x-dir pixels in projection 
+  //x-dir pixels in projection
   R.nx = P->nxr;
   //z-dir pixels in projection
   R.nz = P->nzr;
@@ -241,7 +254,7 @@ void Grid3D::AllocateMemory(void)
   #ifdef CLOUDY_COOL
   //printf("Warning: Cloudy cooling isn't currently working. No cooling will be applied.\n");
   Load_Cuda_Textures();
-  #endif  
+  #endif
 
 }
 
@@ -267,12 +280,12 @@ void Grid3D::AllocateMemory(void)
   #ifdef MPI_CHOLLA
   max_dti = ReduceRealMax(max_dti);
   #endif /*MPI_CHOLLA*/
-  
+
   /*
   if (H.n_step > 1) {
     H.dt = fmin(2*H.dt, C_cfl / max_dti);
   }
-  else 
+  else
     H.dt = C_cfl / max_dti;
   */
   //chprintf("Within set_dt: %f %f %f\n", C_cfl, H.dt, max_dti);
@@ -353,7 +366,7 @@ Real Grid3D::calc_dti_CPU()
     max_dti = max_vx / H.dx;
     max_dti = fmax(max_dti, max_vy / H.dy);
     max_dti = fmax(max_dti, max_vz / H.dy);
-  } 
+  }
   else {
     chprintf("Invalid grid dimensions. Failed to compute dt.\n");
     chexit(-1);
@@ -422,7 +435,7 @@ Real Grid3D::Update_Grid(void)
     #endif //not_VL
     #ifdef VL
     chprintf("VL algorithm not implemented in non-cuda version.");
-    chexit(-1);    
+    chexit(-1);
     #endif //VL
     #endif //not_CUDA
 
@@ -443,7 +456,7 @@ Real Grid3D::Update_Grid(void)
     #endif //not_VL
     #ifdef VL
     chprintf("VL algorithm not implemented in non-cuda version.");
-    chexit(-1);    
+    chexit(-1);
     #endif //VL
     #endif //not_CUDA
 
@@ -454,7 +467,7 @@ Real Grid3D::Update_Grid(void)
     #ifdef VL
     max_dti = VL_Algorithm_3D_CUDA(g0, g1, H.nx, H.ny, H.nz, x_off, y_off, z_off, H.n_ghost, H.dx, H.dy, H.dz, H.xbound, H.ybound, H.zbound, H.dt, H.n_fields);
     #endif //VL
-    #endif    
+    #endif
   }
   else
   {

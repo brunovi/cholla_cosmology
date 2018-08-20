@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
   // read in the parameters
   parse_params (param_file, &P);
   // and output to screen
-  chprintf ("Parameter values:  nx = %d, ny = %d, nz = %d, tout = %f, init = %s, boundaries = %d %d %d %d %d %d\n", 
+  chprintf ("Parameter values:  nx = %d, ny = %d, nz = %d, tout = %f, init = %s, boundaries = %d %d %d %d %d %d\n",
     P.nx, P.ny, P.nz, P.tout, P.init, P.xl_bcnd, P.xu_bcnd, P.yl_bcnd, P.yu_bcnd, P.zl_bcnd, P.zu_bcnd);
   chprintf ("Output directory:  %s\n", P.outdir);
 
@@ -82,10 +82,15 @@ int main(int argc, char *argv[])
     nfile = P.nfile*P.nfull;
   }
 
+
+  #ifdef GRAVITY
+  G.Grav.Copy_global_parameters(G.H.dx, G.H.dy, G.H.dz, G.H.xdglobal, G.H.ydglobal, G.H.zdglobal ) ;
+  #endif
+
   // set boundary conditions (assign appropriate values to ghost cells)
   chprintf("Setting boundary conditions...\n");
   G.Set_Boundary_Conditions(P);
-  chprintf("Boundary conditions set.\n");  
+  chprintf("Boundary conditions set.\n");
 
   chprintf("Dimensions of each cell: dx = %f dy = %f dz = %f\n", G.H.dx, G.H.dy, G.H.dz);
   chprintf("Ratio of specific heats gamma = %f\n",gama);
@@ -125,11 +130,11 @@ int main(int argc, char *argv[])
 
     // get the start time
     start_step = get_time();
-    
+
     // calculate the timestep
     G.set_dt(dti);
 
-    if (G.H.t + G.H.dt > outtime) 
+    if (G.H.t + G.H.dt > outtime)
     {
       G.H.dt = outtime - G.H.t;
     }
@@ -137,7 +142,7 @@ int main(int argc, char *argv[])
     #ifdef MPI_CHOLLA
     G.H.dt = ReduceRealMin(G.H.dt);
     #endif
-   
+
 
     // Advance the grid by one timestep
     #ifdef CPU_TIME
@@ -161,7 +166,7 @@ int main(int argc, char *argv[])
     // add one to the timestep count
     G.H.n_step++;
 
-    // set boundary conditions for next time step 
+    // set boundary conditions for next time step
     #ifdef CPU_TIME
     start_bound = get_time();
     #endif //CPU_TIME
@@ -190,8 +195,8 @@ int main(int argc, char *argv[])
     G.H.t_wall = stop_total-start_total;
     #ifdef MPI_CHOLLA
     G.H.t_wall = ReduceRealMax(G.H.t_wall);
-    #endif 
-    chprintf("n_step: %d   sim time: %10.7f   sim timestep: %7.4e  timestep time = %9.3f ms   total time = %9.4f s\n", 
+    #endif
+    chprintf("n_step: %d   sim time: %10.7f   sim timestep: %7.4e  timestep time = %9.3f ms   total time = %9.4f s\n",
       G.H.n_step, G.H.t, G.H.dt, (stop_step-start_step)*1000, G.H.t_wall);
 
     if (G.H.t == outtime)
@@ -203,7 +208,7 @@ int main(int argc, char *argv[])
       nfile++;
       #endif //OUTPUT
       // update to the next output time
-      outtime += P.outstep;      
+      outtime += P.outstep;
     }
 /*
     // check for failures
@@ -222,7 +227,7 @@ int main(int argc, char *argv[])
         }
       }
     }
-*/   
+*/
 
   } /*end loop over timesteps*/
 

@@ -15,6 +15,10 @@
 #include<hdf5.h>
 #endif
 
+#ifdef GRAVITY
+#include"gravity/grav3D.h"
+#endif
+
 struct Rotation
 {
   /*! \var nx
@@ -223,6 +227,10 @@ class Grid3D
     /*! \var buffer1
      *  \brief Buffer to hold conserved variable arrays */
     Real *buffer1;
+
+    #ifdef GRAVITY
+    Grav3D Grav;
+    #endif
 
     struct Conserved
     {
