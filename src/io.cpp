@@ -1150,7 +1150,7 @@ void Grid3D::Write_Grid_HDF5(hid_t file_id)
         for (i=0; i<Grav.nx_local; i++) {
           // id = (i+H.n_ghost) + (j+H.n_ghost)*H.nx + (k+H.n_ghost)*H.nx*H.ny;
           // buf_id = k + j*H.nz_real + i*H.nz_real*H.ny_real;
-          id = (i+N_GHOST_POTENTIAL) + (j+N_GHOST_POTENTIAL)*(Grav.nx_local+2*N_GHOST_POTENTIAL) + (k+1)*(Grav.nx_local+2*N_GHOST_POTENTIAL)*(Grav.ny_local+2*N_GHOST_POTENTIAL);
+          id = (i+N_GHOST_POTENTIAL) + (j+N_GHOST_POTENTIAL)*(Grav.nx_local+2*N_GHOST_POTENTIAL) + (k+N_GHOST_POTENTIAL)*(Grav.nx_local+2*N_GHOST_POTENTIAL)*(Grav.ny_local+2*N_GHOST_POTENTIAL);
           buf_id = k + j*Grav.nz_local + i*Grav.nz_local*Grav.ny_local;
           dataset_buffer[buf_id] = Grav.F.potential_h[id];
           // dataset_buffer[buf_id] = pfft_potential[id][0];

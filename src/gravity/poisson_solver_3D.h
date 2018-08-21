@@ -26,11 +26,19 @@ class Poisson_Solver_3D{
   Real dx;
   Real dy;
   Real dz;
+  int n_cells_total;
+  int n_cells_local;
 
-
+  // Poisson_Solver_3D( void );
   void Initialize( Grav3D Grav );
 
+  void Get_Potential( Grav3D Grav );
+
+
+
 };
+
+
 
 
 
