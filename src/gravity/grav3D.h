@@ -55,6 +55,12 @@ class Grav3D
   int n_cells;
   int n_cells_potential;
 
+
+  bool INITIAL;
+
+  Real dt_prev;
+  Real dt_now;
+
   struct Fields
   {
     /*! \var density

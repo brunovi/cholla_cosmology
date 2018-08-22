@@ -40,6 +40,10 @@ void Grav3D::Initialize( Real Lx, Real Ly, Real Lz, int nx, int ny, int nz, int 
   n_cells = nx_local*ny_local*nz_local;
   n_cells_potential = ( nx_local + 2*N_GHOST_POTENTIAL ) * ( ny_local + 2*N_GHOST_POTENTIAL ) * ( nz_local + 2*N_GHOST_POTENTIAL );
 
+  INITIAL = true;
+  dt_prev = 0;
+  dt_now = 0;
+
   // Allocate memory
   AllocateMemory_CPU();
   // AllocateMemory_GPU();

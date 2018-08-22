@@ -23,6 +23,7 @@ void Copy_Hydro_Density_to_Gravity( Grid3D &G ){
 void Compute_Gravitational_Potential( Grid3D &G, Potential_CUFFT_3D &p_solver){
   Copy_Hydro_Density_to_Gravity( G );
   p_solver.Get_Potential( G.Grav );
+  Extrapolate_Grav_Potential( G.Grav );
   Copy_Potential_To_Hydro_Grid( G );
 }
 #endif
@@ -32,9 +33,21 @@ void Compute_Gravitational_Potential( Grid3D &G, Potential_CUFFT_3D &p_solver){
 void Compute_Gravitational_Potential( Grid3D &G, Potential_FFTW_3D &p_solver){
   Copy_Hydro_Density_to_Gravity( G );
   p_solver.Get_Potential( G.Grav );
+  Extrapolate_Grav_Potential( G.Grav );
   Copy_Potential_To_Hydro_Grid( G );
 }
 #endif
+
+void Extrapolate_Grav_Potential( Grav3D &Grav ){
+
+  if ( Grav.INITIAL ){
+    for ( int i=0; i<Grav.n_cells; i++){
+      Grav.F.potential_1_h[i] = Grav.F.potential_h[i];
+    }
+  Grav.INITIAL = false;
+  return ;
+  }
+}
 
 void Copy_Potential_To_Hydro_Grid( Grid3D &G ){
   int n_ghost_pot = N_GHOST_POTENTIAL;

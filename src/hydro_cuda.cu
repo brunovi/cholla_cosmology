@@ -15,7 +15,7 @@ __global__ void Update_Conserved_Variables_1D(Real *dev_conserved, Real *dev_F, 
 {
   int id;
   #if defined(DE) || defined(STATIC_GRAV)
-  Real d, d_inv, vx;  
+  Real d, d_inv, vx;
   #endif
   #ifdef DE
   Real vx_imo, vx_ipo, vy, vz, P;
@@ -24,7 +24,7 @@ __global__ void Update_Conserved_Variables_1D(Real *dev_conserved, Real *dev_F, 
   Real gx, d_n, d_inv_n, vx_n;
   gx = 0.0;
   #endif
-  
+
   Real dtodx = dt/dx;
 
   // get a global thread ID
@@ -46,7 +46,7 @@ __global__ void Update_Conserved_Variables_1D(Real *dev_conserved, Real *dev_F, 
     vx_imo = dev_conserved[1*n_cells + id-1]/dev_conserved[id-1];
     vx_ipo = dev_conserved[1*n_cells + id+1]/dev_conserved[id+1];
     #endif
-  
+
     // update the conserved variable array
     dev_conserved[            id] += dtodx * (dev_F[            id-1] - dev_F[            id]);
     dev_conserved[  n_cells + id] += dtodx * (dev_F[  n_cells + id-1] - dev_F[  n_cells + id]);
@@ -63,13 +63,13 @@ __global__ void Update_Conserved_Variables_1D(Real *dev_conserved, Real *dev_F, 
                                   +  dtodx * P * 0.5 * (vx_imo - vx_ipo);
     #endif
     #ifdef STATIC_GRAV // add gravitational source terms, time averaged from n to n+1
-    calc_g_1D(id, x_off, n_ghost, dx, xbound, &gx);    
+    calc_g_1D(id, x_off, n_ghost, dx, xbound, &gx);
     d_n  =  dev_conserved[            id];
     d_inv_n = 1.0 / d_n;
     vx_n =  dev_conserved[1*n_cells + id] * d_inv_n;
     dev_conserved[  n_cells + id] += 0.5*dt*gx*(d + d_n);
     dev_conserved[4*n_cells + id] += 0.25*dt*gx*(d + d_n)*(vx + vx_n);
-    #endif    
+    #endif
     if (dev_conserved[id] != dev_conserved[id]) printf("%3d Thread crashed in final update. %f\n", id, dev_conserved[id]);
     /*
     d  =  dev_conserved[            id];
@@ -132,18 +132,18 @@ __global__ void Update_Conserved_Variables_2D(Real *dev_conserved, Real *dev_F_x
     P  = (dev_conserved[4*n_cells + id] - 0.5*d*(vx*vx + vy*vy + vz*vz)) * (gamma - 1.0);
     ipo = xid+1 + yid*nx;
     jpo = xid + (yid+1)*nx;
-    vx_imo = dev_conserved[1*n_cells + imo] / dev_conserved[imo]; 
-    vx_ipo = dev_conserved[1*n_cells + ipo] / dev_conserved[ipo]; 
-    vy_jmo = dev_conserved[2*n_cells + jmo] / dev_conserved[jmo]; 
-    vy_jpo = dev_conserved[2*n_cells + jpo] / dev_conserved[jpo]; 
+    vx_imo = dev_conserved[1*n_cells + imo] / dev_conserved[imo];
+    vx_ipo = dev_conserved[1*n_cells + ipo] / dev_conserved[ipo];
+    vy_jmo = dev_conserved[2*n_cells + jmo] / dev_conserved[jmo];
+    vy_jpo = dev_conserved[2*n_cells + jpo] / dev_conserved[jpo];
     #endif
     // update the conserved variable array
     dev_conserved[            id] += dtodx * (dev_F_x[            imo] - dev_F_x[            id])
                                   +  dtody * (dev_F_y[            jmo] - dev_F_y[            id]);
-    dev_conserved[  n_cells + id] += dtodx * (dev_F_x[  n_cells + imo] - dev_F_x[  n_cells + id]) 
+    dev_conserved[  n_cells + id] += dtodx * (dev_F_x[  n_cells + imo] - dev_F_x[  n_cells + id])
                                   +  dtody * (dev_F_y[  n_cells + jmo] - dev_F_y[  n_cells + id]);
-    dev_conserved[2*n_cells + id] += dtodx * (dev_F_x[2*n_cells + imo] - dev_F_x[2*n_cells + id]) 
-                                  +  dtody * (dev_F_y[2*n_cells + jmo] - dev_F_y[2*n_cells + id]); 
+    dev_conserved[2*n_cells + id] += dtodx * (dev_F_x[2*n_cells + imo] - dev_F_x[2*n_cells + id])
+                                  +  dtody * (dev_F_y[2*n_cells + jmo] - dev_F_y[2*n_cells + id]);
     dev_conserved[3*n_cells + id] += dtodx * (dev_F_x[3*n_cells + imo] - dev_F_x[3*n_cells + id])
                                   +  dtody * (dev_F_y[3*n_cells + jmo] - dev_F_y[3*n_cells + id]);
     dev_conserved[4*n_cells + id] += dtodx * (dev_F_x[4*n_cells + imo] - dev_F_x[4*n_cells + id])
@@ -159,10 +159,10 @@ __global__ void Update_Conserved_Variables_2D(Real *dev_conserved, Real *dev_F_x
                                   +  dtody * (dev_F_y[(n_fields-1)*n_cells + jmo] - dev_F_y[(n_fields-1)*n_cells + id])
                                   +  0.5*P*(dtodx*(vx_imo-vx_ipo) + dtody*(vy_jmo-vy_jpo));
     #endif
-    #ifdef STATIC_GRAV 
+    #ifdef STATIC_GRAV
     // calculate the gravitational acceleration as a function of x & y position
     calc_g_2D(xid, yid, x_off, y_off, n_ghost, dx, dy, xbound, ybound, &gx, &gy);
-    // add gravitational source terms, time averaged from n to n+1                                 
+    // add gravitational source terms, time averaged from n to n+1
     d_n  =  dev_conserved[            id];
     d_inv_n = 1.0 / d_n;
     vx_n =  dev_conserved[1*n_cells + id] * d_inv_n;
@@ -174,7 +174,7 @@ __global__ void Update_Conserved_Variables_2D(Real *dev_conserved, Real *dev_F_x
     #endif
     if (dev_conserved[id] < 0.0 || dev_conserved[id] != dev_conserved[id]) {
       printf("%3d %3d Thread crashed in final update. %f %f %f\n", xid, yid, dtodx*(dev_F_x[imo]-dev_F_x[id]), dtody*(dev_F_y[jmo]-dev_F_y[id]), dev_conserved[id]);
-    }   
+    }
     /*
     d  =  dev_conserved[            id];
     d_inv = 1.0 / d;
@@ -183,7 +183,7 @@ __global__ void Update_Conserved_Variables_2D(Real *dev_conserved, Real *dev_F_x
     vz =  dev_conserved[3*n_cells + id] * d_inv;
     P  = (dev_conserved[4*n_cells + id] - 0.5*d*(vx*vx + vy*vy + vz*vz)) * (gamma - 1.0);
     if (P < 0.0)
-      printf("%3d %3d Negative pressure after final update. %f %f %f %f\n", xid, yid, dev_conserved[4*n_cells + id], 0.5*d*vx*vx, 0.5*d*vy*vy, P);    
+      printf("%3d %3d Negative pressure after final update. %f %f %f %f\n", xid, yid, dev_conserved[4*n_cells + id], 0.5*d*vx*vx, 0.5*d*vy*vy, P);
     */
   }
 
@@ -192,7 +192,7 @@ __global__ void Update_Conserved_Variables_2D(Real *dev_conserved, Real *dev_F_x
 
 
 __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x, Real *dev_F_y,  Real *dev_F_z,
-                                              int nx, int ny, int nz, int x_off, int y_off, int z_off, int n_ghost, 
+                                              int nx, int ny, int nz, int x_off, int y_off, int z_off, int n_ghost,
                                               Real dx, Real dy, Real dz, Real xbound, Real ybound, Real zbound, Real dt,
                                               Real gamma, int n_fields)
 {
@@ -207,6 +207,13 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
   #endif
 
   #ifdef STATIC_GRAV
+  Real gx, gy, gz, d_n, d_inv_n, vx_n, vy_n, vz_n;
+  gx = 0.0;
+  gy = 0.0;
+  gz = 0.0;
+  #endif
+
+  #ifdef GRAVITY
   Real gx, gy, gz, d_n, d_inv_n, vx_n, vy_n, vz_n;
   gx = 0.0;
   gy = 0.0;
@@ -230,7 +237,7 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
   // threads corresponding to real cells do the calculation
   if (xid > n_ghost-1 && xid < nx-n_ghost && yid > n_ghost-1 && yid < ny-n_ghost && zid > n_ghost-1 && zid < nz-n_ghost)
   {
-    #if defined (DE) || defined(STATIC_GRAV)
+    #if defined (DE) || defined(STATIC_GRAV) || defined(GRAVITY)
     d  =  dev_conserved[            id];
     d_inv = 1.0 / d;
     vx =  dev_conserved[1*n_cells + id] * d_inv;
@@ -244,12 +251,12 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
     ipo = xid+1 + yid*nx + zid*nx*ny;
     jpo = xid + (yid+1)*nx + zid*nx*ny;
     kpo = xid + yid*nx + (zid+1)*nx*ny;
-    vx_imo = dev_conserved[1*n_cells + imo] / dev_conserved[imo]; 
-    vx_ipo = dev_conserved[1*n_cells + ipo] / dev_conserved[ipo]; 
-    vy_jmo = dev_conserved[2*n_cells + jmo] / dev_conserved[jmo]; 
-    vy_jpo = dev_conserved[2*n_cells + jpo] / dev_conserved[jpo]; 
-    vz_kmo = dev_conserved[3*n_cells + kmo] / dev_conserved[kmo]; 
-    vz_kpo = dev_conserved[3*n_cells + kpo] / dev_conserved[kpo]; 
+    vx_imo = dev_conserved[1*n_cells + imo] / dev_conserved[imo];
+    vx_ipo = dev_conserved[1*n_cells + ipo] / dev_conserved[ipo];
+    vy_jmo = dev_conserved[2*n_cells + jmo] / dev_conserved[jmo];
+    vy_jpo = dev_conserved[2*n_cells + jpo] / dev_conserved[jpo];
+    vz_kmo = dev_conserved[3*n_cells + kmo] / dev_conserved[kmo];
+    vz_kpo = dev_conserved[3*n_cells + kpo] / dev_conserved[kpo];
     #endif
 
     // update the conserved variable array
@@ -273,7 +280,7 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
       dev_conserved[(5+i)*n_cells + id] += dtodx * (dev_F_x[(5+i)*n_cells + imo] - dev_F_x[(5+i)*n_cells + id])
                                     +  dtody * (dev_F_y[(5+i)*n_cells + jmo] - dev_F_y[(5+i)*n_cells + id])
                                     +  dtodz * (dev_F_z[(5+i)*n_cells + kmo] - dev_F_z[(5+i)*n_cells + id]);
-    }                              
+    }
     #endif
     #ifdef DE
     dev_conserved[(n_fields-1)*n_cells + id] += dtodx * (dev_F_x[(n_fields-1)*n_cells + imo] - dev_F_x[(n_fields-1)*n_cells + id])
@@ -281,7 +288,7 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
                                   +  dtodz * (dev_F_z[(n_fields-1)*n_cells + kmo] - dev_F_z[(n_fields-1)*n_cells + id])
                                   +  0.5*P*(dtodx*(vx_imo-vx_ipo) + dtody*(vy_jmo-vy_jpo) + dtodz*(vz_kmo-vz_kpo));
     #endif
-    #ifdef STATIC_GRAV 
+    #ifdef STATIC_GRAV
     calc_g_3D(xid, yid, zid, x_off, y_off, z_off, n_ghost, dx, dy, dz, xbound, ybound, zbound, &gx, &gy, &gz);
     d_n  =  dev_conserved[            id];
     d_inv_n = 1.0 / d_n;
@@ -294,7 +301,28 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
     dev_conserved[4*n_cells + id] += 0.25*dt*gx*(d + d_n)*(vx + vx_n)
                                   +  0.25*dt*gy*(d + d_n)*(vy + vy_n)
                                   +  0.25*dt*gz*(d + d_n)*(vz + vz_n);
-    #endif    
+    #endif
+
+    #ifdef GRAVITY
+    d_n  =  dev_conserved[            id];
+    d_inv_n = 1.0 / d_n;
+    vx_n =  dev_conserved[1*n_cells + id] * d_inv_n;
+    vy_n =  dev_conserved[2*n_cells + id] * d_inv_n;
+    vz_n =  dev_conserved[3*n_cells + id] * d_inv_n;
+    dev_conserved[  n_cells + id] += 0.5*dt*gx*(d + d_n);
+    dev_conserved[2*n_cells + id] += 0.5*dt*gy*(d + d_n);
+    dev_conserved[3*n_cells + id] += 0.5*dt*gz*(d + d_n);
+    dev_conserved[4*n_cells + id] += 0.25*dt*gx*(d + d_n)*(vx + vx_n)
+                                  +  0.25*dt*gy*(d + d_n)*(vy + vy_n)
+                                  +  0.25*dt*gz*(d + d_n)*(vz + vz_n);
+    #endif 
+
+
+
+
+
+
+
     if (dev_conserved[id] < 0.0 || dev_conserved[id] != dev_conserved[id] || dev_conserved[4*n_cells + id] < 0.0 || dev_conserved[4*n_cells+id] != dev_conserved[4*n_cells+id]) {
       printf("%3d %3d %3d Thread crashed in final update. %e %e %e %e %e\n", xid+x_off, yid+y_off, zid+z_off, dev_conserved[id], dtodx*(dev_F_x[imo]-dev_F_x[id]), dtody*(dev_F_y[jmo]-dev_F_y[id]), dtodz*(dev_F_z[kmo]-dev_F_z[id]), dev_conserved[4*n_cells+id]);
     }
@@ -321,7 +349,7 @@ __global__ void Sync_Energies_1D(Real *dev_conserved, int n_cells, int n_ghost, 
 
   // get a global thread ID
   id = threadIdx.x + blockIdx.x * blockDim.x;
-  
+
   im1 = max(id-1, n_ghost);
   ip1 = min(id+1, n_cells-n_ghost-1);
 
@@ -335,7 +363,7 @@ __global__ void Sync_Energies_1D(Real *dev_conserved, int n_cells, int n_ghost, 
     vy =  dev_conserved[2*n_cells + id] * d_inv;
     vz =  dev_conserved[3*n_cells + id] * d_inv;
     E  =  dev_conserved[4*n_cells + id];
-    // separately tracked internal energy 
+    // separately tracked internal energy
     ge1 = dev_conserved[(n_fields-1)*n_cells + id];
     // internal energy calculated from total energy
     ge2 = dev_conserved[4*n_cells + id] - 0.5*d*(vx*vx + vy*vy + vz*vz);
@@ -345,16 +373,16 @@ __global__ void Sync_Energies_1D(Real *dev_conserved, int n_cells, int n_ghost, 
     if (ge2/E > 0.001) {
       dev_conserved[(n_fields-1)*n_cells + id] = ge2;
       ge1 = ge2;
-    }     
-    // find the max nearby total energy 
+    }
+    // find the max nearby total energy
     Emax = fmax(dev_conserved[4*n_cells + im1], E);
     Emax = fmax(dev_conserved[4*n_cells + ip1], Emax);
     // if the ratio of conservatively calculated internal energy to max nearby total energy
-    // is greater than 1/10, continue to use the conservatively calculated internal energy 
+    // is greater than 1/10, continue to use the conservatively calculated internal energy
     if (ge2/Emax > 0.1) {
       dev_conserved[(n_fields-1)*n_cells + id] = ge2;
     }
-    // sync the total energy with the internal energy 
+    // sync the total energy with the internal energy
     else {
       dev_conserved[4*n_cells + id] += ge1 - ge2;
     }
@@ -370,9 +398,9 @@ __global__ void Sync_Energies_1D(Real *dev_conserved, int n_cells, int n_ghost, 
     }
     //else printf("%d Using ge1 %f %f %f %f\n", id, ge1, ge2, vmax, 0.25*d*vmax*vmax);
     */
-    // calculate the pressure 
-    //P = (dev_conserved[4*n_cells + id] - 0.5*d*(vx*vx + vy*vy + vz*vz)) * (gamma - 1.0);    
-    //if (P < 0.0) printf("%d Negative pressure after internal energy sync. %f %f \n", id, ge1, ge2);    
+    // calculate the pressure
+    //P = (dev_conserved[4*n_cells + id] - 0.5*d*(vx*vx + vy*vy + vz*vz)) * (gamma - 1.0);
+    //if (P < 0.0) printf("%d Negative pressure after internal energy sync. %f %f \n", id, ge1, ge2);
   }
 
 }
@@ -411,7 +439,7 @@ __global__ void Sync_Energies_2D(Real *dev_conserved, int nx, int ny, int n_ghos
     vy =  dev_conserved[2*n_cells + id] * d_inv;
     vz =  dev_conserved[3*n_cells + id] * d_inv;
     E  =  dev_conserved[4*n_cells + id];
-    // separately tracked internal energy 
+    // separately tracked internal energy
     ge1 =  dev_conserved[(n_fields-1)*n_cells + id];
     // internal energy calculated from total energy
     ge2 = dev_conserved[4*n_cells + id] - 0.5*d*(vx*vx + vy*vy + vz*vz);
@@ -421,24 +449,24 @@ __global__ void Sync_Energies_2D(Real *dev_conserved, int nx, int ny, int n_ghos
     if (ge2/E > 0.001) {
       dev_conserved[(n_fields-1)*n_cells + id] = ge2;
       ge1 = ge2;
-    }     
-    //find the max nearby total energy 
+    }
+    //find the max nearby total energy
     Emax = fmax(dev_conserved[4*n_cells + imo], E);
     Emax = fmax(Emax, dev_conserved[4*n_cells + ipo]);
     Emax = fmax(Emax, dev_conserved[4*n_cells + jmo]);
     Emax = fmax(Emax, dev_conserved[4*n_cells + jpo]);
     // if the ratio of conservatively calculated internal energy to max nearby total energy
-    // is greater than 1/10, continue to use the conservatively calculated internal energy 
+    // is greater than 1/10, continue to use the conservatively calculated internal energy
     if (ge2/Emax > 0.1) {
       dev_conserved[(n_fields-1)*n_cells + id] = ge2;
     }
-    // sync the total energy with the internal energy 
+    // sync the total energy with the internal energy
     else {
       dev_conserved[4*n_cells + id] += ge1 - ge2;
     }
-    // calculate the pressure 
-    //Real P = (dev_conserved[4*n_cells + id] - 0.5*d*(vx*vx + vy*vy + vz*vz)) * (gamma - 1.0);    
-    //if (P < 0.0) printf("%d Negative pressure after internal energy sync. %f %f \n", id, ge1, ge2);    
+    // calculate the pressure
+    //Real P = (dev_conserved[4*n_cells + id] - 0.5*d*(vx*vx + vy*vy + vz*vz)) * (gamma - 1.0);
+    //if (P < 0.0) printf("%d Negative pressure after internal energy sync. %f %f \n", id, ge1, ge2);
   }
 }
 
@@ -484,7 +512,7 @@ __global__ void Sync_Energies_3D(Real *dev_conserved, int nx, int ny, int nz, in
     E  =  dev_conserved[4*n_cells + id];
     // don't do the energy sync if this thread has crashed
     if (E < 0.0 || E != E) return;
-    // separately tracked internal energy 
+    // separately tracked internal energy
     ge1 =  dev_conserved[(n_fields-1)*n_cells + id];
     // internal energy calculated from total energy
     ge2 = dev_conserved[4*n_cells + id] - 0.5*d*(vx*vx + vy*vy + vz*vz);
@@ -495,7 +523,7 @@ __global__ void Sync_Energies_3D(Real *dev_conserved, int nx, int ny, int nz, in
       dev_conserved[(n_fields-1)*n_cells + id] = ge2;
       ge1 = ge2;
     }
-    //find the max nearby total energy 
+    //find the max nearby total energy
     Emax = fmax(dev_conserved[4*n_cells + imo], E);
     Emax = fmax(Emax, dev_conserved[4*n_cells + ipo]);
     Emax = fmax(Emax, dev_conserved[4*n_cells + jmo]);
@@ -503,18 +531,18 @@ __global__ void Sync_Energies_3D(Real *dev_conserved, int nx, int ny, int nz, in
     Emax = fmax(Emax, dev_conserved[4*n_cells + kmo]);
     Emax = fmax(Emax, dev_conserved[4*n_cells + kpo]);
     // if the ratio of conservatively calculated internal energy to max nearby total energy
-    // is greater than 1/10, continue to use the conservatively calculated internal energy 
+    // is greater than 1/10, continue to use the conservatively calculated internal energy
     if (ge2/Emax > 0.1 && ge2 > 0.0 && Emax > 0.0) {
       dev_conserved[(n_fields-1)*n_cells + id] = ge2;
     }
-    // sync the total energy with the internal energy 
+    // sync the total energy with the internal energy
     else {
       if (ge1 > 0.0) dev_conserved[4*n_cells + id] += ge1 - ge2;
       else dev_conserved[(n_fields-1)*n_cells+id] = ge2;
     }
-    // calculate the pressure 
+    // calculate the pressure
     //Real P = (dev_conserved[4*n_cells + id] - 0.5*d*(vx*vx + vy*vy + vz*vz)) * (gamma - 1.0);
-    //if (P < 0.0) printf("%3d %3d %3d Negative pressure after internal energy sync. %f %f %f\n", xid, yid, zid, P/(gamma-1.0), ge1, ge2);    
+    //if (P < 0.0) printf("%3d %3d %3d Negative pressure after internal energy sync. %f %f %f\n", xid, yid, zid, P/(gamma-1.0), ge1, ge2);
   }
 }
 
@@ -554,7 +582,7 @@ __global__ void Calc_dt_1D(Real *dev_conserved, int n_cells, int n_ghost, Real d
     max_dti[tid] = (fabs(vx)+cs)/dx;
   }
   __syncthreads();
-  
+
   // do the reduction in shared memory (find the max inverse timestep in the block)
   for (unsigned int s=1; s<blockDim.x; s*=2) {
     if (tid % (2*s) == 0) {
@@ -607,7 +635,7 @@ __global__ void Calc_dt_2D(Real *dev_conserved, int nx, int ny, int n_ghost, Rea
     max_dti[tid] = fmax((fabs(vx)+cs)/dx, (fabs(vy)+cs)/dy);
   }
   __syncthreads();
-  
+
   // do the reduction in shared memory (find the max inverse timestep in the block)
   for (unsigned int s=1; s<blockDim.x; s*=2) {
     if (tid % (2*s) == 0) {
@@ -637,7 +665,7 @@ __global__ void Calc_dt_3D(Real *dev_conserved, int nx, int ny, int nz, int n_gh
   zid = id / (nx*ny);
   yid = (id - zid*nx*ny) / nx;
   xid = id - zid*nx*ny - yid*nx;
-  // and a thread id within the block  
+  // and a thread id within the block
   tid = threadIdx.x;
 
   // set shared memory to 0
@@ -661,7 +689,7 @@ __global__ void Calc_dt_3D(Real *dev_conserved, int nx, int ny, int nz, int n_gh
     max_dti[tid] = fmax(max_dti[tid], 0);
   }
   __syncthreads();
-  
+
   // do the reduction in shared memory (find the max inverse timestep in the block)
   for (unsigned int s=1; s<blockDim.x; s*=2) {
     if (tid % (2*s) == 0) {
