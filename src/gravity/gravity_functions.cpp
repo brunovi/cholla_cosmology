@@ -19,15 +19,20 @@ void Copy_Hydro_Density_to_Gravity( Grid3D &G ){
 }
 
 
+#ifdef POTENTIAL_CUFFT
 void Compute_Gravitational_Potential( Grid3D &G, Potential_CUFFT_3D &p_solver){
-
   Copy_Hydro_Density_to_Gravity( G );
-
   p_solver.Get_Potential( G.Grav );
-
-
 }
+#endif
 
+
+#ifdef POTENTIAL_FFTW
+void Compute_Gravitational_Potential( Grid3D &G, Potential_FFTW_3D &p_solver){
+  Copy_Hydro_Density_to_Gravity( G );
+  p_solver.Get_Potential( G.Grav );
+}
+#endif
 
 
 

@@ -7,11 +7,24 @@
 #include"../global.h"
 // #include"mpi_pfft.h"
 #include "poisson_solver_3D.h"
+
+#ifdef POTENTIAL_CUFFT
 #include "potential_CUFFT_3D.h"
+#endif
+
+#ifdef POTENTIAL_FFTW
+#include "potential_FFTW_3D.h"
+#endif
 
 void Copy_Hydro_Density_to_Gravity( Grid3D &G );
 
+#ifdef POTENTIAL_CUFFT
 void Compute_Gravitational_Potential( Grid3D &G,  Potential_CUFFT_3D &p_solver);
+#endif
+
+#ifdef POTENTIAL_FFTW
+void Compute_Gravitational_Potential( Grid3D &G,  Potential_FFTW_3D &p_solver);
+#endif
 
 #endif //SELF_GRAV_FUNC_H
 #endif //SELF_GRAVITY

@@ -29,6 +29,9 @@ class Potential_CUFFT_3D : public Poisson_Solver_3D
   cufftHandle plan_cufft_fwd;
   cufftHandle plan_cufft_bwd;
 
+  int threads_per_block;
+  int blocks_per_grid;
+
   struct Fields
   {
 
@@ -37,6 +40,13 @@ class Potential_CUFFT_3D : public Poisson_Solver_3D
     Complex_cufft *transform_d;
 
     Real *output_h;
+
+    // Real *k_fft_x;
+    // Real *k_fft_y;
+    // Real *k_fft_z;
+
+    Real *G_h;
+    Real *G_d;
 
   } F;
 
@@ -48,11 +58,15 @@ class Potential_CUFFT_3D : public Poisson_Solver_3D
   void AllocateMemory_GPU( void );
 
   void FreeMemory_GPU( void );
+  void Reset( void );
 
   void Copy_Input( Grav3D &Grav );
   void Copy_Output( Grav3D &Grav );
 
+  virtual void Get_K_for_Green_function( void );
+
   virtual void Get_Potential( Grav3D &Grav );
+
 };
 
 

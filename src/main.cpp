@@ -19,7 +19,9 @@
 #ifdef POTENTIAL_CUFFT
 #include "gravity/potential_CUFFT_3D.h"
 #endif
-
+#ifdef POTENTIAL_FFTW
+#include "gravity/potential_FFTW_3D.h"
+#endif
 
 #endif
 
@@ -97,8 +99,12 @@ int main(int argc, char *argv[])
 
   #ifdef POTENTIAL_CUFFT
   Potential_CUFFT_3D p_solver;
-  p_solver.Initialize( G.Grav );
   #endif
+  #ifdef POTENTIAL_FFTW
+  Potential_FFTW_3D p_solver;
+  #endif
+
+  p_solver.Initialize( G.Grav );
   Compute_Gravitational_Potential( G, p_solver );
   #endif
 
@@ -251,6 +257,10 @@ int main(int argc, char *argv[])
 
   // free the grid
   G.Reset();
+
+  #ifdef GRAVITY
+  p_solver.Reset();
+  #endif
 
   #ifdef MPI_CHOLLA
   MPI_Finalize();
