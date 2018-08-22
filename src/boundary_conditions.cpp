@@ -58,7 +58,7 @@ int Grid3D::Check_Custom_Boundary(int *flags, struct parameters P)
   /*if yes, then return 1*/
   /*if no, then return 0*/
   /*additionally, set a flag for each boundary*/
-  
+
   if(H.nx>1)
   {
     *(flags+0) = P.xl_bcnd;
@@ -72,7 +72,7 @@ int Grid3D::Check_Custom_Boundary(int *flags, struct parameters P)
   if(H.nz>1)
   {
     *(flags+4) = P.zl_bcnd;
-    *(flags+5) = P.zu_bcnd;  
+    *(flags+5) = P.zu_bcnd;
   }
 
   for (int i=0; i<6; i++)
@@ -86,7 +86,7 @@ int Grid3D::Check_Custom_Boundary(int *flags, struct parameters P)
       /*custom boundaries*/
       return 1;
     }
-  }  
+  }
   /*no custom boundaries*/
   return 0;
 }
@@ -124,14 +124,14 @@ void Grid3D::Set_Boundaries(int dir, int flags[])
         a[2] = 1.;
 
         //find the ghost cell index
-        gidx = i + j*H.nx + k*H.nx*H.ny; 
+        gidx = i + j*H.nx + k*H.nx*H.ny;
 
         //find the corresponding real cell index and momenta signs
         idx  = Set_Boundary_Mapping(i,j,k,flags,&a[0]);
 
-        
+
         //idx will be >= 0 if the boundary mapping function has
-        //not set this ghost cell by hand, for instance for analytical 
+        //not set this ghost cell by hand, for instance for analytical
         //boundary conditions
         //
         //Otherwise, the boundary mapping function will set idx<0
@@ -147,10 +147,14 @@ void Grid3D::Set_Boundaries(int dir, int flags[])
           #ifdef DE
           C.GasEnergy[gidx]  = C.GasEnergy[idx];
           #endif
-          #ifdef SCALAR 
+          #ifdef SCALAR
           for (int ii=0; ii<NSCALARS; ii++) {
             C.scalar[gidx + ii*H.n_cells]  = C.scalar[idx + ii*H.n_cells];
           }
+          #endif
+
+          #ifdef GRAVITY
+          C.Grav_potential[gidx]  = C.Grav_potential[idx];
           #endif
 
           //for outflow boundaries, set momentum to restrict inflow
@@ -179,7 +183,7 @@ void Grid3D::Set_Boundaries(int dir, int flags[])
             C.Energy[gidx] += 0.5*(C.momentum_x[gidx]*C.momentum_x[gidx] + C.momentum_y[gidx]*C.momentum_y[gidx] + C.momentum_z[gidx]*C.momentum_z[gidx])/C.density[gidx];
           }
 
-          
+
         }
       }
     }
@@ -339,7 +343,7 @@ int Grid3D::Set_Boundary_Mapping(int ig, int jg, int kg, int flags[], Real *a)
     if (jr < 0) {
       return idx = -1;
     }
-    
+
     // otherwise add j index to ghost cell mapping
     idx += H.nx*jr;
 
@@ -375,7 +379,7 @@ int Grid3D::Set_Boundary_Mapping(int ig, int jg, int kg, int flags[], Real *a)
 }
 
 /*! \fn int Find_Index(int ig, int nx, int flag, int face, Real *a)
- *  \brief Given a ghost cell index and boundary flag, 
+ *  \brief Given a ghost cell index and boundary flag,
     return the index of the corresponding real cell. */
 int Grid3D::Find_Index(int ig, int nx, int flag, int face, Real *a)
 {
@@ -450,7 +454,7 @@ void Grid3D::Custom_Boundary(char bcnd[MAXLEN])
 
 
 /*! \fn void Noh_Boundary()
- *  \brief Apply analytic boundary conditions to +x, +y (and +z) faces, 
+ *  \brief Apply analytic boundary conditions to +x, +y (and +z) faces,
     as per the Noh problem in Liska, 2003, or in Stone, 2008. */
 void Grid3D::Noh_Boundary()
 {
@@ -487,7 +491,7 @@ void Grid3D::Noh_Boundary()
       }
     }
   }
-  
+
   // set exact boundaries on the +y face
   for (k=0; k<H.nz; k++) {
     for (j=H.ny-H.n_ghost; j<H.ny; j++) {
@@ -544,5 +548,3 @@ void Grid3D::Noh_Boundary()
   }
 
 }
-
-

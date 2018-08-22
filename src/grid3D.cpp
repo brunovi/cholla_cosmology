@@ -239,6 +239,16 @@ void Grid3D::AllocateMemory(void)
   #ifdef SCALAR
   C.scalar  = &(buffer0[5*H.n_cells]);
   #endif
+
+  #ifdef GRAVITY
+  #ifndef DE
+  C.Grav_potential = &(buffer0[(H.n_fields-1)*H.n_cells]);
+  #endif
+  #ifdef DE
+  C.Grav_potential = &(buffer0[(H.n_fields-2)*H.n_cells]);
+  #endif
+  #endif
+
   #ifdef DE
   C.GasEnergy = &(buffer0[(H.n_fields-1)*H.n_cells]);
   #endif

@@ -272,6 +272,13 @@ class Grid3D
       Real *scalar;
       #endif
 
+      #ifdef GRAVITY
+      /*! \var GasEnergy
+       *  \brief Array containing the gravitational potential of each cell, only tracked separately when using
+           the GRAVITY. */
+      Real *Grav_potential;
+      #endif
+
     } C;
 
 
