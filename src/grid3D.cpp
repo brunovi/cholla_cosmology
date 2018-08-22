@@ -65,6 +65,7 @@ Grid3D::Grid3D(void)
   H.n_ghost=4;
   #endif //PPMC
 
+  H.n_ghost_pot_offset = H.n_ghost - N_GHOST_POTENTIAL;
 }
 
 /*! \fn void Get_Position(long i, long j, long k, Real *xpos, Real *ypos, Real *zpos)
@@ -101,6 +102,11 @@ void Grid3D::Initialize(struct parameters *P)
   // if including passive scalars increase the number of fields
   #ifdef SCALAR
   H.n_fields += NSCALARS;
+  #endif
+
+  // if using Gravity must track potential
+  #ifdef GRAVITY
+  H.n_fields++;
   #endif
 
   // if using dual energy formalism must track internal energy - always the last field!
