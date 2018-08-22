@@ -26,5 +26,7 @@ void Compute_Gravitational_Potential( Grid3D &G,  Potential_CUFFT_3D &p_solver);
 void Compute_Gravitational_Potential( Grid3D &G,  Potential_FFTW_3D &p_solver);
 #endif
 
+void Copy_Potential_To_Hydro_Grid( Grid3D &G );
+
 #endif //SELF_GRAV_FUNC_H
 #endif //SELF_GRAVITY
