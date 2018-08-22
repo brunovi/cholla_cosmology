@@ -34,6 +34,8 @@ class Poisson_Solver_3D{
 
   void Get_Potential( Grav3D Grav );
 
+  void Get_K_for_Green_function();
+
 
 
 };
