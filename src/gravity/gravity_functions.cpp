@@ -39,13 +39,19 @@ void Compute_Gravitational_Potential( Grid3D &G, Potential_FFTW_3D &p_solver){
 #endif
 
 void Extrapolate_Grav_Potential( Grav3D &Grav ){
-
   if ( Grav.INITIAL ){
     for ( int i=0; i<Grav.n_cells_potential; i++){
       Grav.F.potential_1_h[i] = Grav.F.potential_h[i];
     }
-  Grav.INITIAL = false;
+  // Grav.INITIAL = false;
   return ;
+  }
+  Real delta_pot, pot_now;
+  for ( int i=0; i<Grav.n_cells_potential; i++ ){
+    pot_now = Grav.F.potential_h[i];
+    delta_pot = pot_now - Grav.F.potential_1_h[i];
+    Grav.F.potential_h[i] = pot_now + ( 0.5 * delta_pot / Grav.dt_prev * Grav.dt_now );
+    Grav.F.potential_1_h[i] = pot_now;
   }
 }
 
