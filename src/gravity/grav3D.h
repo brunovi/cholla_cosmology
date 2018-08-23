@@ -50,7 +50,6 @@ class Grav3D
   *  \brief z-width of cells */
   Real dz;
 
-  // int n_ghost_potential;
 
   int n_cells;
   int n_cells_potential;
@@ -60,6 +59,8 @@ class Grav3D
 
   Real dt_prev;
   Real dt_now;
+
+  Real Gconst;
 
   struct Fields
   {
@@ -88,40 +89,9 @@ class Grav3D
 
   // /*! \fn void AllocateMemory(void)
   void AllocateMemory_CPU(void);
-  // void AllocateMemory_GPU(void);
-  //
-  // // void CopyDensityFromHost( Grid3D G );
-  void Initialize_values_CPU();
-  // void Initialize_values_GPU();
-  //
-  // #ifdef HDF5
-  //   // /*! \fn void Write_GravHeader_HDF5(hid_t file_id)
-  //   //  *  \brief Write the relevant header info to the HDF5 file. */
-  //   void Write_GravHeader_HDF5(hid_t file_id);
-  //
-  //   /*! \fn void Write_GravFields_HDF5(hid_t file_id)
-  //    *  \brief Write the grid to a file, at the current simulation time. */
-  //   void Write_GravFields_HDF5(hid_t file_id);
-  // #endif
-  //
-  // Real Get_Potential_PFFT( void );
-  //
-  // void Extrapolate_Potential( Real dt_0, Real dt_1, bool extrapolate );
-  //
-  // void Copy_Potential_To_Device( void );
-  //
-  // // void Copy_potential_to_Particles( void );
-  //
-  //
-  // /*! \fn void Reset(void)
-  //  *  \brief Reset the Griav3D class. */
-  // void Reset(void);
-  //
-  // /*! \fn void FreeMemory(void)
-  //  *  \brief Free the memory for the density array. */
-  void FreeMemory_CPU(void);
-  // void FreeMemory_GPU(void);
 
+  void Initialize_values_CPU();
+  void FreeMemory_CPU(void);
 };
 
 

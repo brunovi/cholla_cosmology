@@ -25,7 +25,6 @@ void Grav3D::Initialize( Real Lx, Real Ly, Real Lz, int nx, int ny, int nz, int 
   nx_total = nx;
   ny_total = ny;
   nz_total = nz;
-  // n_cells = nx*ny*nz;
 
   nx_local = nx_real;
   ny_local = ny_real;
@@ -44,13 +43,12 @@ void Grav3D::Initialize( Real Lx, Real Ly, Real Lz, int nx, int ny, int nz, int 
   dt_prev = 0;
   dt_now = 0;
 
+  Gconst = 1;
+
   // Allocate memory
   AllocateMemory_CPU();
-  // AllocateMemory_GPU();
-  //
-  Initialize_values_CPU();
-  // Initialize_values_GPU();
 
+  Initialize_values_CPU();
 
   chprintf( "\nGravity Initialized: \n Lbox: %0.2f %0.2f %0.2f \n Local: %d %d %d \n Global: %d %d %d \n",
       Lbox_x, Lbox_y, Lbox_z, nx_local, ny_local, nz_local,   nx_total, ny_total, nz_total );
@@ -68,7 +66,7 @@ void Grav3D::AllocateMemory_CPU(void)
   F.potential_h  = (Real *) malloc(n_cells_potential*sizeof(Real));
   F.potential_1_h  = (Real *) malloc(n_cells_potential*sizeof(Real));
 }
-//
+
 void Grav3D::Initialize_values_CPU(void){
 
   for (int id=0; id<n_cells; id++){
@@ -80,44 +78,7 @@ void Grav3D::Initialize_values_CPU(void){
     F.potential_1_h[id_pot] = 0;
   }
 }
-//
-// void Grav3D::Copy_Potential_To_Device(void){
-//   CopyField_Host_To_Device( F.potential_h, F.potential_d, n_cells_potential );
-// }
-//
-// void Grav3D::Extrapolate_Potential( Real dt_1, Real dt_2, bool extrapolate ){
-//
-//   Real p_old, p_current;
-//   int i, j, k, idx;
-//   for (k=0; k<nz_local+2*n_ghost_potential; k++) {
-//     for (j=0; j<ny_local+2*n_ghost_potential; j++) {
-//       for (i=0; i<nx_local+2*n_ghost_potential; i++) {
-//         // id      = i + j*nx_local + k*nx_local*ny_local;
-//         idx = (i) + (j)*(nx_local+2*n_ghost_potential) + (k)*(nx_local+2*nGhost_potential)*(ny_local+2*nGhost_potential);
-//         p_current = F.potential_h[idx];
-//         p_old = F.potential_1_h[idx];
-//         // potential[idx] = 0.5 * (p_1 + p_2);
-//         if (extrapolate) F.potential_h[idx] =  p_current + (p_current - p_old )/dt_1 * dt_2;
-//         else  F.potential_h[idx] =  p_current;
-//         F.potential_1_h[idx] = p_current;
-//       }
-//     }
-//   }
-//   // for (k=n_ghost_potential; k<nz_local+n_ghost_potential; k++) {
-//   //   for (j=n_ghost_potential; j<ny_local+n_ghost_potential; j++) {
-//   //     for (i=n_ghost_potential; i<nx_local+n_ghost_potential; i++) {
-//   //       // id      = i + j*nx_local + k*nx_local*ny_local;
-//   //       idx = (i) + (j)*(nx_local+2*n_ghost_potential) + (k)*(nx_local+2*nGhost_potential)*(ny_local+2*nGhost_potential);
-//   //       p_current = F.potential_h[idx];
-//   //       p_old = F.potential_1_h[idx];
-//   //       // potential[idx] = 0.5 * (p_1 + p_2);
-//   //       F.potential_h[idx] =  p_old + (p_current - p_old )/dt_1 * dt_2;
-//   //       F.potential_1_h[idx] = p_current;
-//   //     }
-//   //   }
-//   // }
-// }
-//
+
 void Grav3D::FreeMemory_CPU(void)
 {
   free(F.density_h);

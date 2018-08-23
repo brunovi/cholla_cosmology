@@ -478,6 +478,9 @@ class Grid3D
      *  \brief Spherical overdensity and overpressure causing an spherical explosion */
      void Sphere_explosion_3D();
 
+     /*! \fn void Sphere_3D()
+      *  \brief Spherical overdensity, gravitational collapse */
+     void Sphere_collapse_3D();
 
 #ifdef   MPI_CHOLLA
     void Set_Boundaries_MPI(struct parameters P);

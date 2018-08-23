@@ -35,11 +35,14 @@ class Potential_CUFFT_3D : public Poisson_Solver_3D
   struct Fields
   {
 
-    Real_cufft *input_d;
-    Real_cufft *output_d;
+    // Real_cufft *input_d;
+    // Real_cufft *output_d;
+    Real_cufft *input_real_d;
+    Complex_cufft *input_d;
+    Complex_cufft *output_d;
     Complex_cufft *transform_d;
 
-    Real *output_h;
+    Complex_cufft *output_h;
 
     // Real *k_fft_x;
     // Real *k_fft_y;

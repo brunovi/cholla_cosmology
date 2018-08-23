@@ -56,6 +56,8 @@ void Grid3D::Set_Initial_Conditions(parameters P) {
     Disk_3D(P);
   } else if (strcmp(P.init, "Sphere_explosion_3D")==0) {
     Sphere_explosion_3D();
+  } else if (strcmp(P.init, "Sphere_collapse_3D")==0) {
+    Sphere_collapse_3D();
   } else if (strcmp(P.init, "Read_Grid")==0) {
     Read_Grid(P);
   } else {
@@ -1018,6 +1020,56 @@ void Grid3D::Sphere_explosion_3D()
         Get_Position(i, j, k, &x_pos, &y_pos, &z_pos);
         density = 0.1;
         pressure = 1;
+
+        r = sqrt( (x_pos-center_x)*(x_pos-center_x) + (y_pos-center_y)*(y_pos-center_y) + (z_pos-center_z)*(z_pos-center_z) );
+        if ( r < 0.2 ){
+          density = overDensity;
+          pressure += overPressure;
+        }
+        v2 = vx*vx + vy*vy + vz*vz;
+        energy = pressure/(gama-1) + 0.5*density*v2;
+        C.density[id] = density;
+        C.momentum_x[id] = density*vx;
+        C.momentum_y[id] = density*vy;
+        C.momentum_z[id] = density*vz;
+        C.Energy[id] = energy;
+
+        #ifdef DE
+        C.GasEnergy[id] = pressure/(gama-1);
+        #endif
+      }
+    }
+  }
+}
+
+
+/*! \fn void Sphere_3D()
+ *  \brief Spherical overdensity, gravitational collapse */
+void Grid3D::Sphere_collapse_3D()
+{
+  int i, j, k, id;
+  Real x_pos, y_pos, z_pos, r, center_x, center_y, center_z;
+  Real density, pressure, overDensity, overPressure, energy;
+  Real vx, vy, vz, v2;
+  center_x = 0.5;
+  center_y = 0.5;
+  center_z = 0.5;
+  overDensity = 1;
+  overPressure = 0;
+  vx = 0;
+  vy = 0;
+  vz = 0;
+
+  // set the initial values of the conserved variables
+  for (k=H.n_ghost; k<H.nz-H.n_ghost; k++) {
+    for (j=H.n_ghost; j<H.ny-H.n_ghost; j++) {
+      for (i=H.n_ghost; i<H.nx-H.n_ghost; i++) {
+        id = i + j*H.nx + k*H.nx*H.ny;
+
+        // // get the centered cell positions at (i,j,k)
+        Get_Position(i, j, k, &x_pos, &y_pos, &z_pos);
+        density = 0.1;
+        pressure = 0.00001;
 
         r = sqrt( (x_pos-center_x)*(x_pos-center_x) + (y_pos-center_y)*(y_pos-center_y) + (z_pos-center_z)*(z_pos-center_z) );
         if ( r < 0.2 ){
