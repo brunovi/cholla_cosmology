@@ -31,17 +31,17 @@ void Potential_FFTW_3D::Initialize( Grav3D Grav){
   AllocateMemory_CPU();
 
   chprintf( "  FFTW: Creating FFT plan...\n");
-  fftw_plan_fwd = fftw_plan_dft_r2c_3d( nz_local, ny_local, nx_local, F.input, F.transform, FFTW_ESTIMATE );
-  fftw_plan_bwd = fftw_plan_dft_c2r_3d( nz_local, ny_local, nx_local, F.transform, F.output, FFTW_ESTIMATE );
+  fftw_plan_fwd = fftw_plan_dft_3d( nz_local, ny_local, nx_local, F.input, F.transform, FFTW_FORWARD, FFTW_ESTIMATE );
+  fftw_plan_bwd = fftw_plan_dft_3d( nz_local, ny_local, nx_local, F.transform, F.output, FFTW_BACKWARD, FFTW_ESTIMATE );
 
-  chprintf( "  CUFFT: Computing K for Gravity Green Funtion\n");
+  chprintf( "  FFTW: Computing K for Gravity Green Funtion\n");
   Get_K_for_Green_function();
 
 }
 
 void Potential_FFTW_3D::AllocateMemory_CPU( void ){
-  F.input = (Real_fftw *) malloc(n_cells_local*sizeof(Real_fftw));
-  F.output = (Real_fftw *) malloc(n_cells_local*sizeof(Real_fftw));
+  F.input = (Complex_fftw *) malloc(n_cells_local*sizeof(Complex_fftw));
+  F.output = (Complex_fftw *) malloc(n_cells_local*sizeof(Complex_fftw));
   F.transform = (Complex_fftw *) malloc(n_cells_local*sizeof(Complex_fftw));
   F.G = (Real *) malloc(n_cells_local*sizeof(Real));
 
@@ -60,7 +60,8 @@ void Potential_FFTW_3D::Copy_Input( Grav3D &Grav ){
     for (j=0; j<ny_local; j++) {
       for (i=0; i<nx_local; i++) {
         id = i + j*nx_local + k*nx_local*ny_local;
-        F.input[id] = Grav.F.density_h[id] ;
+        F.input[id][0] = Grav.F.density_h[id] ;
+        F.input[id][1] = 0 ;
       }
     }
   }
@@ -74,7 +75,7 @@ void Potential_FFTW_3D::Copy_Output( Grav3D &Grav ){
       for (i=0; i<nx_local; i++) {
         id = i + j*nx_local + k*nx_local*ny_local;
         id_pot = (i+N_GHOST_POTENTIAL) + (j+N_GHOST_POTENTIAL)*(nx_local+2*N_GHOST_POTENTIAL) + (k+N_GHOST_POTENTIAL)*(nx_local+2*N_GHOST_POTENTIAL)*(ny_local+2*N_GHOST_POTENTIAL);
-        Grav.F.potential_h[id_pot] = F.output[id] / n_cells_local;
+        Grav.F.potential_h[id_pot] = F.output[id][0] / n_cells_local;
       }
     }
   }
@@ -102,6 +103,31 @@ void Potential_FFTW_3D::Get_K_for_Green_function( void){
 }
 
 
+
+void Potential_FFTW_3D::Apply_K2_Funtion( void ){
+  Real kx, ky, kz, k2;
+  int id;
+  for (int k=0; k<nz_local; k++){
+    for (int j=0; j<ny_local; j++){
+      for ( int i=0; i<nx_local; i++){
+        id = i + j*nx_local + k*nx_local*ny_local;
+        kz = k;
+        ky = j;
+        kx = i;
+        if ( kz > nz_local/2) kz -= nz_local;
+        if ( ky > ny_local/2) ky -= ny_local;
+        if ( kx > nx_local/2) kx -= nx_local;
+        k2  = 4 * M_PI * M_PI * ( kx*kx + ky*ky + kz*kz );
+        if ( id == 0 ) k2 = 1;
+        F.transform[id][0] *= -1/k2;
+        F.transform[id][1] *= -1/k2;
+      }
+    }
+  }
+  F.transform[0][0] = 0;
+  F.transform[0][1] = 0;
+}
+
 void Potential_FFTW_3D::Apply_G_Funtion( void ){
   for ( int i=0; i<n_cells_local; i++ ){
     F.transform[i][0] *= F.G[i];
@@ -118,14 +144,14 @@ void Potential_FFTW_3D::Get_Potential( Grav3D &Grav ){
 
   Copy_Input( Grav );
 
-  fftw_execute_dft_r2c( fftw_plan_fwd, F.input, F.transform );
+  fftw_execute( fftw_plan_fwd);
   Apply_G_Funtion();
-  fftw_execute_dft_c2r( fftw_plan_bwd, F.transform, F.output );
+  fftw_execute( fftw_plan_bwd);
   Copy_Output( Grav );
 
   double stop = get_time();
   double milliseconds = (stop - start) * 1000.0;
-  chprintf( " CUFFT: Potential Time = %f   msecs\n", milliseconds);
+  chprintf( " FFTW: Potential Time = %f   msecs\n", milliseconds);
 }
 
 #endif //POTENTIAL_CUFFT
