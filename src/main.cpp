@@ -185,25 +185,25 @@ int main(int argc, char *argv[])
     }
     #endif
 
-    //Compute Gravitational potential for next step
-    #ifdef GRAVITY
-    Compute_Gravitational_Potential( G, p_solver );
-    #endif
-
-    // set boundary conditions for next time step
-    #ifdef CPU_TIME
-    start_bound = get_time();
-    #endif //CPU_TIME
-    G.Set_Boundary_Conditions(P);
-    #ifdef CPU_TIME
-    stop_bound = get_time();
-    bound = stop_bound - start_bound;
-    #ifdef MPI_CHOLLA
-    bound_min = ReduceRealMin(bound);
-    bound_max = ReduceRealMax(bound);
-    bound_avg = ReduceRealAvg(bound);
-    #endif //MPI_CHOLLA
-    #endif //CPU_TIME
+    // //Compute Gravitational potential for next step
+    // #ifdef GRAVITY
+    // Compute_Gravitational_Potential( G, p_solver );
+    // #endif
+    //
+    // // set boundary conditions for next time step
+    // #ifdef CPU_TIME
+    // start_bound = get_time();
+    // #endif //CPU_TIME
+    // G.Set_Boundary_Conditions(P);
+    // #ifdef CPU_TIME
+    // stop_bound = get_time();
+    // bound = stop_bound - start_bound;
+    // #ifdef MPI_CHOLLA
+    // bound_min = ReduceRealMin(bound);
+    // bound_max = ReduceRealMax(bound);
+    // bound_avg = ReduceRealAvg(bound);
+    // #endif //MPI_CHOLLA
+    // #endif //CPU_TIME
 
 
 
@@ -230,25 +230,25 @@ int main(int argc, char *argv[])
     // add one to the timestep count
     G.H.n_step++;
 
-    // //Compute Gravitational potential for next step
-    // #ifdef GRAVITY
-    // Compute_Gravitational_Potential( G, p_solver );
-    // #endif
-    //
-    // // set boundary conditions for next time step
-    // #ifdef CPU_TIME
-    // start_bound = get_time();
-    // #endif //CPU_TIME
-    // G.Set_Boundary_Conditions(P);
-    // #ifdef CPU_TIME
-    // stop_bound = get_time();
-    // bound = stop_bound - start_bound;
-    // #ifdef MPI_CHOLLA
-    // bound_min = ReduceRealMin(bound);
-    // bound_max = ReduceRealMax(bound);
-    // bound_avg = ReduceRealAvg(bound);
-    // #endif //MPI_CHOLLA
-    // #endif //CPU_TIME
+    //Compute Gravitational potential for next step
+    #ifdef GRAVITY
+    Compute_Gravitational_Potential( G, p_solver );
+    #endif
+
+    // set boundary conditions for next time step
+    #ifdef CPU_TIME
+    start_bound = get_time();
+    #endif //CPU_TIME
+    G.Set_Boundary_Conditions(P);
+    #ifdef CPU_TIME
+    stop_bound = get_time();
+    bound = stop_bound - start_bound;
+    #ifdef MPI_CHOLLA
+    bound_min = ReduceRealMin(bound);
+    bound_max = ReduceRealMax(bound);
+    bound_avg = ReduceRealAvg(bound);
+    #endif //MPI_CHOLLA
+    #endif //CPU_TIME
 
     #ifdef CPU_TIME
     #ifdef MPI_CHOLLA

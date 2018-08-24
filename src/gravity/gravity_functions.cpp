@@ -23,7 +23,7 @@ void Copy_Hydro_Density_to_Gravity( Grid3D &G ){
 void Compute_Gravitational_Potential( Grid3D &G, Potential_CUFFT_3D &p_solver){
   Copy_Hydro_Density_to_Gravity( G );
   p_solver.Get_Potential( G.Grav );
-  Extrapolate_Grav_Potential( G.Grav );
+  // Extrapolate_Grav_Potential( G.Grav );
   Copy_Potential_To_Hydro_Grid( G );
 }
 #endif
