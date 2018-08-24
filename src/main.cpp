@@ -307,6 +307,10 @@ int main(int argc, char *argv[])
   p_solver.Reset();
   #endif
 
+  #ifdef Particles_3D
+  G.Particles.Reset();
+  #endif
+
   #ifdef MPI_CHOLLA
   MPI_Finalize();
   #endif /*MPI_CHOLLA*/

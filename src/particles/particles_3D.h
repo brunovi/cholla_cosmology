@@ -64,9 +64,10 @@ class Particles_3D
     Real domainMin_y, domainMax_y;
     Real domainMin_z, domainMax_z;
 
-    /*! \var density
-     *  \brief Array containing the density of each cell in the grid */
-    Real *density_h;
+    int n_ghost_particles_grid;
+    int n_cells;
+
+    Real *density;
     Real *gravity_x;
     Real *gravity_y;
     Real *gravity_z;
@@ -78,6 +79,13 @@ class Particles_3D
 
   void Initialize( Grav3D &Grav, Real xblocal, Real yblocal, Real zblocal, Real xbound, Real ybound, Real zbound, Real xdglobal, Real ydglobal, Real zdglobal );
 
+  void AllocateMemory_CPU( void );
+  void FreeMemory_CPU( void );
+
+  void Initialize_values_CPU( void );
+  void Initialize_Sphere( void );
+
+  void Reset( void );
 
 
 };
