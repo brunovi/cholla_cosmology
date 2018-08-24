@@ -23,6 +23,10 @@
 #include "gravity/potential_FFTW_3D.h"
 #endif
 
+#ifdef PARTICLES
+#include "particles/particles_3D.h"
+#endif
+
 #endif
 
 #define OUTPUT
@@ -105,9 +109,17 @@ int main(int argc, char *argv[])
   #endif
 
   p_solver.Initialize( G.Grav );
-  Compute_Gravitational_Potential( G, p_solver );
   #endif
 
+  #ifdef PARTICLES
+  Particles_3D Particles;
+  Particles.Initialize( G );
+  #endif
+
+
+  #ifdef GRAVITY
+  Compute_Gravitational_Potential( G, p_solver );
+  #endif
 
 
 
