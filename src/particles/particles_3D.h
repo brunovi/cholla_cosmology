@@ -8,8 +8,8 @@
 #include <math.h>
 #include <cstdlib>
 #include"../global.h"
-#include "../grid3D.h"
-#include "../io.h"
+#include "../gravity/grav3D.h"
+
 
 
 
@@ -76,7 +76,7 @@ class Particles_3D
 
   Particles_3D(void);
 
-  void Initialize( Grid3D &Grid_hydro );
+  void Initialize( Grav3D &Grav );
 
 
 

@@ -493,6 +493,16 @@ Real Grid3D::Update_Grid(void)
   #ifdef SCALAR
   C.scalar = &g1[5*H.n_cells];
   #endif
+
+  #ifdef GRAVITY
+  #ifndef DE
+  C.Grav_potential = &g1[(H.n_fields-1)*H.n_cells];
+  #endif
+  #ifdef DE
+  C.Grav_potential = &g1[(H.n_fields-2)*H.n_cells];
+  #endif
+  #endif
+
   #ifdef DE
   C.GasEnergy = &g1[(H.n_fields-1)*H.n_cells];
   #endif

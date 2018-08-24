@@ -19,6 +19,10 @@
 #include"gravity/grav3D.h"
 #endif
 
+#ifdef PARTICLES
+#include "particles/particles_3D.h"
+#endif
+
 struct Rotation
 {
   /*! \var nx
