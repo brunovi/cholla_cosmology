@@ -241,6 +241,10 @@ class Grid3D
     Grav3D Grav;
     #endif
 
+    #ifdef PARTICLES
+    Particles_3D Particles;
+    #endif
+
     struct Conserved
     {
       /*! \var density

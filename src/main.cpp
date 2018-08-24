@@ -107,10 +107,9 @@ int main(int argc, char *argv[])
   p_solver.Initialize( G.Grav );
   #endif
 
-  // #ifdef PARTICLES
-  // Particles_3D Particles;
-  // Particles.Initialize( G );
-  // #endif
+  #ifdef PARTICLES
+  G.Particles.Initialize( G.Grav, G.H.xblocal, G.H.yblocal, G.H.zblocal, G.H.xbound, G.H.ybound, G.H.zbound, G.H.xdglobal, G.H.ydglobal, G.H.zdglobal );
+  #endif
 
 
   #ifdef GRAVITY

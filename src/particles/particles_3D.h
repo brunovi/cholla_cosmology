@@ -76,7 +76,7 @@ class Particles_3D
 
   Particles_3D(void);
 
-  void Initialize( Grav3D &Grav );
+  void Initialize( Grav3D &Grav, Real xblocal, Real yblocal, Real zblocal, Real xbound, Real ybound, Real zbound, Real xdglobal, Real ydglobal, Real zdglobal );
 
 
 
