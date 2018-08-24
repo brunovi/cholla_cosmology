@@ -185,10 +185,10 @@ int main(int argc, char *argv[])
     }
     #endif
 
-    // //Compute Gravitational potential for next step
-    // #ifdef GRAVITY
-    // Compute_Gravitational_Potential( G, p_solver );
-    // #endif
+    //Compute Gravitational potential for next step
+    #ifdef GRAVITY
+    Compute_Gravitational_Potential( G, p_solver );
+    #endif
     //
     // // set boundary conditions for next time step
     // #ifdef CPU_TIME
@@ -230,10 +230,10 @@ int main(int argc, char *argv[])
     // add one to the timestep count
     G.H.n_step++;
 
-    //Compute Gravitational potential for next step
-    #ifdef GRAVITY
-    Compute_Gravitational_Potential( G, p_solver );
-    #endif
+    // //Compute Gravitational potential for next step
+    // #ifdef GRAVITY
+    // Compute_Gravitational_Potential( G, p_solver );
+    // #endif
 
     // set boundary conditions for next time step
     #ifdef CPU_TIME

@@ -1068,8 +1068,8 @@ void Grid3D::Sphere_collapse_3D()
 
         // // get the centered cell positions at (i,j,k)
         Get_Position(i, j, k, &x_pos, &y_pos, &z_pos);
-        density = 0.1;
-        pressure = 0.00001;
+        density = 0.0001;
+        pressure = 0.000005;
 
         r = sqrt( (x_pos-center_x)*(x_pos-center_x) + (y_pos-center_y)*(y_pos-center_y) + (z_pos-center_z)*(z_pos-center_z) );
         if ( r < 0.2 ){

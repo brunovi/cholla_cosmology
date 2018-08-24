@@ -16,6 +16,10 @@
 #include "potential_FFTW_3D.h"
 #endif
 
+#ifdef PARTICLES
+#include "../particles/density_CIC.h"
+#endif
+
 void Copy_Hydro_Density_to_Gravity( Grid3D &G );
 
 #ifdef POTENTIAL_CUFFT

@@ -22,8 +22,13 @@ void Copy_Hydro_Density_to_Gravity( Grid3D &G ){
 #ifdef POTENTIAL_CUFFT
 void Compute_Gravitational_Potential( Grid3D &G, Potential_CUFFT_3D &p_solver){
   Copy_Hydro_Density_to_Gravity( G );
+
+  #ifdef PARTICLES
+  Get_Particles_Density_CIC( G.Particles );
+  #endif
+
   p_solver.Get_Potential( G.Grav );
-  // Extrapolate_Grav_Potential( G.Grav );
+  Extrapolate_Grav_Potential( G.Grav );
   Copy_Potential_To_Hydro_Grid( G );
 }
 #endif
@@ -32,6 +37,11 @@ void Compute_Gravitational_Potential( Grid3D &G, Potential_CUFFT_3D &p_solver){
 #ifdef POTENTIAL_FFTW
 void Compute_Gravitational_Potential( Grid3D &G, Potential_FFTW_3D &p_solver){
   Copy_Hydro_Density_to_Gravity( G );
+
+  #ifdef PARTICLES
+  Get_Particles_Density_CIC( G.Particles );
+  #endif
+
   p_solver.Get_Potential( G.Grav );
   Extrapolate_Grav_Potential( G.Grav );
   Copy_Potential_To_Hydro_Grid( G );
