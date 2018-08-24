@@ -40,7 +40,7 @@ void Potential_CUFFT_3D::Initialize( Grav3D Grav){
   Get_K_for_Green_function();
   threads_per_block = 1024;
   blocks_per_grid = (( n_cells_local - 1 ) / threads_per_block) + 1;
-  chprintf( "   CUFFT: Using %d threads and %d blocks for applying G funtion: %d \n", threads_per_block, blocks_per_grid, threads_per_block*blocks_per_grid);
+  chprintf( "  CUFFT: Using %d threads and %d blocks for applying G funtion: %d \n", threads_per_block, blocks_per_grid, threads_per_block*blocks_per_grid);
 
 }
 
