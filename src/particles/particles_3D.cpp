@@ -123,8 +123,46 @@ void Particles_3D::Initialize_values_CPU( void ){
     G.gravity_z[id] = 0;
   }
 
-  Initialize_Sphere();
+  // Initialize_Sphere();
+  Initialize_Uniform_Grid();
 }
+
+
+void Particles_3D::Initialize_Uniform_Grid( void ){
+  int i, j, k;
+  Real pPos_x, pPos_y, pPos_z;
+  part_int_t pID = 0;
+  Real Mparticle = G.dx*G.dy*G.dz;
+  Real offset_x, offset_y, offset_z;
+  offset_x = -0.3*G.dx;
+  offset_y = 0.2*G.dy;
+  offset_z = -0.1*G.dz;
+  for (k=0; k<G.nz_local; k++ ){
+    for (j=0; j<G.ny_local; j++ ){
+      for (i=0; i<G.nx_local; i++ ){
+        pPos_x = G.xMin + k*G.dx + 0.5*G.dx + offset_x;
+        pPos_y = G.yMin + j*G.dy + 0.5*G.dy + offset_y;
+        pPos_z = G.zMin + i*G.dz + 0.5*G.dz + offset_z;
+        partIDs.push_back( pID );
+        mass.push_back( Mparticle );
+        pos_x.push_back( pPos_x );
+        pos_y.push_back( pPos_y );
+        pos_z.push_back( pPos_z);
+        vel_x.push_back( 0.0 );
+        vel_y.push_back( 0.0 );
+        vel_z.push_back( 0.0 );
+        grav_x.push_back( 0.0 );
+        grav_y.push_back( 0.0 );
+        grav_z.push_back( 0.0 );
+        pID += 1;
+      }
+    }
+  }
+  n_local = mass.size();
+  chprintf( " Particles Uniform Grid Initialized, n_local: %lu\n", n_local);
+}
+
+
 
 void Particles_3D::Initialize_Sphere( void ){
   int i, j, k, id;
@@ -134,11 +172,12 @@ void Particles_3D::Initialize_Sphere( void ){
   center_z = 0.5;;
   sphereR = 0.2;
 
+  part_int_t n_particles_local = G.nx_local*G.ny_local*G.nz_local;
+
   Real rho_start = 1;
   Real M_sphere = 4./3 * M_PI* rho_start * sphereR*sphereR*sphereR;
-  Real Mparticle = M_sphere / n_local;
+  Real Mparticle = M_sphere / n_particles_local;
 
-  part_int_t n_particles_local = G.nx_local*G.ny_local*G.nz_local;
   part_int_t pID = 0;
   Real pPos_x, pPos_y, pPos_z, r;
   while ( pID < n_particles_local ){

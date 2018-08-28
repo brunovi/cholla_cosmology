@@ -84,6 +84,7 @@ class Particles_3D
 
   void Initialize_values_CPU( void );
   void Initialize_Sphere( void );
+  void Initialize_Uniform_Grid( void );
 
   void Reset( void );
 

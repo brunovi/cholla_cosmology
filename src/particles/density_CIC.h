@@ -9,6 +9,7 @@
 #include"../global.h"
 #include"particles_3D.h"
 #include <iostream>
+#include"density_boundaries.h"
 
 
 void Clear_Density( Particles_3D &Parts );

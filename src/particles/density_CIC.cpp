@@ -104,6 +104,8 @@ void Get_Particles_Density_CIC( Particles_3D &Parts ){
   Clear_Density( Parts );
   Get_Density_CIC( Parts );
 
+  Tranfer_Particles_Density_Boundaries( Parts );
+
 }
 
 #endif

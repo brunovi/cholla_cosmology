@@ -14,6 +14,10 @@
 #endif
 #include"error_handling.h"
 
+#ifdef PARTICLES
+#include "particles/io_particles.h"
+#endif
+
 /* function used to rotate points about an axis in 3D for the rotated projection output routine */
 void rotate_point(Real x, Real y, Real z, Real delta, Real phi, Real theta, Real *xp, Real *yp, Real *zp);
 
@@ -31,6 +35,10 @@ void WriteData(Grid3D G, struct parameters P, int nfile)
   #ifdef SLICES
   OutputSlices(G,P,nfile);
   #endif /*SLICES*/
+
+  #ifdef PARTICLES
+  WriteData_Particles( G, P, nfile );
+  #endif
 }
 
 
