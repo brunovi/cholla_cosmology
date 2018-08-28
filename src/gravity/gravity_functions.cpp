@@ -12,7 +12,7 @@ void Copy_Hydro_Density_to_Gravity( Grid3D &G ){
       for (i=0; i<G.Grav.nx_local; i++) {
         id = (i+G.H.n_ghost) + (j+G.H.n_ghost)*G.H.nx + (k+G.H.n_ghost)*G.H.nx*G.H.ny;
         id_grav = (i) + (j)*G.Grav.nx_local + (k)*G.Grav.nx_local*G.Grav.ny_local;
-        G.Grav.F.density_h[id_grav] =  G.C.density[id] ;
+        G.Grav.F.density_h[id_grav] = 4 * M_PI * G.C.density[id] ;
       }
     }
   }
