@@ -123,8 +123,8 @@ void Particles_3D::Initialize_values_CPU( void ){
     G.gravity_z[id] = 0;
   }
 
-  // Initialize_Sphere();
-  Initialize_Uniform_Grid();
+  Initialize_Sphere();
+  // Initialize_Uniform_Grid();
 }
 
 

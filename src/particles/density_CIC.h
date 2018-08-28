@@ -16,5 +16,7 @@ void Clear_Density( Particles_3D &Parts );
 
 void Get_Particles_Density_CIC( Particles_3D &Parts );
 
+void Copy_Particles_Density_to_Gravity( Grid3D &G );
+
 #endif
 #endif

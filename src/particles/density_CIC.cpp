@@ -96,6 +96,24 @@ void Get_Density_CIC( Particles_3D &Parts ){
   }
 }
 
+void Copy_Particles_Density_to_Gravity( Grid3D &G ){
+  int nx, ny, nz, nGHST;
+  nx = G.Particles.G.nx_local;
+  ny = G.Particles.G.ny_local;
+  nz = G.Particles.G.nz_local;
+  nGHST = G.Particles.G.n_ghost_particles_grid;
+  int i, j, k, id_CIC, id_grid;
+  for ( k=0; k<nz; k++ ){
+    for ( j=0; j<ny; j++ ){
+      for ( i=0; i<nx; i++ ){
+      id_CIC = (i+nGHST) + (j+nGHST)*(nx+2*nGHST) + (k+nGHST)*(nx+2*nGHST)*(ny+2*nGHST);
+      id_grid = i + j*nx + k*nx*ny;
+      G.Grav.G.density_h[id_grid] += G.Particles.G.density[id_CIC];
+      }
+    }
+  }
+}
+
 
 void Get_Particles_Density_CIC( Particles_3D &Parts ){
 
@@ -105,6 +123,7 @@ void Get_Particles_Density_CIC( Particles_3D &Parts ){
   Get_Density_CIC( Parts );
 
   Tranfer_Particles_Density_Boundaries( Parts );
+
 
 }
 
