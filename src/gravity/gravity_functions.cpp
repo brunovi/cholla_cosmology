@@ -41,6 +41,7 @@ void Compute_Gravitational_Potential( Grid3D &G, Potential_FFTW_3D &p_solver){
 
   #ifdef PARTICLES
   Get_Particles_Density_CIC( G.Particles );
+  Copy_Particles_Density_to_Gravity( G );
   #endif
 
   p_solver.Get_Potential( G.Grav );

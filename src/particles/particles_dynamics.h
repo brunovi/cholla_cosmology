@@ -13,7 +13,7 @@
 #include"gravity_CIC.h"
 
 
-void Advance_Particles( Grid3D &G );
+float Advance_Particles( Grid3D &G );
 
 
 

@@ -157,6 +157,10 @@ int main(int argc, char *argv[])
   #endif //MPI_CHOLLA
   #endif //CPU_TIME
 
+  #ifdef PARTICLES
+  float time_advance_particles;
+  #endif
+
   // Evolve the grid, one timestep at a time
   chprintf("Starting calculations.\n");
   while (G.H.t < P.tout)
@@ -209,9 +213,10 @@ int main(int argc, char *argv[])
     #endif //MPI_CHOLLA
     #endif //CPU_TIME
 
+    #ifdef PARTICLES
     //Advance the particles by one timesteps
-    Advance_Particles( G );
-
+    time_advance_particles = Advance_Particles( G );
+    #endif
 
     // Advance the grid by one timestep
     #ifdef CPU_TIME

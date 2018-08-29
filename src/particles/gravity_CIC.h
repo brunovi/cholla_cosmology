@@ -15,7 +15,7 @@
 
 void Get_Gavity_Field( Grid3D &G );
 
-void Get_Gravity_CIC( Grid3D &G );
+void Get_Gravity_CIC( Particles_3D &Particles );
 
 
 #endif

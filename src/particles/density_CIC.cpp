@@ -117,7 +117,7 @@ void Copy_Particles_Density_to_Gravity( Grid3D &G ){
 
 void Get_Particles_Density_CIC( Particles_3D &Parts ){
 
-  chprintf(" Computing Particles Density: CIC\n");
+  // chprintf(" Computing Particles Density: CIC\n");
 
   Clear_Density( Parts );
   Get_Density_CIC( Parts );
