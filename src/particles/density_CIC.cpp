@@ -108,7 +108,7 @@ void Copy_Particles_Density_to_Gravity( Grid3D &G ){
       for ( i=0; i<nx; i++ ){
       id_CIC = (i+nGHST) + (j+nGHST)*(nx+2*nGHST) + (k+nGHST)*(nx+2*nGHST)*(ny+2*nGHST);
       id_grid = i + j*nx + k*nx*ny;
-      G.Grav.G.density_h[id_grid] += 4 * M_PI * G.Particles.G.density[id_CIC];
+      G.Grav.F.density_h[id_grid] += 4 * M_PI * G.Particles.G.density[id_CIC];
       }
     }
   }
