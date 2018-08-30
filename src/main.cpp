@@ -127,6 +127,10 @@ int main(int argc, char *argv[])
   G.Set_Boundary_Conditions(P);
   chprintf("Boundary conditions set.\n");
 
+  #ifdef PARTICLES
+  Get_Particles_Acceleration( G );
+  #endif
+
   chprintf("Dimensions of each cell: dx = %f dy = %f dz = %f\n", G.H.dx, G.H.dy, G.H.dz);
   chprintf("Ratio of specific heats gamma = %f\n",gama);
   chprintf("Nstep = %d  Timestep = %f  Simulation time = %f\n", G.H.n_step, G.H.dt, G.H.t);
@@ -158,7 +162,8 @@ int main(int argc, char *argv[])
   #endif //CPU_TIME
 
   #ifdef PARTICLES
-  float time_advance_particles;
+  Real time_advance_particles;
+  Real dt_particles, dt_min;
   #endif
 
   // Evolve the grid, one timestep at a time
@@ -182,6 +187,14 @@ int main(int argc, char *argv[])
     G.H.dt = ReduceRealMin(G.H.dt);
     #endif
 
+    #ifdef PARTICLES
+    dt_particles = Get_Particles_dt( G.Particles );
+    dt_min = std::min( G.H.dt, dt_particles );
+    G.H.dt = dt_min;
+    G.Particles.dt = dt_min;
+    // G.Particles.dt = 0;
+    #endif
+
     #ifdef GRAVITY
     if ( G.Grav.INITIAL ){
       G.Grav.dt_prev = G.H.dt;
@@ -193,36 +206,15 @@ int main(int argc, char *argv[])
     }
     #endif
 
+    #ifdef PARTICLES
+    //Advance the particles ( first step )
+    time_advance_particles = Update_Particles( G, 1 );
+    #endif
 
     // Extrapolate gravitational potential for hydro step
     #ifdef GRAVITY
     Extrapolate_Grav_Potential( G );
     #endif
-
-    // //Compute Gravitational potential for next step
-    // #ifdef GRAVITY
-    // Compute_Gravitational_Potential( G, p_solver );
-    // #endif
-    // //
-    // // set boundary conditions for next time step
-    // #ifdef CPU_TIME
-    // start_bound = get_time();
-    // #endif //CPU_TIME
-    // G.Set_Boundary_Conditions(P);
-    // #ifdef CPU_TIME
-    // stop_bound = get_time();
-    // bound = stop_bound - start_bound;
-    // #ifdef MPI_CHOLLA
-    // bound_min = ReduceRealMin(bound);
-    // bound_max = ReduceRealMax(bound);
-    // bound_avg = ReduceRealAvg(bound);
-    // #endif //MPI_CHOLLA
-    // #endif //CPU_TIME
-
-    // #ifdef PARTICLES
-    // //Advance the particles by one timesteps
-    // time_advance_particles = Update_Particles( G );
-    // #endif
 
     // Advance the grid by one timestep
     #ifdef CPU_TIME
@@ -266,6 +258,11 @@ int main(int argc, char *argv[])
     bound_avg = ReduceRealAvg(bound);
     #endif //MPI_CHOLLA
     #endif //CPU_TIME
+
+    #ifdef PARTICLES
+    //Advance the particles ( second step )
+    time_advance_particles = Update_Particles( G, 2 );
+    #endif
 
     #ifdef CPU_TIME
     #ifdef MPI_CHOLLA
@@ -323,7 +320,7 @@ int main(int argc, char *argv[])
   #ifdef GRAVITY
   p_solver.Reset();
   #endif
-
+  
   #ifdef Particles_3D
   G.Particles.Reset();
   #endif

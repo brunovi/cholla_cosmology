@@ -49,6 +49,8 @@ class Particles_3D
   real_vector_t grav_y;
   real_vector_t grav_z;
 
+  bool INITIAL;
+
 
   struct Grid
   {

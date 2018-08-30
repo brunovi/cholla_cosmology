@@ -13,6 +13,7 @@ void Copy_Hydro_Density_to_Gravity( Grid3D &G ){
         id = (i+G.H.n_ghost) + (j+G.H.n_ghost)*G.H.nx + (k+G.H.n_ghost)*G.H.nx*G.H.ny;
         id_grav = (i) + (j)*G.Grav.nx_local + (k)*G.Grav.nx_local*G.Grav.ny_local;
         G.Grav.F.density_h[id_grav] = 4 * M_PI * G.C.density[id] ;
+        // G.Grav.F.density_h[id_grav] = 0 ;
       }
     }
   }
@@ -124,6 +125,27 @@ void Copy_Potential_To_Hydro_Grid( Grid3D &G ){
   }
 }
 
+void Copy_Potential_From_Hydro_Grid( Grid3D &G ){
+  int n_ghost_pot = N_GHOST_POTENTIAL;
+  int nx_pot = G.Grav.nx_local + 2*n_ghost_pot;
+  int ny_pot = G.Grav.ny_local + 2*n_ghost_pot;
+  int nz_pot = G.Grav.nz_local + 2*n_ghost_pot;
+  int n_ghost_grid = G.H.n_ghost;
+  int nx_grid = G.Grav.nx_local + 2*n_ghost_grid;
+  int ny_grid = G.Grav.ny_local + 2*n_ghost_grid;
+  int nz_grid = G.Grav.nz_local + 2*n_ghost_grid;
+  int nGHST = n_ghost_grid - n_ghost_pot;
+  int k, j, i, id_pot, id_grid;
+  for ( k=0; k<nz_pot; k++ ){
+    for ( j=0; j<ny_pot; j++ ){
+      for ( i=0; i<nx_pot; i++ ){
+        id_pot = i + j*nx_pot + k*nx_pot*ny_pot;
+        id_grid = (i+nGHST) + (j+nGHST)*nx_grid + (k+nGHST)*nx_grid*ny_grid;
+        G.Grav.F.potential_h[id_pot] = G.C.Grav_potential[id_grid];
+      }
+    }
+  }
+}
 
 
 #endif

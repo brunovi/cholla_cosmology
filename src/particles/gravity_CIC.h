@@ -13,7 +13,7 @@
 #include"density_CIC.h"
 
 
-void Get_Gavity_Field( Grid3D &G );
+void Get_Gravity_Field( Grid3D &G );
 
 void Get_Gravity_CIC( Particles_3D &Particles );
 

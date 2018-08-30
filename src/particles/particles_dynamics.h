@@ -12,8 +12,19 @@
 #include <iostream>
 #include"gravity_CIC.h"
 
+// void Advance_Particles_LeapFrog( Particles_3D &Particles);
 
-float Advance_Particles( Grid3D &G );
+void Get_Particles_Acceleration( Grid3D &G );
+
+void Advance_Particles_step1( Particles_3D &Particles );
+
+void Advance_Particles_step2( Particles_3D &Particles );
+
+float Get_Particles_dt( Particles_3D &Particles );
+
+float Update_Particles( Grid3D &G, int step );
+
+
 
 
 

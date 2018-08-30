@@ -60,6 +60,8 @@ void Particles_3D::Initialize( Grav3D &Grav, Real xblocal, Real yblocal, Real zb
   G.n_ghost_particles_grid = 1;
   G.n_cells = (G.nx_local+2*G.n_ghost_particles_grid) * (G.ny_local+2*G.n_ghost_particles_grid) * (G.nz_local+2*G.n_ghost_particles_grid);
 
+  INITIAL = true;
+
   AllocateMemory_CPU();
 
   Initialize_values_CPU();
@@ -68,6 +70,12 @@ void Particles_3D::Initialize( Grav3D &Grav, Real xblocal, Real yblocal, Real zb
   chprintf(" xDomain_local:  [%.4f %.4f ] [%.4f %.4f ] [%.4f %.4f ]\n", G.xMin, G.xMax, G.yMin, G.yMax, G.zMin, G.zMax );
   chprintf(" xDomain_global: [%.4f %.4f ] [%.4f %.4f ] [%.4f %.4f ]\n", G.domainMin_x, G.domainMax_x, G.domainMin_y, G.domainMax_y, G.domainMin_z, G.domainMax_z);
   chprintf(" dx: %f  %f  %f\n", G.dx, G.dy, G.dz );
+
+
+  #ifdef PARTICLES_OMP
+  chprintf(" Using OMP for particles calculations\n");
+  #endif
+
 }
 
 void Particles_3D::AllocateMemory_CPU( void ){
