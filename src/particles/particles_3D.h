@@ -10,6 +10,10 @@
 #include"../global.h"
 #include "../gravity/grav3D.h"
 
+#ifdef PARTICLES_OMP
+#include "particles_omp.h"
+#endif
+
 
 
 
