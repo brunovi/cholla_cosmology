@@ -234,7 +234,11 @@ int main(int argc, char *argv[])
     #ifdef CPU_TIME
     start_hydro = get_time();
     #endif //CPU_TIME
+    #ifndef ONLY_PM
     dti = G.Update_Grid();
+    #else
+    dti = 1e-10;
+    #endif
     #ifdef CPU_TIME
     stop_hydro = get_time();
     hydro = stop_hydro - start_hydro;
