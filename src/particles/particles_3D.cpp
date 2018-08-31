@@ -77,8 +77,8 @@ void Particles_3D::Initialize( Grav3D &Grav, Real xblocal, Real yblocal, Real zb
   int n_omp_max = omp_get_max_threads();
   chprintf("  MAX OMP Threads: %d\n", n_omp_max);
   chprintf("  N OMP Threads: %d\n", N_OMP_PARTICLE_THREADS);
-  omp_set_num_threads(8);
-  #pragma omp parallel num_threads( 8 )
+  // omp_set_num_threads(8);
+  #pragma omp parallel num_threads( N_OMP_PARTICLE_THREADS )
   {
     int omp_id, n_omp_procs;
     part_int_t omp_pIndx_start, omp_pIndx_end;
@@ -87,12 +87,10 @@ void Particles_3D::Initialize( Grav3D &Grav, Real xblocal, Real yblocal, Real zb
     omp_id = omp_get_thread_num();
     n_omp_procs = omp_get_num_threads();
     #pragma omp barrier
-    // get_omp_indxs( &omp_pIndx_start, &omp_pIndx_end, &omp_gridIndx_start, &omp_gridIndx_end, Particles.n_local, n_omp_proc, omp_id, G.Grav.nz_local + 2*Particles.G.grid_ghost );
+    Get_OMP_Indxs( n_local, n_omp_procs, omp_id, G.nz_local + 2*G.n_ghost_particles_grid, &omp_pIndx_start, &omp_pIndx_end, &omp_gridIndx_start, &omp_gridIndx_end );
 
-    omp_pIndx_start = 0;
-    omp_pIndx_end = 0;
     for (int omp_indx = 0; omp_indx<n_omp_procs; omp_indx++){
-      if (omp_id == omp_indx) chprintf( "omp_id:%d  p_start:%ld  p_end:%ld\n", omp_id, n_omp_procs, omp_pIndx_end );
+      if (omp_id == omp_indx) chprintf( "omp_id:%d  p_start:%ld  p_end:%ld  g_start:%d  g_end:%d\n", omp_id, omp_pIndx_start, omp_pIndx_end, omp_gridIndx_start, omp_gridIndx_end );
     }
   }
   #endif
