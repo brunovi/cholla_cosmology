@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
   chprintf("Boundary conditions set.\n");
 
   #ifdef PARTICLES
-  Get_Particles_Acceleration( G );
+  Get_Particles_Acceleration( G, 0, G.Particles.n_local, 0, G.Particles.G.nz_local + 2*G.Particles.G.n_ghost_particles_grid );
   #endif
 
   chprintf("Dimensions of each cell: dx = %f dy = %f dz = %f\n", G.H.dx, G.H.dy, G.H.dz);
@@ -284,6 +284,7 @@ int main(int argc, char *argv[])
     #ifdef CPU_TIME
     chprintf( " Time Particles Density: %f\n", time_particles_density );
     chprintf( " Time Advance Particles: %f\n", time_advance_particles );
+    chprintf( " N Local Particles: %ld\n", G.Particles.n_local );
     #endif
     #endif
 

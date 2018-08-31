@@ -12,13 +12,17 @@
 #include <iostream>
 #include"gravity_CIC.h"
 
+#ifdef PARTICLES_OMP
+#include "particles_omp.h"
+#endif
+
 // void Advance_Particles_LeapFrog( Particles_3D &Particles);
 
-void Get_Particles_Acceleration( Grid3D &G );
+void Get_Particles_Acceleration( Grid3D &G, part_int_t p_start, part_int_t p_end, int g_start, int g_end );
 
-void Advance_Particles_step1( Particles_3D &Particles );
+void Advance_Particles_step1( Particles_3D &Particles, part_int_t p_start, part_int_t p_end );
 
-void Advance_Particles_step2( Particles_3D &Particles );
+void Advance_Particles_step2( Particles_3D &Particles, part_int_t p_start, part_int_t p_end );
 
 Real Get_Particles_dt( Particles_3D &Particles );
 

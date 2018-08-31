@@ -4,7 +4,7 @@
 #include"../io.h"
 
 
-void Get_Gravity_Field( Grid3D &G ){
+void Get_Gravity_Field( Grid3D &G, int g_start, int g_end ){
   // int nGHST_pot = N_GHOST_POTENTIAL;
   int nx_grav, ny_grav, nz_grav, nGHST_grav;
   nGHST_grav = G.Particles.G.n_ghost_particles_grid;
@@ -28,7 +28,7 @@ void Get_Gravity_Field( Grid3D &G ){
 
   Real phi_l, phi_r;
   int k, j, i, id_l, id_r, id;
-  for ( k=0; k<nz_grav; k++ ){
+  for ( k=g_start; k<g_end; k++ ){
     for ( j=0; j<ny_grav; j++ ){
       for ( i=0; i<nx_grav; i++ ){
         id   = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
@@ -41,7 +41,7 @@ void Get_Gravity_Field( Grid3D &G ){
     }
   }
 
-  for ( k=0; k<nz_grav; k++ ){
+  for ( k=g_start; k<g_end; k++ ){
     for ( j=0; j<ny_grav; j++ ){
       for ( i=0; i<nx_grav; i++ ){
         id   = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
@@ -54,7 +54,7 @@ void Get_Gravity_Field( Grid3D &G ){
     }
   }
 
-  for ( k=0; k<nz_grav; k++ ){
+  for ( k=g_start; k<g_end; k++ ){
     for ( j=0; j<ny_grav; j++ ){
       for ( i=0; i<nx_grav; i++ ){
         id   = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
@@ -69,7 +69,7 @@ void Get_Gravity_Field( Grid3D &G ){
 
 }
 
-void Get_Gravity_CIC( Particles_3D &Particles ){
+void Get_Gravity_CIC( Particles_3D &Particles, part_int_t p_start, part_int_t p_end ){
 
   int nx_g, ny_g, nz_g, nGHST;
   nGHST = Particles.G.n_ghost_particles_grid;
@@ -95,7 +95,7 @@ void Get_Gravity_CIC( Particles_3D &Particles ){
   Real g_z_bl, g_z_br, g_z_bu, g_z_bru, g_z_tl, g_z_tr, g_z_tu, g_z_tru;
   Real g_x, g_y, g_z;
   bool ignore;
-  for ( pIndx=0; pIndx < Particles.n_local; pIndx++ ){
+  for ( pIndx=p_start; pIndx < p_end; pIndx++ ){
     ignore = false;
     // pMass = Particles.mass[pIndx] * dV_inv;
     x_pos = Particles.pos_x[pIndx];
