@@ -11,6 +11,9 @@
 #include"error_handling.h"
 #include"mpi_routines.h"
 
+#ifdef PARTICLES
+#include "particles/particles_boundaries.h"
+#endif
 
 /*! \fn void Set_Boundary_Conditions(parameters P)
  *  \brief Set the boundary conditions based on info in the parameters structure. */
@@ -39,6 +42,10 @@ void Grid3D::Set_Boundary_Conditions(parameters P) {
     Set_Boundaries(4, flags);
     Set_Boundaries(5, flags);
   }
+
+  #ifdef PARTICLES
+  Tranfer_Particles_Boundaries( Particles );
+  #endif
 
 #else  /*MPI_CHOLLA*/
 
