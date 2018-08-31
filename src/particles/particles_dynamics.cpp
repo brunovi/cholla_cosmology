@@ -45,7 +45,7 @@ void Advance_Particles_step2( Particles_3D &Particles ){
   }
 }
 
-float Get_Particles_dt( Particles_3D &Particles ){
+Real Get_Particles_dt( Particles_3D &Particles ){
   part_int_t pID;
   Real dt, dt_min, vel;
   dt_min = 1e100;
@@ -71,17 +71,22 @@ float Get_Particles_dt( Particles_3D &Particles ){
 }
 
 
-float Update_Particles( Grid3D &G, int step ){
+Real Update_Particles( Grid3D &G, int step ){
+
+  Real start, stop, milliseconds;
+  start = get_time();
 
   if ( step == 1 ){
     Advance_Particles_step1( G.Particles );
-    return 0;
   }
-  if ( step == 2 ){
+  else if ( step == 2 ){
     Get_Particles_Acceleration( G );
     Advance_Particles_step2( G.Particles );
-    return 0;
   }
+
+  stop = get_time();
+  milliseconds = (stop - start) * 1000.0;
+  return milliseconds;
 }
 
 #endif

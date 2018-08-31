@@ -65,7 +65,9 @@ Grid3D::Grid3D(void)
   H.n_ghost=4;
   #endif //PPMC
 
+  #ifdef GRAVITY
   H.n_ghost_pot_offset = H.n_ghost - N_GHOST_POTENTIAL;
+  #endif
 }
 
 /*! \fn void Get_Position(long i, long j, long k, Real *xpos, Real *ypos, Real *zpos)

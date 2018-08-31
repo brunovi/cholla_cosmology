@@ -57,7 +57,7 @@ class Potential_FFTW_3D : public Poisson_Solver_3D
   virtual void Get_K_for_Green_function( void );
   void Apply_G_Funtion( void );
   void Apply_K2_Funtion( void );
-  virtual void Get_Potential( Grav3D &Grav );
+  virtual Real Get_Potential( Grav3D &Grav );
 
 };
 

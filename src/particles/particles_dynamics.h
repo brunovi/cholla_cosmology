@@ -20,9 +20,9 @@ void Advance_Particles_step1( Particles_3D &Particles );
 
 void Advance_Particles_step2( Particles_3D &Particles );
 
-float Get_Particles_dt( Particles_3D &Particles );
+Real Get_Particles_dt( Particles_3D &Particles );
 
-float Update_Particles( Grid3D &G, int step );
+Real Update_Particles( Grid3D &G, int step );
 
 
 
