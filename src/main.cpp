@@ -146,11 +146,9 @@ int main(int argc, char *argv[])
 
 
   #ifdef OUTPUT
-  if (strcmp(P.init, "Read_Grid") != 0) {
   // write the initial conditions to file
   chprintf("Writing initial conditions to file...\n");
   WriteData(G, P, nfile);
-  }
   // add one to the output file count
   nfile++;
   #endif //OUTPUT

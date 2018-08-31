@@ -1880,9 +1880,9 @@ void Grid3D::Read_Grid(struct parameters P) {
   char timestep[20];
   int nfile = P.nfile; //output step you want to read from
 
-  // create the filename to read from
-  // assumes your data is in the outdir specified in the input file
-  strcpy(filename, P.outdir);
+
+  chprintf( "Loading Initial conditions: %s\n", P.indir);
+  strcpy(filename, P.indir);
   sprintf(timestep, "%d", nfile);
   strcat(filename,timestep);
   #if defined BINARY

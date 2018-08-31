@@ -129,6 +129,7 @@ struct parameters
   int zug_bcnd;
 #endif /*MPI_CHOLLA*/
   char custom_bcnd[MAXLEN];
+  char  indir[MAXLEN];
   char outdir[MAXLEN];
   Real rho;
   Real vx;

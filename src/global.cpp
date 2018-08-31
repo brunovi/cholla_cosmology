@@ -27,9 +27,9 @@ void Set_Gammas(Real gamma_in)
 
 
 /*! \fn double get_time(void)
- *  \brief Returns the current clock time. */ 
+ *  \brief Returns the current clock time. */
 double get_time(void)
-{ 
+{
   struct timeval timer;
   gettimeofday(&timer,NULL);
   return timer.tv_sec + 1.0e-6*timer.tv_usec;
@@ -134,7 +134,7 @@ void parse_params (char *param_file, struct parameters * parms)
 
     /* Copy into correct entry in parameters struct */
     if (strcmp(name, "nx")==0)
-      parms->nx = atoi(value); 
+      parms->nx = atoi(value);
     else if (strcmp(name, "ny")==0)
       parms->ny = atoi(value);
     else if (strcmp(name, "nz")==0)
@@ -179,6 +179,8 @@ void parse_params (char *param_file, struct parameters * parms)
       strncpy (parms->custom_bcnd, value, MAXLEN);
     else if (strcmp(name, "outdir")==0)
       strncpy (parms->outdir, value, MAXLEN);
+    else if (strcmp(name, "indir")==0)
+      strncpy (parms->indir, value, MAXLEN);
     else if (strcmp(name, "rho")==0)
       parms->rho = atof(value);
     else if (strcmp(name, "vx")==0)
