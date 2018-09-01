@@ -4,12 +4,13 @@
 #include "particles_3D.h"
 #include "../io.h"
 #include "../random_functions.h"
+#include "io_particles.h"
 
 
 Particles_3D::Particles_3D( void ){}
 
 
-void Particles_3D::Initialize( Grav3D &Grav, Real xblocal, Real yblocal, Real zblocal, Real xbound, Real ybound, Real zbound, Real xdglobal, Real ydglobal, Real zdglobal ){
+void Particles_3D::Initialize( struct parameters P, Grav3D &Grav, Real xblocal, Real yblocal, Real zblocal, Real xbound, Real ybound, Real zbound, Real xdglobal, Real ydglobal, Real zdglobal ){
 
   chprintf( "\nInitializing Particles...\n");
   n_local = 0;
@@ -65,6 +66,8 @@ void Particles_3D::Initialize( Grav3D &Grav, Real xblocal, Real yblocal, Real zb
   AllocateMemory_CPU();
 
   Initialize_values_CPU();
+
+  if (strcmp(P.init, "Read_Grid")==0)  Load_Particles_Data( *this, P );
 
   chprintf("Particles Initialized: \n n_local: %lu \n", n_local );
   chprintf(" xDomain_local:  [%.4f %.4f ] [%.4f %.4f ] [%.4f %.4f ]\n", G.xMin, G.xMax, G.yMin, G.yMax, G.zMin, G.zMax );
@@ -151,7 +154,8 @@ void Particles_3D::Initialize_values_CPU( void ){
     G.gravity_z[id] = 0;
   }
 
-  Initialize_Sphere();
+
+  // Initialize_Sphere();
   // Initialize_Uniform_Grid();
 }
 

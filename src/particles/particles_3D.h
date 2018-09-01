@@ -7,6 +7,7 @@
 #include<stdlib.h>
 #include <math.h>
 #include <cstdlib>
+#include <string.h>
 #include"../global.h"
 #include "../gravity/grav3D.h"
 
@@ -83,7 +84,7 @@ class Particles_3D
 
   Particles_3D(void);
 
-  void Initialize( Grav3D &Grav, Real xblocal, Real yblocal, Real zblocal, Real xbound, Real ybound, Real zbound, Real xdglobal, Real ydglobal, Real zdglobal );
+  void Initialize( struct parameters P, Grav3D &Grav, Real xblocal, Real yblocal, Real zblocal, Real xbound, Real ybound, Real zbound, Real xdglobal, Real ydglobal, Real zdglobal );
 
   void AllocateMemory_CPU( void );
   void FreeMemory_CPU( void );

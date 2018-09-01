@@ -204,4 +204,150 @@ void OutputData_Particles( Grid3D &G, struct parameters P, int nfile)
   status = H5Fclose(file_id);
   #endif
 }
+
+
+void Load_Particles_Data( Particles_3D &Particles, struct parameters P){
+  char filename[100];
+  char timestep[20];
+  int nfile = P.nfile; //output step you want to read from
+  char filename_counter[100];
+  // create the filename to read from
+
+  strcpy(filename, P.indir);
+  sprintf(timestep, "%d_particles", nfile);
+  strcat(filename,timestep);
+
+  #if defined BINARY
+  chprintf("\nERROR: Particles only support HDF5 outputs\n")
+  #elif defined HDF5
+  strcat(filename,".h5");
+  #endif
+
+  #ifdef MPI_CHOLLA
+  sprintf(filename,"%s.%d",filename,procID);
+  #endif
+
+  chprintf(" Loading particles file: %s \n", filename );
+
+  #ifdef HDF5
+  hid_t  file_id;
+  herr_t  status;
+
+  // open the file
+  file_id = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
+  if (file_id < 0) {
+    printf("Unable to open input file.\n");
+    exit(0);
+  }
+
+  Load_Particles_Data_HDF5(file_id, nfile, Particles );
+
+  #endif
+}
+
+#ifdef HDF5
+void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles )
+{
+  int i, j, k, id, buf_id;
+  hid_t     attribute_id, dataset_id;
+  Real      *dataset_buffer_px;
+  Real      *dataset_buffer_py;
+  Real      *dataset_buffer_pz;
+  Real      *dataset_buffer_vx;
+  Real      *dataset_buffer_vy;
+  Real      *dataset_buffer_vz;
+  Real      *dataset_buffer_m;
+  herr_t    status;
+
+  part_int_t n_local, pIndx;
+  // Real part_dt, part_t;
+
+  attribute_id = H5Aopen(file_id, "n_particles_local", H5P_DEFAULT);
+  status = H5Aread(attribute_id, H5T_NATIVE_LONG, &n_local);
+  status = H5Aclose(attribute_id);
+
+  chprintf(" Loading %ld particles\n", n_local);
+
+  dataset_buffer_px = (Real *) malloc(n_local*sizeof(Real));
+  dataset_id = H5Dopen(file_id, "/pos_x", H5P_DEFAULT);
+  status = H5Dread(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, dataset_buffer_px);
+  status = H5Dclose(dataset_id);
+
+  dataset_buffer_py = (Real *) malloc(n_local*sizeof(Real));
+  dataset_id = H5Dopen(file_id, "/pos_y", H5P_DEFAULT);
+  status = H5Dread(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, dataset_buffer_py);
+  status = H5Dclose(dataset_id);
+
+  dataset_buffer_pz = (Real *) malloc(n_local*sizeof(Real));
+  dataset_id = H5Dopen(file_id, "/pos_z", H5P_DEFAULT);
+  status = H5Dread(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, dataset_buffer_pz);
+  status = H5Dclose(dataset_id);
+
+  dataset_buffer_vx = (Real *) malloc(n_local*sizeof(Real));
+  dataset_id = H5Dopen(file_id, "/vel_x", H5P_DEFAULT);
+  status = H5Dread(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, dataset_buffer_vx);
+  status = H5Dclose(dataset_id);
+
+  dataset_buffer_vy = (Real *) malloc(n_local*sizeof(Real));
+  dataset_id = H5Dopen(file_id, "/vel_y", H5P_DEFAULT);
+  status = H5Dread(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, dataset_buffer_vy);
+  status = H5Dclose(dataset_id);
+
+  dataset_buffer_vz = (Real *) malloc(n_local*sizeof(Real));
+  dataset_id = H5Dopen(file_id, "/vel_z", H5P_DEFAULT);
+  status = H5Dread(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, dataset_buffer_vz);
+  status = H5Dclose(dataset_id);
+
+  dataset_buffer_m = (Real *) malloc(n_local*sizeof(Real));
+  dataset_id = H5Dopen(file_id, "/mass", H5P_DEFAULT);
+  status = H5Dread(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, dataset_buffer_m);
+  status = H5Dclose(dataset_id);
+
+  Real pPos_x, pPos_y, pPos_z;
+  Real pVel_x, pVel_y, pVel_z, pMass;
+  bool in_local;
+  for( pIndx=0; pIndx<n_local; pIndx++ ){
+    pPos_x = dataset_buffer_px[pIndx];
+    pPos_y = dataset_buffer_py[pIndx];
+    pPos_z = dataset_buffer_pz[pIndx];
+    pVel_x = dataset_buffer_vx[pIndx];
+    pVel_y = dataset_buffer_vy[pIndx];
+    pVel_z = dataset_buffer_vz[pIndx];
+    pMass = dataset_buffer_m[pIndx];
+    in_local = true;
+    if ( pPos_x < Particles.G.domainMin_x || pPos_x > Particles.G.domainMax_x ){
+      std::cout << " Particle outside global domain " << std::endl;
+    }
+    if ( pPos_y < Particles.G.domainMin_y || pPos_y > Particles.G.domainMax_y ){
+      std::cout << " Particle outside global domain " << std::endl;
+    }
+    if ( pPos_z < Particles.G.domainMin_z || pPos_z > Particles.G.domainMax_z ){
+      std::cout << " Particle outside global domain " << std::endl;
+    }
+    if ( pPos_x < Particles.G.xMin || pPos_x >= Particles.G.xMax ) in_local = false;
+    if ( pPos_y < Particles.G.yMin || pPos_y >= Particles.G.yMax ) in_local = false;
+    if ( pPos_z < Particles.G.zMin || pPos_z >= Particles.G.zMax ) in_local = false;
+    if ( ! in_local ) continue;
+    Particles.partIDs.push_back(pIndx);
+    Particles.mass.push_back( pMass );
+    Particles.pos_x.push_back( pPos_x );
+    Particles.pos_y.push_back( pPos_y );
+    Particles.pos_z.push_back( pPos_z );
+    Particles.vel_x.push_back( pVel_x );
+    Particles.vel_y.push_back( pVel_y );
+    Particles.vel_z.push_back( pVel_z );
+    Particles.grav_x.push_back( 0.0 );
+    Particles.grav_y.push_back( 0.0 );
+    Particles.grav_z.push_back( 0.0 );
+    Particles.n_local += 1;
+  }
+  chprintf( " Loaded  %ld  particles\n", Particles.n_local );
+}
+#endif
+
+
+
+
+
+
 #endif

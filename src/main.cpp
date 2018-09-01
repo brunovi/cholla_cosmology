@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
 
   Real time_advance_particles = 0 ;
   #ifdef PARTICLES
-  G.Particles.Initialize( G.Grav, G.H.xblocal, G.H.yblocal, G.H.zblocal, G.H.xbound, G.H.ybound, G.H.zbound, G.H.xdglobal, G.H.ydglobal, G.H.zdglobal );
+  G.Particles.Initialize( P, G.Grav, G.H.xblocal, G.H.yblocal, G.H.zblocal, G.H.xbound, G.H.ybound, G.H.zbound, G.H.xdglobal, G.H.ydglobal, G.H.zdglobal );
   #endif
 
 
