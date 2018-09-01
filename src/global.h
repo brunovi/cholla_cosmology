@@ -55,6 +55,12 @@ typedef int part_int_t
 #endif
 #endif
 
+#ifdef PARTICLES
+#include <vector>
+typedef std::vector<Real> real_vector_t;
+typedef std::vector<part_int_t> int_vector_t;
+#endif
+
 #define SIGN(a) ( ((a) < 0.) ? -1. : 1. )
 
 

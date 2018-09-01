@@ -15,16 +15,6 @@
 #include "particles_omp.h"
 #endif
 
-
-
-
-#include <vector>
-
-
-typedef std::vector<Real> real_vector_t;
-typedef std::vector<part_int_t> int_vector_t;
-
-
 /*! \class Part3D
  *  \brief Class to create a set of particles in 3D space. */
 class Particles_3D
