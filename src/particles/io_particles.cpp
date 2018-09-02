@@ -55,14 +55,14 @@ void Write_Particles_Header_HDF5(Particles_3D &Particles, hid_t file_id)
   attribute_id = H5Acreate(file_id, "n_particles_local", H5T_STD_I64BE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
   status = H5Awrite(attribute_id, H5T_NATIVE_ULONG, &Particles.n_local);
   status = H5Aclose(attribute_id);
-// #ifdef COSMOLOGY
-//   attribute_id = H5Acreate(file_id, "current_a", H5T_IEEE_F64BE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
-//   status = H5Awrite(attribute_id, H5T_NATIVE_DOUBLE, &current_a);
-//   status = H5Aclose(attribute_id);
-//   attribute_id = H5Acreate(file_id, "current_z", H5T_IEEE_F64BE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
-//   status = H5Awrite(attribute_id, H5T_NATIVE_DOUBLE, &current_z);
-//   status = H5Aclose(attribute_id);
-// #endif
+  #ifdef COSMOLOGY
+  attribute_id = H5Acreate(file_id, "current_a", H5T_IEEE_F64BE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
+  status = H5Awrite(attribute_id, H5T_NATIVE_DOUBLE, &Particles.current_a);
+  status = H5Aclose(attribute_id);
+  attribute_id = H5Acreate(file_id, "current_z", H5T_IEEE_F64BE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
+  status = H5Awrite(attribute_id, H5T_NATIVE_DOUBLE, &Particles.current_z);
+  status = H5Aclose(attribute_id);
+  #endif
   status = H5Sclose(dataspace_id);
 }
 
@@ -265,6 +265,17 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
   attribute_id = H5Aopen(file_id, "n_particles_local", H5P_DEFAULT);
   status = H5Aread(attribute_id, H5T_NATIVE_LONG, &n_local);
   status = H5Aclose(attribute_id);
+
+  #ifdef COSMOLOGY
+  attribute_id = H5Aopen(file_id, "current_z", H5P_DEFAULT);
+  status = H5Aread(attribute_id, H5T_NATIVE_DOUBLE, &Particles.current_z);
+  status = H5Aclose(attribute_id);
+
+  attribute_id = H5Aopen(file_id, "current_a", H5P_DEFAULT);
+  status = H5Aread(attribute_id, H5T_NATIVE_DOUBLE, &Particles.current_a);
+  status = H5Aclose(attribute_id);
+  #endif
+
 
   chprintf(" Loading %ld particles\n", n_local);
 

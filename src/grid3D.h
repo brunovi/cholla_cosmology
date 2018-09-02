@@ -23,6 +23,10 @@
 #include "particles/particles_3D.h"
 #endif
 
+#ifdef COSMOLOGY
+#include "cosmology/cosmology.h"
+#endif
+
 struct Rotation
 {
   /*! \var nx
@@ -244,6 +248,10 @@ class Grid3D
 
     #ifdef PARTICLES
     Particles_3D Particles;
+    #endif
+
+    #ifdef COSMOLOGY
+    Cosmology Cosmo;
     #endif
 
     struct Conserved
@@ -490,6 +498,8 @@ class Grid3D
      /*! \fn void Sphere_3D()
       *  \brief Spherical overdensity, gravitational collapse */
      void Sphere_collapse_3D();
+
+     void Uniform_Grid();
 
 #ifdef   MPI_CHOLLA
     void Set_Boundaries_MPI(struct parameters P);

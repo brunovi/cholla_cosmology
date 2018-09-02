@@ -31,6 +31,10 @@ using namespace std;
 #include "particles/particles_dynamics.h"
 #endif
 
+#ifdef COSMOLOGY
+#include "cosmology/cosmology.h"
+#endif
+
 #endif
 
 #define OUTPUT
@@ -119,6 +123,10 @@ int main(int argc, char *argv[])
   Real time_advance_particles = 0 ;
   #ifdef PARTICLES
   G.Particles.Initialize( P, G.Grav, G.H.xblocal, G.H.yblocal, G.H.zblocal, G.H.xbound, G.H.ybound, G.H.zbound, G.H.xdglobal, G.H.ydglobal, G.H.zdglobal );
+  #endif
+
+  #ifdef COSMOLOGY
+  Initialize_Cosmology( G.Cosmo, P, G.Particles );
   #endif
 
 
@@ -251,6 +259,9 @@ int main(int argc, char *argv[])
 
     // update the time
     G.H.t += G.H.dt;
+    #ifdef PARTICLES
+    G.Particles.t += G.Particles.dt;
+    #endif
 
     // add one to the timestep count
     G.H.n_step++;
