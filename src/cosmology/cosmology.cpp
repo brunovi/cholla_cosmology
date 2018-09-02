@@ -2,6 +2,7 @@
 
 #include"cosmology.h"
 #include "../io.h"
+#include "io_cosmology.h"
 
 Cosmology::Cosmology( void ){}
 
@@ -36,6 +37,9 @@ void Initialize_Cosmology( Cosmology &Cosmo, struct parameters P, Particles_3D &
   chprintf( " Current_a: %f\n", Cosmo.current_a );
   chprintf( " Current_z: %f\n", Cosmo.current_z );
   chprintf( " r0: %f\n", Cosmo.r_0_dm );
+
+  Load_Scale_Outputs( P, Cosmo );
+
   chprintf( "\n");
 
 

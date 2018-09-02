@@ -137,6 +137,7 @@ struct parameters
   char custom_bcnd[MAXLEN];
   char  indir[MAXLEN];
   char outdir[MAXLEN];
+  char scale_outputs_file[MAXLEN];
   Real rho;
   Real vx;
   Real vy;
