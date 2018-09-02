@@ -6,7 +6,7 @@
 
 using namespace std;
 
-int Load_Scale_Outputs( struct parameters P, Cosmology &Cosmo ) {
+void Load_Scale_Outputs( struct parameters P, Cosmology &Cosmo ) {
 
   char filename_1[100];
   // create the filename to read from
@@ -26,6 +26,7 @@ int Load_Scale_Outputs( struct parameters P, Cosmology &Cosmo ) {
     }
     file_out.close();
     Cosmo.n_outputs = Cosmo.scale_outputs.size();
+    Cosmo.next_output_indx = 0;
     chprintf("  Loaded %d scale outputs \n", Cosmo.n_outputs);
   }
   else{
@@ -35,5 +36,20 @@ int Load_Scale_Outputs( struct parameters P, Cosmology &Cosmo ) {
 
 }
 
+void Set_Next_Scale_Output( Cosmology &Cosmo ){
+
+  int scale_indx = Cosmo.next_output_indx;
+  Real a_value = Cosmo.scale_outputs[scale_indx];
+  if  ( ( scale_indx == 0 ) && ( abs(a_value - Cosmo.current_a )<1e-3 ) )scale_indx = 1;
+  a_value = Cosmo.scale_outputs[scale_indx];
+  while ( a_value <= Cosmo.current_a ){
+    chprintf( "%f   %f\n", a_value, Cosmo.current_a);
+    scale_indx += 1;
+    a_value = Cosmo.scale_outputs[scale_indx];
+  }
+  Cosmo.next_output_indx = scale_indx;
+  Cosmo.next_output = a_value;
+  chprintf( " Next output scale_factor: %f\n", Cosmo.next_output);
+}
 
 #endif

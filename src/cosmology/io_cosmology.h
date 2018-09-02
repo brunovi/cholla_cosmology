@@ -7,8 +7,8 @@
 #include"cosmology.h"
 
 
-int Load_Scale_Outputs( struct parameters P, Cosmology &Cosmo );
+void Load_Scale_Outputs( struct parameters P, Cosmology &Cosmo );
 
-
+void Set_Next_Scale_Output( Cosmology &Cosmo );
 
 #endif /*IO_PARTICLES_H*/

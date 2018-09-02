@@ -45,15 +45,19 @@ public:
   Real e_0_gas;
 
   int n_outputs;
+  int next_output_indx;
   real_vector_t scale_outputs;
-
+  Real next_output;
   Cosmology( void );
+
+  void Set_Next_Scale_Output( );
 
 
 };
 
 void Initialize_Cosmology( Cosmology &Cosmo, struct parameters P, Particles_3D &Particles );
 
+// void Normalize_DM_Units(  )
 
 
 #endif
