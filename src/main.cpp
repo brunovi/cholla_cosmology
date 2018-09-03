@@ -160,10 +160,6 @@ int main(int argc, char *argv[])
   // write the initial conditions to file
   chprintf("Writing initial conditions to file...\n");
   WriteData(G, P, nfile);
-  #ifdef COSMOLOGY
-  Set_Next_Scale_Output( G.Cosmo );
-  chprintf( " Saved Snapshot: %d     a:%f   next_output: %f\n", nfile, G.Cosmo.current_a, G.Cosmo.next_output );
-  #endif
   // add one to the output file count
   nfile++;
   #endif //OUTPUT
@@ -341,10 +337,6 @@ int main(int argc, char *argv[])
       #ifdef OUTPUT
       /*output the grid data*/
       WriteData(G, P, nfile);
-      #ifdef COSMOLOGY
-      Set_Next_Scale_Output( G.Cosmo );
-      chprintf( " Saved Snapshot: %d     a:%f   next_output: %f\n", nfile, G.Cosmo.current_a, G.Cosmo.next_output );
-      #endif
       // add one to the output file count
       nfile++;
       #endif //OUTPUT
