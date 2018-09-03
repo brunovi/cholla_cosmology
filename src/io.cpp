@@ -14,14 +14,31 @@
 #endif
 #include"error_handling.h"
 
+#ifdef PARTICLES
+#include "particles/io_particles.h"
+#endif
+
+#ifdef COSMOLOGY
+#include "cosmology/io_cosmology.h"
+#include "cosmology/cosmology_units.h"
+#endif
+
 /* function used to rotate points about an axis in 3D for the rotated projection output routine */
 void rotate_point(Real x, Real y, Real z, Real delta, Real phi, Real theta, Real *xp, Real *yp, Real *zp);
 
 /* Write the initial conditions */
-void WriteData(Grid3D G, struct parameters P, int nfile)
+void WriteData(Grid3D &G, struct parameters P, int nfile)
 {
+
+  #ifdef COSMOLOGY
+  Change_Cosmological_Frame_Sytem( G, false );
+  #endif
+
+  #ifndef ONLY_PM
   /*call the data output routine*/
   OutputData(G,P,nfile);
+  #endif
+
   #ifdef PROJECTION
   OutputProjectedData(G,P,nfile);
   #endif /*PROJECTION*/
@@ -31,6 +48,21 @@ void WriteData(Grid3D G, struct parameters P, int nfile)
   #ifdef SLICES
   OutputSlices(G,P,nfile);
   #endif /*SLICES*/
+
+  #ifdef PARTICLES
+  WriteData_Particles( G, P, nfile );
+  #endif
+
+  #ifdef COSMOLOGY
+  Set_Next_Scale_Output( G.Cosmo );
+  chprintf( " Saved Snapshot: %d     a:%f   next_output: %f\n", nfile, G.Cosmo.current_a, G.Cosmo.next_output );
+  #endif
+
+  #ifdef COSMOLOGY
+  Change_Cosmological_Frame_Sytem( G, true );
+
+  // chprintf( " Saved Snapshot: %d     a:%f\n", nfile, G.Cosmo.current_a );
+  #endif
 }
 
 
@@ -1872,9 +1904,9 @@ void Grid3D::Read_Grid(struct parameters P) {
   char timestep[20];
   int nfile = P.nfile; //output step you want to read from
 
-  // create the filename to read from
-  // assumes your data is in the outdir specified in the input file
-  strcpy(filename, P.outdir);
+
+  chprintf( "Loading Initial conditions: %s\n", P.indir);
+  strcpy(filename, P.indir);
   sprintf(timestep, "%d", nfile);
   strcat(filename,timestep);
   #if defined BINARY

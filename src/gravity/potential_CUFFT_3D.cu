@@ -40,7 +40,7 @@ void Potential_CUFFT_3D::Initialize( Grav3D Grav){
   Get_K_for_Green_function();
   threads_per_block = 1024;
   blocks_per_grid = (( n_cells_local - 1 ) / threads_per_block) + 1;
-  chprintf( "   CUFFT: Using %d threads and %d blocks for applying G funtion: %d \n", threads_per_block, blocks_per_grid, threads_per_block*blocks_per_grid);
+  chprintf( "  CUFFT: Using %d threads and %d blocks for applying G funtion: %d \n", threads_per_block, blocks_per_grid, threads_per_block*blocks_per_grid);
 
 }
 
@@ -145,7 +145,7 @@ void Apply_G_Funtion( int n_cells, Complex_cufft *transform, Real *G ){
 }
 
 
-void Potential_CUFFT_3D::Get_Potential( Grav3D &Grav ){
+Real Potential_CUFFT_3D::Get_Potential( Grav3D &Grav ){
 
   cudaEvent_t start, stop;
   cudaEventCreate(&start);
@@ -166,7 +166,9 @@ void Potential_CUFFT_3D::Get_Potential( Grav3D &Grav ){
   cudaEventSynchronize(stop);
   float milliseconds = 0;
   cudaEventElapsedTime(&milliseconds, start, stop);
-  chprintf( " CUFFT: Potential Time = %f   msecs\n", milliseconds);
+  // chprintf( " CUFFT: Potential Time = %f   msecs\n", milliseconds);
+  return (Real) milliseconds;
+
 }
 
 #endif //POTENTIAL_CUFFT

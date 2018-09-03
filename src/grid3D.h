@@ -19,6 +19,14 @@
 #include"gravity/grav3D.h"
 #endif
 
+#ifdef PARTICLES
+#include "particles/particles_3D.h"
+#endif
+
+#ifdef COSMOLOGY
+#include "cosmology/cosmology.h"
+#endif
+
 struct Rotation
 {
   /*! \var nx
@@ -196,10 +204,11 @@ struct Header
   *  \brief Number of fields (conserved variables, scalars, etc.) */
   int n_fields;
 
+  #ifdef GRAVITY
   /*! \var n_ghost
   *  \brief Number of offset betewen hydro_ghost_cells and potential_ghost_cells */
   int n_ghost_pot_offset;
-
+  #endif
 
 };
 
@@ -235,6 +244,14 @@ class Grid3D
 
     #ifdef GRAVITY
     Grav3D Grav;
+    #endif
+
+    #ifdef PARTICLES
+    Particles_3D Particles;
+    #endif
+
+    #ifdef COSMOLOGY
+    Cosmology Cosmo;
     #endif
 
     struct Conserved
@@ -481,6 +498,8 @@ class Grid3D
      /*! \fn void Sphere_3D()
       *  \brief Spherical overdensity, gravitational collapse */
      void Sphere_collapse_3D();
+
+     void Uniform_Grid();
 
 #ifdef   MPI_CHOLLA
     void Set_Boundaries_MPI(struct parameters P);

@@ -46,6 +46,21 @@ typedef double Real;
 #define N_GHOST_POTENTIAL 2
 #endif
 
+#ifdef PARTICLES
+#ifdef LONG_INTS
+typedef long int part_int_t;
+#endif
+#ifndef LONG_INTS
+typedef int part_int_t
+#endif
+#endif
+
+#ifdef PARTICLES
+#include <vector>
+typedef std::vector<Real> real_vector_t;
+typedef std::vector<part_int_t> int_vector_t;
+#endif
+
 #define SIGN(a) ( ((a) < 0.) ? -1. : 1. )
 
 
@@ -120,7 +135,9 @@ struct parameters
   int zug_bcnd;
 #endif /*MPI_CHOLLA*/
   char custom_bcnd[MAXLEN];
+  char  indir[MAXLEN];
   char outdir[MAXLEN];
+  char scale_outputs_file[MAXLEN];
   Real rho;
   Real vx;
   Real vy;

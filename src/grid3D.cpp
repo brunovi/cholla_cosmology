@@ -65,7 +65,9 @@ Grid3D::Grid3D(void)
   H.n_ghost=4;
   #endif //PPMC
 
+  #ifdef GRAVITY
   H.n_ghost_pot_offset = H.n_ghost - N_GHOST_POTENTIAL;
+  #endif
 }
 
 /*! \fn void Get_Position(long i, long j, long k, Real *xpos, Real *ypos, Real *zpos)
@@ -493,6 +495,16 @@ Real Grid3D::Update_Grid(void)
   #ifdef SCALAR
   C.scalar = &g1[5*H.n_cells];
   #endif
+
+  #ifdef GRAVITY
+  #ifndef DE
+  C.Grav_potential = &g1[(H.n_fields-1)*H.n_cells];
+  #endif
+  #ifdef DE
+  C.Grav_potential = &g1[(H.n_fields-2)*H.n_cells];
+  #endif
+  #endif
+
   #ifdef DE
   C.GasEnergy = &g1[(H.n_fields-1)*H.n_cells];
   #endif

@@ -138,9 +138,9 @@ void Potential_FFTW_3D::Apply_G_Funtion( void ){
 }
 
 
-void Potential_FFTW_3D::Get_Potential( Grav3D &Grav ){
-
-  double start = get_time();
+Real Potential_FFTW_3D::Get_Potential( Grav3D &Grav ){
+  Real start, stop, milliseconds;
+  start = get_time();
 
   Copy_Input( Grav );
 
@@ -149,9 +149,10 @@ void Potential_FFTW_3D::Get_Potential( Grav3D &Grav ){
   fftw_execute( fftw_plan_bwd);
   Copy_Output( Grav );
 
-  double stop = get_time();
-  double milliseconds = (stop - start) * 1000.0;
-  chprintf( " FFTW: Potential Time = %f   msecs\n", milliseconds);
+  stop = get_time();
+  milliseconds = (stop - start) * 1000.0;
+  // chprintf( " FFTW: Potential Time = %f   msecs\n", milliseconds);
+  return milliseconds;
 }
 
 #endif //POTENTIAL_CUFFT
