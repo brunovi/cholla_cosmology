@@ -40,10 +40,7 @@ void Initialize_Cosmology( Cosmology &Cosmo, struct parameters P, Particles_3D &
 
   Load_Scale_Outputs( P, Cosmo );
 
-  chprintf( "\n");
-
-
-
+  // chprintf( "\n");
 }
 
 

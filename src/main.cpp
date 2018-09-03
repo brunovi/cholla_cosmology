@@ -33,6 +33,7 @@ using namespace std;
 
 #ifdef COSMOLOGY
 #include "cosmology/cosmology.h"
+#include "cosmology/cosmology_units.h"
 #endif
 
 #endif
@@ -127,6 +128,7 @@ int main(int argc, char *argv[])
 
   #ifdef COSMOLOGY
   Initialize_Cosmology( G.Cosmo, P, G.Particles );
+  Change_Cosmological_Frame_Sytem( G, true );
   #endif
 
 

@@ -20,6 +20,7 @@
 
 #ifdef COSMOLOGY
 #include "cosmology/io_cosmology.h"
+#include "cosmology/cosmology_units.h"
 #endif
 
 /* function used to rotate points about an axis in 3D for the rotated projection output routine */
@@ -28,6 +29,11 @@ void rotate_point(Real x, Real y, Real z, Real delta, Real phi, Real theta, Real
 /* Write the initial conditions */
 void WriteData(Grid3D G, struct parameters P, int nfile)
 {
+
+  #ifdef COSMOLOGY
+  Change_Cosmological_Frame_Sytem( G, false );
+  #endif
+
   /*call the data output routine*/
   OutputData(G,P,nfile);
   #ifdef PROJECTION
@@ -46,6 +52,7 @@ void WriteData(Grid3D G, struct parameters P, int nfile)
 
   #ifdef COSMOLOGY
   chprintf( " Saved Snapshot: %d     a:%f\n", nfile, G.Cosmo.current_a );
+  Change_Cosmological_Frame_Sytem( G, true );
   Set_Next_Scale_Output( G.Cosmo );
   #endif
 }

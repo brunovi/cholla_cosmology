@@ -5,15 +5,8 @@
 
 #include<stdio.h>
 #include <cmath>
-// #include "../io.h"
 #include"../global.h"
-// #include"../grid3D.h"
-// #include"universal_constants.h"
-// #include"part3D.h"
-// #include "io_cosmo.h"
 #include"../particles/particles_3D.h"
-
-#include <vector>
 
 class Cosmology
 {
@@ -56,8 +49,6 @@ public:
 };
 
 void Initialize_Cosmology( Cosmology &Cosmo, struct parameters P, Particles_3D &Particles );
-
-// void Normalize_DM_Units(  )
 
 
 #endif
