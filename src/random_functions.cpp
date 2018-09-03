@@ -1,4 +1,4 @@
-#include "random_routines.h"
+#include "random_functions.h"
 
 
 Real Rand_Real( Real min, Real max ){
