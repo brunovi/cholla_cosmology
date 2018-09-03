@@ -34,6 +34,7 @@ using namespace std;
 #ifdef COSMOLOGY
 #include "cosmology/cosmology.h"
 #include "cosmology/cosmology_units.h"
+#include "cosmology/io_cosmology.h"
 #endif
 
 #endif
@@ -159,6 +160,10 @@ int main(int argc, char *argv[])
   // write the initial conditions to file
   chprintf("Writing initial conditions to file...\n");
   WriteData(G, P, nfile);
+  #ifdef COSMOLOGY
+  Set_Next_Scale_Output( G.Cosmo );
+  chprintf( " Saved Snapshot: %d     a:%f   next_output: %f\n", nfile, G.Cosmo.current_a, G.Cosmo.next_output );
+  #endif
   // add one to the output file count
   nfile++;
   #endif //OUTPUT
@@ -226,6 +231,11 @@ int main(int argc, char *argv[])
       G.Grav.dt_prev = G.Grav.dt_now;
       G.Grav.dt_now = G.H.dt;
     }
+    #ifdef COSMOLOGY
+    G.Cosmo.delta_a = G.Cosmo.max_delta_a;
+    if ( (G.Cosmo.current_a + G.Cosmo.delta_a) >  G.Cosmo.next_output ) G.Cosmo.delta_a = G.Cosmo.next_output - G.Cosmo.current_a;
+    chprintf( "Current_a: %f    delta_a: %f \n", G.Cosmo.current_a, G.Cosmo.delta_a );
+    #endif
     #endif
 
     #ifdef PARTICLES
@@ -263,6 +273,12 @@ int main(int argc, char *argv[])
     G.H.t += G.H.dt;
     #ifdef PARTICLES
     G.Particles.t += G.Particles.dt;
+    #ifdef COSMOLOGY
+    G.Cosmo.current_a += G.Cosmo.delta_a;
+    G.Cosmo.current_z = 1./G.Cosmo.current_a - 1;
+    G.Particles.current_a = G.Cosmo.current_a;
+    G.Particles.current_z = G.Cosmo.current_z;
+    #endif
     #endif
 
     // add one to the timestep count
@@ -321,11 +337,14 @@ int main(int argc, char *argv[])
     chprintf("n_step: %d   sim time: %10.7f   sim timestep: %7.4e  timestep time = %9.3f ms   total time = %9.4f s\n",
       G.H.n_step, G.H.t, G.H.dt, (stop_step-start_step)*1000, G.H.t_wall);
 
-    if (G.H.t == outtime)
-    {
+    if ( (G.H.t == outtime) || ( G.Cosmo.current_a == G.Cosmo.next_output) ){
       #ifdef OUTPUT
       /*output the grid data*/
       WriteData(G, P, nfile);
+      #ifdef COSMOLOGY
+      Set_Next_Scale_Output( G.Cosmo );
+      chprintf( " Saved Snapshot: %d     a:%f   next_output: %f\n", nfile, G.Cosmo.current_a, G.Cosmo.next_output );
+      #endif
       // add one to the output file count
       nfile++;
       #endif //OUTPUT
@@ -343,6 +362,13 @@ int main(int argc, char *argv[])
       time_all_total += (stop_step-start_step)*1000;
     }
     step_counter += 1;
+    #endif
+
+    #ifdef COSMOLOGY
+    if ( G.Cosmo.current_a >= G.Cosmo.scale_outputs[G.Cosmo.n_outputs-1] ) {
+      chprintf( "\nReached Last Cosmological Output: Ending Simulation\n");
+      break;
+    }
     #endif
 /*
     // check for failures

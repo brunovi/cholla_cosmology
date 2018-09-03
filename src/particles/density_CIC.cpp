@@ -108,7 +108,11 @@ void Copy_Particles_Density_to_Gravity( Grid3D &G ){
       for ( i=0; i<nx; i++ ){
       id_CIC = (i+nGHST) + (j+nGHST)*(nx+2*nGHST) + (k+nGHST)*(nx+2*nGHST)*(ny+2*nGHST);
       id_grid = i + j*nx + k*nx*ny;
+      #ifndef COSMOLOGY
       G.Grav.F.density_h[id_grid] += 4 * M_PI * G.Particles.G.density[id_CIC];
+      #else
+      G.Grav.F.density_h[id_grid] += 4 * M_PI * G.Cosmo.cosmo_G * ( G.Particles.G.density[id_CIC] - G.Cosmo.rho_0_dm ) / G.Cosmo.current_a ;
+      #endif
       }
     }
   }

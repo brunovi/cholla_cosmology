@@ -45,10 +45,17 @@ public:
 
   void Set_Next_Scale_Output( );
 
+  Real Get_da_from_dt( Real dt );
+  Real Get_dt_from_da( Real da );
+
 
 };
 
 void Initialize_Cosmology( Cosmology &Cosmo, struct parameters P, Particles_3D &Particles );
+
+Real Scale_Function( Real a, Real Omega_M, Real Omega_L, Real Omega_K );
+
+
 
 
 #endif

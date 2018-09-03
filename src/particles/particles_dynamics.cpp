@@ -45,6 +45,53 @@ void Advance_Particles_step2( Particles_3D &Particles, part_int_t p_start, part_
   }
 }
 
+void Advance_Particles_step1_cosmo( Particles_3D &Particles, Cosmology &Cosmo, part_int_t p_start, part_int_t p_end ){
+
+  part_int_t pIndx;
+  Real da = Cosmo.delta_a;
+  Real current_a = Cosmo.current_a;
+
+  Real scale_factor = Scale_Function( current_a, Cosmo.Omega_M, Cosmo.Omega_L, Cosmo.Omega_K ) / Cosmo.H0 * Cosmo.cosmo_h;
+  Real scale_factor_1 = Scale_Function( current_a + 0.5*da, Cosmo.Omega_M, Cosmo.Omega_L, Cosmo.Omega_K  ) / Cosmo.H0 * Cosmo.cosmo_h;
+  Real a2_inv = 1./( ( current_a + 0.5*da )*( current_a + 0.5*da ));
+  // Advance velocities by half a step
+  Real pos_x, vel_x, grav_x;
+  Real pos_y, vel_y, grav_y;
+  Real pos_z, vel_z, grav_z;
+  for ( pIndx=p_start; pIndx<p_end; pIndx++ ){
+    pos_x = Particles.pos_x[pIndx];
+    pos_y = Particles.pos_y[pIndx];
+    pos_z = Particles.pos_z[pIndx];
+    vel_x = Particles.vel_x[pIndx];
+    vel_y = Particles.vel_y[pIndx];
+    vel_z = Particles.vel_z[pIndx];
+    grav_x = Particles.grav_x[pIndx];
+    grav_y = Particles.grav_y[pIndx];
+    grav_z = Particles.grav_z[pIndx];
+
+    vel_x += scale_factor * da * grav_x;
+    vel_y += scale_factor * da * grav_y;
+    vel_z += scale_factor * da * grav_z;
+
+    pos_x += a2_inv * scale_factor_1 * da * vel_x;
+    pos_y += a2_inv * scale_factor_1 * da * vel_y;
+    pos_z += a2_inv * scale_factor_1 * da * vel_z;
+
+    Particles.pos_x[pIndx] = pos_x;
+    Particles.pos_y[pIndx] = pos_y;
+    Particles.pos_z[pIndx] = pos_z;
+
+    Particles.vel_x[pIndx] = vel_x;
+    Particles.vel_y[pIndx] = vel_y;
+    Particles.vel_z[pIndx] = vel_z;
+  }
+}
+
+void Advance_Particles_step2_cosmo( Particles_3D &Particles, Cosmology &Cosmo, part_int_t p_start, part_int_t p_end ){
+
+}
+
+
 Real Get_Particles_dt( Particles_3D &Particles ){
   part_int_t pID;
   Real dt, dt_min, vel;
@@ -79,11 +126,19 @@ Real Update_Particles( Grid3D &G, int step ){
 
   #ifndef PARTICLES_OMP
   if ( step == 1 ){
+    #ifndef COSMOLOGY
     Advance_Particles_step1( G.Particles, 0, G.Particles.n_local );
+    #else
+    Advance_Particles_step1_cosmo( G.Particles, G.Cosmo, 0, G.Particles.n_local);
+    #endif
   }
   else if ( step == 2 ){
     Get_Particles_Acceleration( G, 0, G.Particles.n_local, 0, G.Particles.G.nz_local + 2*G.Particles.G.n_ghost_particles_grid  );
+    #ifndef COSMOLOGY
     Advance_Particles_step2( G.Particles, 0, G.Particles.n_local);
+    #else
+    Advance_Particles_step2_cosmo( G.Particles, G.Cosmo, 0, G.Particles.n_local);
+    #endif
   }
   #endif
 
@@ -106,12 +161,20 @@ Real Update_Particles( Grid3D &G, int step ){
     // }
 
     if ( step == 1 ){
+      #ifndef COSMOLOGY
       Advance_Particles_step1( G.Particles, p_start, p_end );
+      #else
+      Advance_Particles_step1_cosmo( G.Particles, G.Cosmo, p_start, p_end );
+      #endif
     }
     else if ( step == 2 ){
       Get_Particles_Acceleration( G, p_start, p_end, g_start, g_end );
       #pragma omp barrier
+      #ifndef COSMOLOGY
       Advance_Particles_step2( G.Particles, p_start, p_end );
+      #else
+      Advance_Particles_step2_cosmo( G.Particles, G.Cosmo, p_start, p_end );
+      #endif
     }
 
   }
