@@ -5,9 +5,9 @@
 #ifdef MPI_CHOLLA
 
 void Grid3D::Set_Boundaries_MPI(struct parameters P)
-{ 
+{
   int flags[6] = {0,0,0,0,0,0};
-  
+
   if(Check_Custom_Boundary(&flags[0],P))
   {
     //perform custom boundaries
@@ -129,7 +129,7 @@ void Grid3D::Set_Edge_Boundaries(int dir, int *flags)
   Real a[3]   = {1,1,1};  //sign of momenta
   int idx;    //index of a real cell
   int gidx;   //index of a ghost cell
-  
+
   int nedge = 0;
 
   if(H.ny>1)
@@ -153,13 +153,13 @@ void Grid3D::Set_Edge_Boundaries(int dir, int *flags)
           a[2] = 1.;
 
           //find the ghost cell index
-          gidx = i + j*H.nx + k*H.nx*H.ny; 
+          gidx = i + j*H.nx + k*H.nx*H.ny;
 
           //find the corresponding real cell index and momenta signs
           idx  = Set_Boundary_Mapping(i,j,k,flags,&a[0]);
-        
+
           //idx will be >= 0 if the boundary mapping function has
-          //not set this ghost cell by hand, for instance for analytical 
+          //not set this ghost cell by hand, for instance for analytical
           //boundary conditions
           //
           //Otherwise, the boundary mapping function will set idx<0
@@ -179,6 +179,9 @@ void Grid3D::Set_Edge_Boundaries(int dir, int *flags)
             for (int ii=0; ii<NSCALARS; ii++) {
               C.scalar[gidx + ii*H.n_cells]  = C.scalar[idx+ii*H.n_cells];
             }
+            #endif
+            #ifdef GRAVITY
+            C.Grav_potential[gidx]  = C.Grav_potential[idx];
             #endif
           }
         }
@@ -226,7 +229,7 @@ void Grid3D::Set_Edge_Boundary_Extents(int dir, int edge, int *imin, int *imax)
     {
       *(imin+i) = 0;
       *(imax+i) = 2*H.n_ghost;
-  
+
 
     }else{
       *(imin+i) = ni-2*H.n_ghost;
@@ -320,7 +323,7 @@ void Grid3D::Set_Edge_Boundary_Extents(int dir, int edge, int *imin, int *imax)
 
       //upper edge
       case 3:
-        *(imin+j) = nj-H.n_ghost; 
+        *(imin+j) = nj-H.n_ghost;
         *(imax+j) = nj;
         *(imin+k) = H.n_ghost;
         *(imax+k) = nk-H.n_ghost;
@@ -328,7 +331,7 @@ void Grid3D::Set_Edge_Boundary_Extents(int dir, int edge, int *imin, int *imax)
 
       //upper right corner
       case 4:
-        *(imin+j) = nj-H.n_ghost; 
+        *(imin+j) = nj-H.n_ghost;
         *(imax+j) = nj;
         *(imin+k) = nk-H.n_ghost;
         *(imax+k) = nk;
@@ -469,7 +472,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
   /* x boundaries */
   if(dir == 0)
   {
-    if (flags[0]==5) { 
+    if (flags[0]==5) {
       // load left x communication buffer
       // 1D
       if (H.ny == 1 && H.nz == 1) {
@@ -491,12 +494,12 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
             gidx = i + j*H.n_ghost;
             for (ii=0; ii<H.n_fields; ii++) {
               *(send_buffer_x0 + gidx + ii*offset) = C.density[idx + ii*H.n_cells];
-            } 
+            }
           }
         }
       }
       // 3D
-      if (H.ny > 1 && H.nz > 1) { 
+      if (H.ny > 1 && H.nz > 1) {
         offset = H.n_ghost*(H.ny-2*H.n_ghost)*(H.nz-2*H.n_ghost);
         for(i=0;i<H.n_ghost;i++)
         {
@@ -514,7 +517,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
         }
       }
 
-   
+
       //post non-blocking receive left x communication buffer
       MPI_Irecv(recv_buffer_x0, x_buffer_length, MPI_CHREAL, source[0], 0, world, &recv_request[ireq]);
 
@@ -553,7 +556,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
         }
       }
       // 3D
-      if (H.ny > 1 && H.nz > 1) { 
+      if (H.ny > 1 && H.nz > 1) {
         offset = H.n_ghost*(H.ny-2*H.n_ghost)*(H.nz-2*H.n_ghost);
         for(i=0;i<H.n_ghost;i++)
         {
@@ -602,7 +605,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
         }
       }
       // 3D
-      if (H.nz > 1) { 
+      if (H.nz > 1) {
         offset = H.n_ghost*H.nx*(H.nz-2*H.n_ghost);
         for(i=0;i<H.nx;i++)
         {
@@ -619,7 +622,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
           }
         }
       }
-      
+
       //post non-blocking receive left y communication buffer
       MPI_Irecv(recv_buffer_y0, y_buffer_length, MPI_CHREAL, source[2], 2, world, &recv_request[ireq]);
 
@@ -647,7 +650,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
         }
       }
       // 3D
-      if (H.nz > 1) { 
+      if (H.nz > 1) {
         offset = H.n_ghost*H.nx*(H.nz-2*H.n_ghost);
         for(i=0;i<H.nx;i++)
         {
@@ -664,7 +667,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
           }
         }
       }
-      
+
       //post non-blocking receive right y communication buffer
       MPI_Irecv(recv_buffer_y1, y_buffer_length, MPI_CHREAL, source[3], 3, world, &recv_request[ireq]);
 
@@ -698,7 +701,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
           }
         }
       }
-      
+
       //post non-blocking receive left z communication buffer
       MPI_Irecv(recv_buffer_z0, z_buffer_length, MPI_CHREAL, source[4], 4, world, &recv_request[ireq]);
 
@@ -727,7 +730,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
           }
         }
       }
-      
+
       //post non-blocking receive right x communication buffer
       MPI_Irecv(recv_buffer_z1, z_buffer_length, MPI_CHREAL, source[5], 5, world, &recv_request[ireq]);
 
@@ -885,7 +888,7 @@ void Grid3D::Unload_MPI_Comm_Buffers_BLOCK(int index)
       for(i=0;i<H.n_ghost;i++) {
         idx  = i;
         gidx = i;
-        for (ii=0; ii<H.n_fields; ii++) { 
+        for (ii=0; ii<H.n_fields; ii++) {
           C.density[idx + H.n_cells] = *(recv_buffer_x0 + gidx + ii*offset);
         }
       }
@@ -897,7 +900,7 @@ void Grid3D::Unload_MPI_Comm_Buffers_BLOCK(int index)
         for (j=0;j<H.ny-2*H.n_ghost;j++) {
           idx  = i + (j+H.n_ghost)*H.nx;
           gidx = i + j*H.n_ghost;
-          for (ii=0; ii<H.n_fields; ii++) { 
+          for (ii=0; ii<H.n_fields; ii++) {
             C.density[idx + ii*H.n_cells] = *(recv_buffer_x0 + gidx + ii*offset);
           }
         }

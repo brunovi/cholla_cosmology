@@ -198,7 +198,7 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
 {
   int id, xid, yid, zid, n_cells;
   int imo, jmo, kmo;
-  #if defined (DE) || defined(STATIC_GRAV)
+  #if defined (DE) || defined(STATIC_GRAV) || defined(GRAVITY)
   Real d, d_inv, vx, vy, vz;
   #endif
   #ifdef DE
@@ -348,7 +348,7 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
     dev_conserved[4*n_cells + id] += 0.25*dt*gx*(d + d_n)*(vx + vx_n)
     +  0.25*dt*gy*(d + d_n)*(vy + vy_n)
     +  0.25*dt*gz*(d + d_n)*(vz + vz_n);
-    
+
     #endif
 
 
