@@ -16,6 +16,10 @@
 #include "potential_FFTW_3D.h"
 #endif
 
+#ifdef POTENTIAL_PFFT
+#include "potential_PFFT_3D.h"
+#endif
+
 #ifdef PARTICLES
 #include "../particles/density_CIC.h"
 #endif
@@ -28,6 +32,10 @@ void Compute_Gravitational_Potential( Grid3D &G,  Potential_CUFFT_3D &p_solver, 
 
 #ifdef POTENTIAL_FFTW
 void Compute_Gravitational_Potential( Grid3D &G,  Potential_FFTW_3D &p_solver, Real *time_pot, Real *time_set);
+#endif
+
+#ifdef POTENTIAL_PFFT
+void Compute_Gravitational_Potential( Grid3D &G,  Potential_PFFT_3D &p_solver, Real *time_pot, Real *time_set);
 #endif
 
 void Copy_Potential_To_Hydro_Grid( Grid3D &G );

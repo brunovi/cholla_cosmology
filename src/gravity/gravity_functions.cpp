@@ -71,22 +71,34 @@ void Compute_Gravitational_Potential( Grid3D &G, Potential_FFTW_3D &p_solver, Re
 }
 #endif
 
-// void Extrapolate_Grav_Potential( Grid3D &G ){
-  // if ( Grav.INITIAL ){
-  //   for ( int i=0; i<Grav.n_cells_potential; i++){
-  //     Grav.F.potential_1_h[i] = Grav.F.potential_h[i];
-  //   }
-  // // Grav.INITIAL = false;
-  // return ;
-  // }
-//   Real delta_pot, pot_now;
-//   for ( int i=0; i<Grav.n_cells_potential; i++ ){
-//     pot_now = Grav.F.potential_h[i];
-//     delta_pot = pot_now - Grav.F.potential_1_h[i];
-//     Grav.F.potential_h[i] = pot_now + ( 0.5 * delta_pot / Grav.dt_prev * Grav.dt_now );
-//     Grav.F.potential_1_h[i] = pot_now;
-//   }
-// }
+
+#ifdef POTENTIAL_PFFT
+void Compute_Gravitational_Potential( Grid3D &G, Potential_PFFT_3D &p_solver, Real *time_pot, Real *time_set ){
+  Real time_potential, start, stop, time_setup;
+
+  Copy_Hydro_Density_to_Gravity( G );
+
+  start = get_time();
+  #ifdef PARTICLES
+  Get_Particles_Density_CIC( G.Particles );
+  Copy_Particles_Density_to_Gravity( G );
+  #endif
+  stop = get_time();
+  time_setup = (stop - start) * 1000.0;
+
+
+  time_potential = p_solver.Get_Potential( G.Grav );
+
+  *time_pot = time_potential;
+  *time_set = time_setup;
+  // Extrapolate_Grav_Potential( G.Grav );
+  // Copy_Potential_To_Hydro_Grid( G );
+}
+#endif
+
+
+
+
 
 void Extrapolate_Grav_Potential( Grid3D &G ){
   int n_ghost_pot = N_GHOST_POTENTIAL;

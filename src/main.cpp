@@ -26,6 +26,9 @@ using namespace std;
 #ifdef POTENTIAL_FFTW
 #include "gravity/potential_FFTW_3D.h"
 #endif
+#ifdef POTENTIAL_PFFT
+#include "gravity/potential_PFFT_3D.h"
+#endif
 
 #ifdef PARTICLES
 #include "particles/particles_dynamics.h"
@@ -117,6 +120,10 @@ int main(int argc, char *argv[])
   #ifdef POTENTIAL_FFTW
   Potential_FFTW_3D p_solver;
   #endif
+  #ifdef POTENTIAL_PFFT
+  Potential_PFFT_3D p_solver;
+  #endif
+
 
   p_solver.Initialize( G.Grav );
   #endif
@@ -333,7 +340,12 @@ int main(int argc, char *argv[])
     chprintf("n_step: %d   sim time: %10.7f   sim timestep: %7.4e  timestep time = %9.3f ms   total time = %9.4f s\n",
       G.H.n_step, G.H.t, G.H.dt, (stop_step-start_step)*1000, G.H.t_wall);
 
-    if ( (G.H.t == outtime) || ( G.Cosmo.current_a == G.Cosmo.next_output) ){
+    #ifndef COSMO
+    if (G.H.t == outtime)
+    #else
+    if ( G.Cosmo.current_a == G.Cosmo.next_output)
+    #endif
+    {
       #ifdef OUTPUT
       /*output the grid data*/
       WriteData(G, P, nfile);

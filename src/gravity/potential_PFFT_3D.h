@@ -12,6 +12,8 @@
 #include <cmath>
 #include <time.h>
 
+#include <pfft.h>
+
 
 // #if PRECISION == 1
 // typedef fftReal Real_fftw;
@@ -28,17 +30,31 @@ class Potential_PFFT_3D : public Poisson_Solver_3D
 {
   public:
 
-  // fftw_plan fftw_plan_fwd;
-  // fftw_plan fftw_plan_bwd;
+  int procID_pfft;
+  int nproc_pfft;
+  MPI_Comm comm_pfft;
+
+  int nprocs_grid_pfft[3];
+  int pcoords_pfft[3];
+  int poffset_pfft[3];
+  ptrdiff_t n_pfft[3];
+  ptrdiff_t alloc_local;
+  ptrdiff_t local_ni_pfft[3], local_i_start_pfft[3];
+  ptrdiff_t local_no_pfft[3], local_o_start_pfft[3];
+  ptrdiff_t local_ntrans_pfft[3], local_trans_start_pfft[3];
+
+  pfft_plan plan_fwd;
+  pfft_plan plan_bwd;
 
   struct Fields
   {
 
-    // Complex_fftw *input;
-    // Complex_fftw *output;
+    pfft_complex *transform;
+    double *input;
+    double *output;
     // Complex_fftw *transform;
+    double *G;
 
-    Real *G;
 
   } F;
 
@@ -56,7 +72,7 @@ class Potential_PFFT_3D : public Poisson_Solver_3D
   virtual void Get_K_for_Green_function( void );
   void Apply_G_Funtion( void );
   void Apply_K2_Funtion( void );
-  virtual void Get_Potential( Grav3D &Grav );
+  virtual Real Get_Potential( Grav3D &Grav );
 
 };
 
