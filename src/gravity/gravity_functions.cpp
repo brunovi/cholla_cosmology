@@ -24,14 +24,14 @@ void Copy_Hydro_Density_to_Gravity( Grid3D &G ){
 
 
 #ifdef POTENTIAL_CUFFT
-void Compute_Gravitational_Potential( Grid3D &G, Potential_CUFFT_3D &p_solver, Real *time_pot, Real *time_set ){
+void Compute_Gravitational_Potential( Grid3D &G, Potential_CUFFT_3D &p_solver, Real *time_pot, Real *time_set, struct parameters P ){
   Real time_potential, start, stop, time_setup;
 
   Copy_Hydro_Density_to_Gravity( G );
 
   start = get_time();
   #ifdef PARTICLES
-  Get_Particles_Density_CIC( G.Particles );
+  Get_Particles_Density_CIC( G, P );
   Copy_Particles_Density_to_Gravity( G );
   #endif
   stop = get_time();
@@ -48,14 +48,14 @@ void Compute_Gravitational_Potential( Grid3D &G, Potential_CUFFT_3D &p_solver, R
 
 
 #ifdef POTENTIAL_FFTW
-void Compute_Gravitational_Potential( Grid3D &G, Potential_FFTW_3D &p_solver, Real *time_pot, Real *time_set ){
+void Compute_Gravitational_Potential( Grid3D &G, Potential_FFTW_3D &p_solver, Real *time_pot, Real *time_set, struct parameters P ){
   Real time_potential, start, stop, time_setup;
 
   Copy_Hydro_Density_to_Gravity( G );
 
   start = get_time();
   #ifdef PARTICLES
-  Get_Particles_Density_CIC( G.Particles );
+  Get_Particles_Density_CIC( G, P );
   Copy_Particles_Density_to_Gravity( G );
   #endif
   stop = get_time();
@@ -73,14 +73,14 @@ void Compute_Gravitational_Potential( Grid3D &G, Potential_FFTW_3D &p_solver, Re
 
 
 #ifdef POTENTIAL_PFFT
-void Compute_Gravitational_Potential( Grid3D &G, Potential_PFFT_3D &p_solver, Real *time_pot, Real *time_set ){
+void Compute_Gravitational_Potential( Grid3D &G, Potential_PFFT_3D &p_solver, Real *time_pot, Real *time_set, struct parameters P ){
   Real time_potential, start, stop, time_setup;
 
   Copy_Hydro_Density_to_Gravity( G );
 
   start = get_time();
   #ifdef PARTICLES
-  Get_Particles_Density_CIC( G.Particles );
+  Get_Particles_Density_CIC( G, P );
   Copy_Particles_Density_to_Gravity( G );
   #endif
   stop = get_time();

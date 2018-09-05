@@ -1,8 +1,9 @@
 #ifdef PARTICLES
 
 #include "density_boundaries.h"
+#include "../io.h"
 
-void Tranfer_Particles_Density_Boundaries( Particles_3D &Parts ){
+void Transfer_Particles_Density_Boundaries( Particles_3D &Parts ){
   int nGHST, nx_g, ny_g, nz_g, nx, ny, nz;
   nGHST = Parts.G.n_ghost_particles_grid;
   nx_g = Parts.G.nx_local + 2*nGHST;
@@ -69,8 +70,18 @@ void Tranfer_Particles_Density_Boundaries( Particles_3D &Parts ){
       }
     }
   }
-
-
 }
 
+#ifdef MPI_CHOLLA
+
+void Transfer_Particles_Density_Boundaries_MPI( Grid3D &G, struct parameters P){
+
+
+  G.Particles.TRANSFER_DENSITY_BOUNDARIES = true;
+  // chprintf( " Transfering Particles Density Boundaries\n");
+  G.Set_Boundary_Conditions(P);
+  G.Particles.TRANSFER_DENSITY_BOUNDARIES = false;
+
+}
+#endif
 #endif

@@ -46,6 +46,8 @@ class Particles_3D
 
   bool INITIAL;
 
+  bool TRANSFER_DENSITY_BOUNDARIES;
+
   #ifdef COSMOLOGY
   Real current_z;
   Real current_a;

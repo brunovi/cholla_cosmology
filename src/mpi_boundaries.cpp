@@ -459,6 +459,127 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_SLAB(int *flags)
   //done!
 }
 
+#ifdef PARTICLES
+int Grid3D::Load_Particles_Density_Boundary_to_Buffer( int direction, int side, Real *buffer  ){
+
+  int i, j, k, indx, indx_buff, buffer_length;
+  int nGHST, nx_g, ny_g, nz_g, nx, ny, nz;
+  nGHST = Particles.G.n_ghost_particles_grid;
+  nx = Particles.G.nx_local;
+  ny = Particles.G.ny_local;
+  nz = Particles.G.nz_local;
+  nx_g = Particles.G.nx_local + 2*nGHST;
+  ny_g = Particles.G.ny_local + 2*nGHST;
+  nz_g = Particles.G.nz_local + 2*nGHST;
+
+  //Load Z boundaries
+  if (direction == 2){
+    for ( k=0; k<nGHST; k++ ){
+      for ( j=0; j<ny_g; j++ ){
+        for ( i=0; i<nx_g; i++ ){
+          if ( side == 0 ) indx = (i) + (j)*nx_g + (k)*nx_g*ny_g;
+          if ( side == 1 ) indx = (i) + (j)*nx_g + (nz_g - nGHST + k)*nx_g*ny_g;
+          indx_buff = i + j*nx_g + k*nx_g*ny_g ;
+          buffer[indx_buff] = Particles.G.density[indx];
+        }
+      }
+    }
+    buffer_length = nGHST * nx_g * ny_g;
+  }
+
+  //Load Y boundaries
+  if (direction == 1){
+    for ( k=0; k<nz_g; k++ ){
+      for ( j=0; j<nGHST; j++ ){
+        for ( i=0; i<nx_g; i++ ){
+          if ( side == 0 ) indx = (i) + (j)*nx_g + (k)*nx_g*ny_g;
+          if ( side == 1 ) indx = (i) + (ny_g - nGHST + j)*nx_g + (k)*nx_g*ny_g;
+          indx_buff = i + k*nx_g + j*nx_g*nz_g ;
+          buffer[indx_buff] = Particles.G.density[indx];
+        }
+      }
+    }
+    buffer_length = nGHST * nx_g * nz_g;
+  }
+
+  //Load X boundaries
+  if (direction == 0){
+    for ( k=0; k<nz_g; k++ ){
+      for ( j=0; j<ny_g; j++ ){
+        for ( i=0; i<nGHST; i++ ){
+          if ( side == 0 ) indx = (i) + (j)*nx_g + (k)*nx_g*ny_g;
+          if ( side == 1 ) indx = (nx_g - nGHST + i) + (j)*nx_g + (k)*nx_g*ny_g;
+          indx_buff = j + k*ny_g + i*ny_g*nz_g ;
+          buffer[indx_buff] = Particles.G.density[indx];
+        }
+      }
+    }
+    buffer_length = nGHST * ny_g * nz_g;
+  }
+
+
+  return buffer_length;
+}
+
+void Grid3D::Unload_Particles_Density_Boundary_From_Buffer( int direction, int side, Real *buffer  ){
+
+  int i, j, k, indx, indx_buff, buffer_length;
+  int nGHST, nx_g, ny_g, nz_g, nx, ny, nz;
+  nGHST = Particles.G.n_ghost_particles_grid;
+  nx = Particles.G.nx_local;
+  ny = Particles.G.ny_local;
+  nz = Particles.G.nz_local;
+  nx_g = Particles.G.nx_local + 2*nGHST;
+  ny_g = Particles.G.ny_local + 2*nGHST;
+  nz_g = Particles.G.nz_local + 2*nGHST;
+
+  // //Unload Z boundaries
+  if (direction == 2){
+    for ( k=0; k<nGHST; k++ ){
+      for ( j=0; j<ny_g; j++ ){
+        for ( i=0; i<nx_g; i++ ){
+          if ( side == 0 ) indx = (i) + (j)*nx_g + (k + nGHST )*nx_g*ny_g;
+          if ( side == 1 ) indx = (i) + (j)*nx_g + (nz_g - 2*nGHST + k)*nx_g*ny_g;
+          indx_buff = i + j*nx_g + k*nx_g*ny_g ;
+          Particles.G.density[indx] += buffer[indx_buff];
+        }
+      }
+    }
+  }
+
+  //Unload Y boundaries
+  if (direction == 1){
+    for ( k=0; k<nz_g; k++ ){
+      for ( j=0; j<nGHST; j++ ){
+        for ( i=0; i<nx_g; i++ ){
+          if ( side == 0 ) indx = (i) + (j + nGHST)*nx_g + (k)*nx_g*ny_g;
+          if ( side == 1 ) indx = (i) + (ny_g - 2*nGHST + j)*nx_g + (k)*nx_g*ny_g;
+          indx_buff = i + k*nx_g + j*nx_g*nz_g ;
+          Particles.G.density[indx] += buffer[indx_buff];
+        }
+      }
+    }
+  }
+
+  //Unload X boundaries
+  if (direction == 0){
+    for ( k=0; k<nz_g; k++ ){
+      for ( j=0; j<ny_g; j++ ){
+        for ( i=0; i<nGHST; i++ ){
+          if ( side == 0 ) indx = (i+nGHST) + (j)*nx_g + (k)*nx_g*ny_g;
+          if ( side == 1 ) indx = (nx_g - 2*nGHST + i) + (j)*nx_g + (k)*nx_g*ny_g;
+          indx_buff = j + k*ny_g + i*ny_g*nz_g ;
+          Particles.G.density[indx] += buffer[indx_buff];
+          // Particles.G.density[indx] += 1;
+        }
+      }
+    }
+  }
+
+}
+
+#endif
+
 
 void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
 {
@@ -469,60 +590,76 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
   int ireq;
   ireq = 0;
 
+  //Flag to omit hydro transfer when doing particles_density Transfering
+  int buffer_length;
+  bool transfer_hydro = true;
+
+  #ifdef PARTICLES
+  if ( Particles.TRANSFER_DENSITY_BOUNDARIES ) transfer_hydro = false;
+  #endif
+
   /* x boundaries */
   if(dir == 0)
   {
     if (flags[0]==5) {
-      // load left x communication buffer
-      // 1D
-      if (H.ny == 1 && H.nz == 1) {
-        offset = H.n_ghost;
-        for (i=0;i<H.n_ghost;i++) {
-          idx = (i+H.n_ghost);
-          gidx = i;
-          for (ii=0; ii<H.n_fields; ii++) {
-            *(send_buffer_x0 + gidx + ii*offset) = C.density[idx + ii*H.n_cells];
-          }
-        }
-      }
-      // 2D
-      if (H.ny > 1 && H.nz == 1) {
-        offset = H.n_ghost*(H.ny-2*H.n_ghost);
-        for (i=0;i<H.n_ghost;i++) {
-          for (j=0;j<H.ny-2*H.n_ghost;j++) {
-            idx = (i+H.n_ghost) + (j+H.n_ghost)*H.nx;
-            gidx = i + j*H.n_ghost;
+      if ( transfer_hydro ){
+        // load left x communication buffer
+        // 1D
+        if (H.ny == 1 && H.nz == 1) {
+          offset = H.n_ghost;
+          for (i=0;i<H.n_ghost;i++) {
+            idx = (i+H.n_ghost);
+            gidx = i;
             for (ii=0; ii<H.n_fields; ii++) {
               *(send_buffer_x0 + gidx + ii*offset) = C.density[idx + ii*H.n_cells];
             }
           }
         }
-      }
-      // 3D
-      if (H.ny > 1 && H.nz > 1) {
-        offset = H.n_ghost*(H.ny-2*H.n_ghost)*(H.nz-2*H.n_ghost);
-        for(i=0;i<H.n_ghost;i++)
-        {
-          for(j=0;j<H.ny-2*H.n_ghost;j++)
-          {
-            for(k=0;k<H.nz-2*H.n_ghost;k++)
-            {
-              idx  = (i+H.n_ghost) + (j+H.n_ghost)*H.nx + (k+H.n_ghost)*H.nx*H.ny;
-              gidx = i + j*H.n_ghost + k*H.n_ghost*(H.ny-2*H.n_ghost);
+        // 2D
+        if (H.ny > 1 && H.nz == 1) {
+          offset = H.n_ghost*(H.ny-2*H.n_ghost);
+          for (i=0;i<H.n_ghost;i++) {
+            for (j=0;j<H.ny-2*H.n_ghost;j++) {
+              idx = (i+H.n_ghost) + (j+H.n_ghost)*H.nx;
+              gidx = i + j*H.n_ghost;
               for (ii=0; ii<H.n_fields; ii++) {
                 *(send_buffer_x0 + gidx + ii*offset) = C.density[idx + ii*H.n_cells];
               }
             }
           }
         }
+        // 3D
+        if (H.ny > 1 && H.nz > 1) {
+          offset = H.n_ghost*(H.ny-2*H.n_ghost)*(H.nz-2*H.n_ghost);
+          for(i=0;i<H.n_ghost;i++)
+          {
+            for(j=0;j<H.ny-2*H.n_ghost;j++)
+            {
+              for(k=0;k<H.nz-2*H.n_ghost;k++)
+              {
+                idx  = (i+H.n_ghost) + (j+H.n_ghost)*H.nx + (k+H.n_ghost)*H.nx*H.ny;
+                gidx = i + j*H.n_ghost + k*H.n_ghost*(H.ny-2*H.n_ghost);
+                for (ii=0; ii<H.n_fields; ii++) {
+                  *(send_buffer_x0 + gidx + ii*offset) = C.density[idx + ii*H.n_cells];
+                }
+              }
+            }
+          }
+        }
       }
+
+      if( transfer_hydro ) buffer_length = x_buffer_length;
+
+      #ifdef PARTICLES
+      if( !transfer_hydro) buffer_length = Load_Particles_Density_Boundary_to_Buffer( 0, 0, send_buffer_x0  );
+      #endif
 
 
       //post non-blocking receive left x communication buffer
-      MPI_Irecv(recv_buffer_x0, x_buffer_length, MPI_CHREAL, source[0], 0, world, &recv_request[ireq]);
+      MPI_Irecv(recv_buffer_x0, buffer_length, MPI_CHREAL, source[0], 0, world, &recv_request[ireq]);
 
       //non-blocking send left x communication buffer
-      MPI_Isend(send_buffer_x0, x_buffer_length, MPI_CHREAL, dest[0],   1, world, &send_request[0]);
+      MPI_Isend(send_buffer_x0, buffer_length, MPI_CHREAL, dest[0],   1, world, &send_request[0]);
 
       //keep track of how many sends and receives are expected
       ireq++;
@@ -530,55 +667,63 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
 
     if(flags[1]==5)
     {
-      // load right x communication buffer
-      // 1D
-      if (H.ny == 1 && H.nz == 1) {
-        offset = H.n_ghost;
-        for (i=0;i<H.n_ghost;i++) {
-          idx = (i+H.nx-2*H.n_ghost);
-          gidx = i;
-          for (ii=0; ii<H.n_fields; ii++) {
-            *(send_buffer_x1 + gidx + ii*offset) = C.density[idx + ii*H.n_cells];
-          }
-        }
-      }
-      // 2D
-      if (H.ny > 1 && H.nz == 1) {
-        offset = H.n_ghost*(H.ny-2*H.n_ghost);
-        for (i=0;i<H.n_ghost;i++) {
-          for (j=0;j<H.ny-2*H.n_ghost;j++) {
-            idx = (i+H.nx-2*H.n_ghost) + (j+H.n_ghost)*H.nx;
-            gidx = i + j*H.n_ghost;
+      if ( transfer_hydro ){
+        // load right x communication buffer
+        // 1D
+        if (H.ny == 1 && H.nz == 1) {
+          offset = H.n_ghost;
+          for (i=0;i<H.n_ghost;i++) {
+            idx = (i+H.nx-2*H.n_ghost);
+            gidx = i;
             for (ii=0; ii<H.n_fields; ii++) {
               *(send_buffer_x1 + gidx + ii*offset) = C.density[idx + ii*H.n_cells];
             }
           }
         }
-      }
-      // 3D
-      if (H.ny > 1 && H.nz > 1) {
-        offset = H.n_ghost*(H.ny-2*H.n_ghost)*(H.nz-2*H.n_ghost);
-        for(i=0;i<H.n_ghost;i++)
-        {
-          for(j=0;j<H.ny-2*H.n_ghost;j++)
-          {
-            for(k=0;k<H.nz-2*H.n_ghost;k++)
-            {
-              idx  = (i+H.nx-2*H.n_ghost) + (j+H.n_ghost)*H.nx + (k+H.n_ghost)*H.nx*H.ny;
-              gidx = i + j*H.n_ghost + k*H.n_ghost*(H.ny-2*H.n_ghost);
+        // 2D
+        if (H.ny > 1 && H.nz == 1) {
+          offset = H.n_ghost*(H.ny-2*H.n_ghost);
+          for (i=0;i<H.n_ghost;i++) {
+            for (j=0;j<H.ny-2*H.n_ghost;j++) {
+              idx = (i+H.nx-2*H.n_ghost) + (j+H.n_ghost)*H.nx;
+              gidx = i + j*H.n_ghost;
               for (ii=0; ii<H.n_fields; ii++) {
                 *(send_buffer_x1 + gidx + ii*offset) = C.density[idx + ii*H.n_cells];
               }
             }
           }
         }
+        // 3D
+        if (H.ny > 1 && H.nz > 1) {
+          offset = H.n_ghost*(H.ny-2*H.n_ghost)*(H.nz-2*H.n_ghost);
+          for(i=0;i<H.n_ghost;i++)
+          {
+            for(j=0;j<H.ny-2*H.n_ghost;j++)
+            {
+              for(k=0;k<H.nz-2*H.n_ghost;k++)
+              {
+                idx  = (i+H.nx-2*H.n_ghost) + (j+H.n_ghost)*H.nx + (k+H.n_ghost)*H.nx*H.ny;
+                gidx = i + j*H.n_ghost + k*H.n_ghost*(H.ny-2*H.n_ghost);
+                for (ii=0; ii<H.n_fields; ii++) {
+                  *(send_buffer_x1 + gidx + ii*offset) = C.density[idx + ii*H.n_cells];
+                }
+              }
+            }
+          }
+        }
       }
 
+      if (transfer_hydro) buffer_length = x_buffer_length;
+
+      #ifdef PARTICLES
+      if( !transfer_hydro) buffer_length = Load_Particles_Density_Boundary_to_Buffer( 0, 1, send_buffer_x1  );
+      #endif
+
       //post non-blocking receive right x communication buffer
-      MPI_Irecv(recv_buffer_x1, x_buffer_length, MPI_CHREAL, source[1], 1, world, &recv_request[ireq]);
+      MPI_Irecv(recv_buffer_x1, buffer_length, MPI_CHREAL, source[1], 1, world, &recv_request[ireq]);
 
       //non-blocking send right x communication buffer
-      MPI_Isend(send_buffer_x1, x_buffer_length, MPI_CHREAL, dest[1],   0, world, &send_request[1]);
+      MPI_Isend(send_buffer_x1, buffer_length, MPI_CHREAL, dest[1],   0, world, &send_request[1]);
 
       //keep track of how many sends and receives are expected
       ireq++;
@@ -591,43 +736,51 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
     // load left y communication buffer
     if(flags[2] == 5)
     {
-      // 2D
-      if (H.nz == 1) {
-        offset = H.n_ghost*H.nx;
-        for (i=0;i<H.nx;i++) {
-          for (j=0;j<H.n_ghost;j++) {
-            idx = i + (j+H.n_ghost)*H.nx;
-            gidx = i + j*H.nx;
-            for (ii=0; ii<H.n_fields; ii++) {
-              *(send_buffer_y0 + gidx + ii*offset) = C.density[idx + ii*H.n_cells];
-            }
-          }
-        }
-      }
-      // 3D
-      if (H.nz > 1) {
-        offset = H.n_ghost*H.nx*(H.nz-2*H.n_ghost);
-        for(i=0;i<H.nx;i++)
-        {
-          for(j=0;j<H.n_ghost;j++)
-          {
-            for(k=0;k<H.nz-2*H.n_ghost;k++)
-            {
-              idx  = i + (j+H.n_ghost)*H.nx + (k+H.n_ghost)*H.nx*H.ny;
-              gidx = i + j*H.nx + k*H.nx*H.n_ghost;
+      if (transfer_hydro){
+        // 2D
+        if (H.nz == 1) {
+          offset = H.n_ghost*H.nx;
+          for (i=0;i<H.nx;i++) {
+            for (j=0;j<H.n_ghost;j++) {
+              idx = i + (j+H.n_ghost)*H.nx;
+              gidx = i + j*H.nx;
               for (ii=0; ii<H.n_fields; ii++) {
                 *(send_buffer_y0 + gidx + ii*offset) = C.density[idx + ii*H.n_cells];
               }
             }
           }
         }
+        // 3D
+        if (H.nz > 1) {
+          offset = H.n_ghost*H.nx*(H.nz-2*H.n_ghost);
+          for(i=0;i<H.nx;i++)
+          {
+            for(j=0;j<H.n_ghost;j++)
+            {
+              for(k=0;k<H.nz-2*H.n_ghost;k++)
+              {
+                idx  = i + (j+H.n_ghost)*H.nx + (k+H.n_ghost)*H.nx*H.ny;
+                gidx = i + j*H.nx + k*H.nx*H.n_ghost;
+                for (ii=0; ii<H.n_fields; ii++) {
+                  *(send_buffer_y0 + gidx + ii*offset) = C.density[idx + ii*H.n_cells];
+                }
+              }
+            }
+          }
+        }
       }
 
+      if ( transfer_hydro ) buffer_length = y_buffer_length;
+
+      #ifdef PARTICLES
+      if( !transfer_hydro) buffer_length = Load_Particles_Density_Boundary_to_Buffer( 1, 0, send_buffer_y0  );
+      #endif
+
       //post non-blocking receive left y communication buffer
-      MPI_Irecv(recv_buffer_y0, y_buffer_length, MPI_CHREAL, source[2], 2, world, &recv_request[ireq]);
+      MPI_Irecv(recv_buffer_y0, buffer_length, MPI_CHREAL, source[2], 2, world, &recv_request[ireq]);
 
       //non-blocking send left y communication buffer
-      MPI_Isend(send_buffer_y0, y_buffer_length, MPI_CHREAL, dest[2],   3, world, &send_request[0]);
+      MPI_Isend(send_buffer_y0, buffer_length, MPI_CHREAL, dest[2],   3, world, &send_request[0]);
 
       //keep track of how many sends and receives are expected
       ireq++;
@@ -636,43 +789,51 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
     // load right y communication buffer
     if(flags[3]==5)
     {
-      // 2D
-      if (H.nz == 1) {
-        offset = H.n_ghost*H.nx;
-        for (i=0;i<H.nx;i++) {
-          for (j=0;j<H.n_ghost;j++) {
-            idx = i + (j+H.ny-2*H.n_ghost)*H.nx;
-            gidx = i + j*H.nx;
-            for (ii=0; ii<H.n_fields; ii++) {
-              *(send_buffer_y1 + gidx + ii*offset) = C.density[idx + ii*H.n_cells];
-            }
-          }
-        }
-      }
-      // 3D
-      if (H.nz > 1) {
-        offset = H.n_ghost*H.nx*(H.nz-2*H.n_ghost);
-        for(i=0;i<H.nx;i++)
-        {
-          for(j=0;j<H.n_ghost;j++)
-          {
-            for(k=0;k<H.nz-2*H.n_ghost;k++)
-            {
-              idx  = i + (j+H.ny-2*H.n_ghost)*H.nx + (k+H.n_ghost)*H.nx*H.ny;
-              gidx = i + j*H.nx + k*H.nx*H.n_ghost;
+      if ( transfer_hydro ){
+        // 2D
+        if (H.nz == 1) {
+          offset = H.n_ghost*H.nx;
+          for (i=0;i<H.nx;i++) {
+            for (j=0;j<H.n_ghost;j++) {
+              idx = i + (j+H.ny-2*H.n_ghost)*H.nx;
+              gidx = i + j*H.nx;
               for (ii=0; ii<H.n_fields; ii++) {
                 *(send_buffer_y1 + gidx + ii*offset) = C.density[idx + ii*H.n_cells];
               }
             }
           }
         }
+        // 3D
+        if (H.nz > 1) {
+          offset = H.n_ghost*H.nx*(H.nz-2*H.n_ghost);
+          for(i=0;i<H.nx;i++)
+          {
+            for(j=0;j<H.n_ghost;j++)
+            {
+              for(k=0;k<H.nz-2*H.n_ghost;k++)
+              {
+                idx  = i + (j+H.ny-2*H.n_ghost)*H.nx + (k+H.n_ghost)*H.nx*H.ny;
+                gidx = i + j*H.nx + k*H.nx*H.n_ghost;
+                for (ii=0; ii<H.n_fields; ii++) {
+                  *(send_buffer_y1 + gidx + ii*offset) = C.density[idx + ii*H.n_cells];
+                }
+              }
+            }
+          }
+        }
       }
 
+      if ( transfer_hydro ) buffer_length = y_buffer_length;
+
+      #ifdef PARTICLES
+      if( !transfer_hydro) buffer_length = Load_Particles_Density_Boundary_to_Buffer( 1, 1, send_buffer_y1  );
+      #endif
+
       //post non-blocking receive right y communication buffer
-      MPI_Irecv(recv_buffer_y1, y_buffer_length, MPI_CHREAL, source[3], 3, world, &recv_request[ireq]);
+      MPI_Irecv(recv_buffer_y1, buffer_length, MPI_CHREAL, source[3], 3, world, &recv_request[ireq]);
 
       //non-blocking send right y communication buffer
-      MPI_Isend(send_buffer_y1, y_buffer_length, MPI_CHREAL, dest[3],   2, world, &send_request[1]);
+      MPI_Isend(send_buffer_y1, buffer_length, MPI_CHREAL, dest[3],   2, world, &send_request[1]);
 
       //keep track of how many sends and receives are expected
       ireq++;
@@ -685,28 +846,36 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
     // left z communication buffer
     if(flags[4]==5)
     {
-      // 3D
-      offset = H.n_ghost*H.nx*H.ny;
-      for(i=0;i<H.nx;i++)
-      {
-        for(j=0;j<H.ny;j++)
+      if ( transfer_hydro ){
+        // 3D
+        offset = H.n_ghost*H.nx*H.ny;
+        for(i=0;i<H.nx;i++)
         {
-          for(k=0;k<H.n_ghost;k++)
+          for(j=0;j<H.ny;j++)
           {
-            idx  = i + j*H.nx + (k+H.n_ghost)*H.nx*H.ny;
-            gidx = i + j*H.nx + k*H.nx*H.ny;
-            for (ii=0; ii<H.n_fields; ii++) {
-              *(send_buffer_z0 + gidx + ii*offset) = C.density[idx + ii*H.n_cells];
+            for(k=0;k<H.n_ghost;k++)
+            {
+              idx  = i + j*H.nx + (k+H.n_ghost)*H.nx*H.ny;
+              gidx = i + j*H.nx + k*H.nx*H.ny;
+              for (ii=0; ii<H.n_fields; ii++) {
+                *(send_buffer_z0 + gidx + ii*offset) = C.density[idx + ii*H.n_cells];
+              }
             }
           }
         }
       }
 
+      if ( transfer_hydro ) buffer_length = z_buffer_length;
+
+      #ifdef PARTICLES
+      if( !transfer_hydro) buffer_length = Load_Particles_Density_Boundary_to_Buffer( 2, 0, send_buffer_z0  );
+      #endif
+
       //post non-blocking receive left z communication buffer
-      MPI_Irecv(recv_buffer_z0, z_buffer_length, MPI_CHREAL, source[4], 4, world, &recv_request[ireq]);
+      MPI_Irecv(recv_buffer_z0, buffer_length, MPI_CHREAL, source[4], 4, world, &recv_request[ireq]);
 
       //non-blocking send left z communication buffer
-      MPI_Isend(send_buffer_z0, z_buffer_length, MPI_CHREAL, dest[4],   5, world, &send_request[0]);
+      MPI_Isend(send_buffer_z0, buffer_length, MPI_CHREAL, dest[4],   5, world, &send_request[0]);
 
       //keep track of how many sends and receives are expected
       ireq++;
@@ -715,27 +884,35 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
     // load right z communication buffer
     if(flags[5]==5)
     {
-      offset = H.n_ghost*H.nx*H.ny;
-      for(i=0;i<H.nx;i++)
-      {
-        for(j=0;j<H.ny;j++)
+      if ( transfer_hydro ){
+        offset = H.n_ghost*H.nx*H.ny;
+        for(i=0;i<H.nx;i++)
         {
-          for(k=0;k<H.n_ghost;k++)
+          for(j=0;j<H.ny;j++)
           {
-            idx  = i + j*H.nx + (k+H.nz-2*H.n_ghost)*H.nx*H.ny;
-            gidx = i + j*H.nx + k*H.nx*H.ny;
-            for (ii=0; ii<H.n_fields; ii++) {
-              *(send_buffer_z1 + gidx + ii*offset) = C.density[idx + ii*H.n_cells];
+            for(k=0;k<H.n_ghost;k++)
+            {
+              idx  = i + j*H.nx + (k+H.nz-2*H.n_ghost)*H.nx*H.ny;
+              gidx = i + j*H.nx + k*H.nx*H.ny;
+              for (ii=0; ii<H.n_fields; ii++) {
+                *(send_buffer_z1 + gidx + ii*offset) = C.density[idx + ii*H.n_cells];
+              }
             }
           }
         }
       }
 
+      if ( transfer_hydro ) buffer_length = z_buffer_length;
+
+      #ifdef PARTICLES
+      if( !transfer_hydro) buffer_length = Load_Particles_Density_Boundary_to_Buffer( 2, 1, send_buffer_z1  );
+      #endif
+
       //post non-blocking receive right x communication buffer
-      MPI_Irecv(recv_buffer_z1, z_buffer_length, MPI_CHREAL, source[5], 5, world, &recv_request[ireq]);
+      MPI_Irecv(recv_buffer_z1, buffer_length, MPI_CHREAL, source[5], 5, world, &recv_request[ireq]);
 
       //non-blocking send right x communication buffer
-      MPI_Isend(send_buffer_z1, z_buffer_length, MPI_CHREAL, dest[5],   4, world, &send_request[1]);
+      MPI_Isend(send_buffer_z1, buffer_length, MPI_CHREAL, dest[5],   4, world, &send_request[1]);
 
       //keep track of how many sends and receives are expected
       ireq++;
@@ -879,154 +1056,196 @@ void Grid3D::Unload_MPI_Comm_Buffers_BLOCK(int index)
   int gidx;
   int offset;
 
-  //unload left x communication buffer
-  if(index==0)
-  {
-    // 1D
-    if (H.ny == 1 && H.nz == 1) {
-      offset = H.n_ghost;
-      for(i=0;i<H.n_ghost;i++) {
-        idx  = i;
-        gidx = i;
-        for (ii=0; ii<H.n_fields; ii++) {
-          C.density[idx + H.n_cells] = *(recv_buffer_x0 + gidx + ii*offset);
-        }
-      }
-    }
-    // 2D
-    if (H.ny > 1 && H.nz == 1) {
-      offset = H.n_ghost*(H.ny-2*H.n_ghost);
-      for(i=0;i<H.n_ghost;i++) {
-        for (j=0;j<H.ny-2*H.n_ghost;j++) {
-          idx  = i + (j+H.n_ghost)*H.nx;
-          gidx = i + j*H.n_ghost;
+  bool transfer_hydro = true;
+
+  #ifdef PARTICLES
+  if ( Particles.TRANSFER_DENSITY_BOUNDARIES ) transfer_hydro = false;
+  #endif
+
+  if ( transfer_hydro ){
+    //unload left x communication buffer
+    if(index==0)
+    {
+      // 1D
+      if (H.ny == 1 && H.nz == 1) {
+        offset = H.n_ghost;
+        for(i=0;i<H.n_ghost;i++) {
+          idx  = i;
+          gidx = i;
           for (ii=0; ii<H.n_fields; ii++) {
-            C.density[idx + ii*H.n_cells] = *(recv_buffer_x0 + gidx + ii*offset);
+            C.density[idx + H.n_cells] = *(recv_buffer_x0 + gidx + ii*offset);
           }
         }
       }
-    }
-    // 3D
-    if (H.nz > 1) {
-      offset = H.n_ghost*(H.ny-2*H.n_ghost)*(H.nz-2*H.n_ghost);
-      for(i=0;i<H.n_ghost;i++) {
-        for(j=0;j<H.ny-2*H.n_ghost;j++) {
-          for(k=0;k<H.nz-2*H.n_ghost;k++) {
-            idx  = i + (j+H.n_ghost)*H.nx + (k+H.n_ghost)*H.nx*H.ny;
-            gidx = i + j*H.n_ghost + k*H.n_ghost*(H.ny-2*H.n_ghost);
+      // 2D
+      if (H.ny > 1 && H.nz == 1) {
+        offset = H.n_ghost*(H.ny-2*H.n_ghost);
+        for(i=0;i<H.n_ghost;i++) {
+          for (j=0;j<H.ny-2*H.n_ghost;j++) {
+            idx  = i + (j+H.n_ghost)*H.nx;
+            gidx = i + j*H.n_ghost;
             for (ii=0; ii<H.n_fields; ii++) {
               C.density[idx + ii*H.n_cells] = *(recv_buffer_x0 + gidx + ii*offset);
             }
           }
         }
       }
-    }
-  }
-
-  //unload right x communication buffer
-  if(index==1)
-  {
-    // 1D
-    if (H.ny == 1 && H.nz == 1) {
-      offset = H.n_ghost;
-      for(i=0;i<H.n_ghost;i++) {
-        idx  = i+H.nx-H.n_ghost;
-        gidx = i;
-        for (ii=0; ii<H.n_fields; ii++) {
-          C.density[idx + ii*H.n_cells] = *(recv_buffer_x1 + gidx + ii*offset);
+      // 3D
+      if (H.nz > 1) {
+        offset = H.n_ghost*(H.ny-2*H.n_ghost)*(H.nz-2*H.n_ghost);
+        for(i=0;i<H.n_ghost;i++) {
+          for(j=0;j<H.ny-2*H.n_ghost;j++) {
+            for(k=0;k<H.nz-2*H.n_ghost;k++) {
+              idx  = i + (j+H.n_ghost)*H.nx + (k+H.n_ghost)*H.nx*H.ny;
+              gidx = i + j*H.n_ghost + k*H.n_ghost*(H.ny-2*H.n_ghost);
+              for (ii=0; ii<H.n_fields; ii++) {
+                C.density[idx + ii*H.n_cells] = *(recv_buffer_x0 + gidx + ii*offset);
+              }
+            }
+          }
         }
       }
     }
-    // 2D
-    if (H.ny > 1 && H.nz == 1) {
-      offset = H.n_ghost*(H.ny-2*H.n_ghost);
-      for(i=0;i<H.n_ghost;i++) {
-        for (j=0;j<H.ny-2*H.n_ghost;j++) {
-          idx  = i+H.nx-H.n_ghost + (j+H.n_ghost)*H.nx;
-          gidx = i + j*H.n_ghost;
+
+    //unload right x communication buffer
+    if(index==1)
+    {
+      // 1D
+      if (H.ny == 1 && H.nz == 1) {
+        offset = H.n_ghost;
+        for(i=0;i<H.n_ghost;i++) {
+          idx  = i+H.nx-H.n_ghost;
+          gidx = i;
           for (ii=0; ii<H.n_fields; ii++) {
             C.density[idx + ii*H.n_cells] = *(recv_buffer_x1 + gidx + ii*offset);
           }
         }
       }
-    }
-    // 3D
-    if (H.nz > 1) {
-      offset = H.n_ghost*(H.ny-2*H.n_ghost)*(H.nz-2*H.n_ghost);
-      for(i=0;i<H.n_ghost;i++) {
-        for(j=0;j<H.ny-2*H.n_ghost;j++) {
-          for(k=0;k<H.nz-2*H.n_ghost;k++) {
-            idx  = i+H.nx-H.n_ghost + (j+H.n_ghost)*H.nx + (k+H.n_ghost)*H.nx*H.ny;
-            gidx = i + j*H.n_ghost + k*H.n_ghost*(H.ny-2*H.n_ghost);
+      // 2D
+      if (H.ny > 1 && H.nz == 1) {
+        offset = H.n_ghost*(H.ny-2*H.n_ghost);
+        for(i=0;i<H.n_ghost;i++) {
+          for (j=0;j<H.ny-2*H.n_ghost;j++) {
+            idx  = i+H.nx-H.n_ghost + (j+H.n_ghost)*H.nx;
+            gidx = i + j*H.n_ghost;
             for (ii=0; ii<H.n_fields; ii++) {
               C.density[idx + ii*H.n_cells] = *(recv_buffer_x1 + gidx + ii*offset);
             }
           }
         }
       }
-    }
-  }
-
-
-  //unload left y communication buffer
-  if(index==2)
-  {
-    // 2D
-    if (H.nz == 1) {
-      offset = H.n_ghost*H.nx;
-      for(i=0;i<H.nx;i++) {
-        for (j=0;j<H.n_ghost;j++) {
-          idx  = i + j*H.nx;
-          gidx = i + j*H.nx;
-          for (ii=0; ii<H.n_fields; ii++) {
-            C.density[idx + ii*H.n_cells] = *(recv_buffer_y0 + gidx + ii*offset);
+      // 3D
+      if (H.nz > 1) {
+        offset = H.n_ghost*(H.ny-2*H.n_ghost)*(H.nz-2*H.n_ghost);
+        for(i=0;i<H.n_ghost;i++) {
+          for(j=0;j<H.ny-2*H.n_ghost;j++) {
+            for(k=0;k<H.nz-2*H.n_ghost;k++) {
+              idx  = i+H.nx-H.n_ghost + (j+H.n_ghost)*H.nx + (k+H.n_ghost)*H.nx*H.ny;
+              gidx = i + j*H.n_ghost + k*H.n_ghost*(H.ny-2*H.n_ghost);
+              for (ii=0; ii<H.n_fields; ii++) {
+                C.density[idx + ii*H.n_cells] = *(recv_buffer_x1 + gidx + ii*offset);
+              }
+            }
           }
         }
       }
     }
-    // 3D
-    if (H.nz > 1) {
-      offset = H.n_ghost*H.nx*(H.nz-2*H.n_ghost);
-      for(i=0;i<H.nx;i++) {
-        for(j=0;j<H.n_ghost;j++) {
-          for(k=0;k<H.nz-2*H.n_ghost;k++) {
-            idx  = i + j*H.nx + (k+H.n_ghost)*H.nx*H.ny;
-            gidx = i + j*H.nx + k*H.nx*H.n_ghost;
+
+
+    //unload left y communication buffer
+    if(index==2)
+    {
+      // 2D
+      if (H.nz == 1) {
+        offset = H.n_ghost*H.nx;
+        for(i=0;i<H.nx;i++) {
+          for (j=0;j<H.n_ghost;j++) {
+            idx  = i + j*H.nx;
+            gidx = i + j*H.nx;
             for (ii=0; ii<H.n_fields; ii++) {
               C.density[idx + ii*H.n_cells] = *(recv_buffer_y0 + gidx + ii*offset);
             }
           }
         }
       }
-    }
-  }
-
-  //unload right y communication buffer
-  if(index==3)
-  {
-    // 2D
-    if (H.nz == 1) {
-      offset = H.n_ghost*H.nx;
-      for(i=0;i<H.nx;i++) {
-        for (j=0;j<H.n_ghost;j++) {
-          idx  = i + (j+H.ny-H.n_ghost)*H.nx;
-          gidx = i + j*H.nx;
-          for (ii=0; ii<H.n_fields; ii++) {
-            C.density[idx + ii*H.n_cells] = *(recv_buffer_y1 + gidx + ii*offset);
+      // 3D
+      if (H.nz > 1) {
+        offset = H.n_ghost*H.nx*(H.nz-2*H.n_ghost);
+        for(i=0;i<H.nx;i++) {
+          for(j=0;j<H.n_ghost;j++) {
+            for(k=0;k<H.nz-2*H.n_ghost;k++) {
+              idx  = i + j*H.nx + (k+H.n_ghost)*H.nx*H.ny;
+              gidx = i + j*H.nx + k*H.nx*H.n_ghost;
+              for (ii=0; ii<H.n_fields; ii++) {
+                C.density[idx + ii*H.n_cells] = *(recv_buffer_y0 + gidx + ii*offset);
+              }
+            }
           }
         }
       }
     }
-    // 3D
-    if (H.nz > 1) {
-      offset = H.n_ghost*H.nx*(H.nz-2*H.n_ghost);
-      for(i=0;i<H.nx;i++) {
-        for(j=0;j<H.n_ghost;j++) {
-          for(k=0;k<H.nz-2*H.n_ghost;k++) {
-            idx  = i + (j+H.ny-H.n_ghost)*H.nx + (k+H.n_ghost)*H.nx*H.ny;
-            gidx = i + j*H.nx + k*H.nx*H.n_ghost;
+
+    //unload right y communication buffer
+    if(index==3)
+    {
+      // 2D
+      if (H.nz == 1) {
+        offset = H.n_ghost*H.nx;
+        for(i=0;i<H.nx;i++) {
+          for (j=0;j<H.n_ghost;j++) {
+            idx  = i + (j+H.ny-H.n_ghost)*H.nx;
+            gidx = i + j*H.nx;
             for (ii=0; ii<H.n_fields; ii++) {
               C.density[idx + ii*H.n_cells] = *(recv_buffer_y1 + gidx + ii*offset);
+            }
+          }
+        }
+      }
+      // 3D
+      if (H.nz > 1) {
+        offset = H.n_ghost*H.nx*(H.nz-2*H.n_ghost);
+        for(i=0;i<H.nx;i++) {
+          for(j=0;j<H.n_ghost;j++) {
+            for(k=0;k<H.nz-2*H.n_ghost;k++) {
+              idx  = i + (j+H.ny-H.n_ghost)*H.nx + (k+H.n_ghost)*H.nx*H.ny;
+              gidx = i + j*H.nx + k*H.nx*H.n_ghost;
+              for (ii=0; ii<H.n_fields; ii++) {
+                C.density[idx + ii*H.n_cells] = *(recv_buffer_y1 + gidx + ii*offset);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    //unload left z communication buffer
+    if(index==4)
+    {
+      offset = H.n_ghost*H.nx*H.ny;
+      for(i=0;i<H.nx;i++) {
+        for(j=0;j<H.ny;j++) {
+          for(k=0;k<H.n_ghost;k++) {
+            idx  = i + j*H.nx + k*H.nx*H.ny;
+            gidx = i + j*H.nx + k*H.nx*H.ny;
+            for (ii=0; ii<H.n_fields; ii++) {
+              C.density[idx + ii*H.n_cells] = *(recv_buffer_z0 + gidx + ii*offset);
+            }
+          }
+        }
+      }
+    }
+
+    //unload right z communication buffer
+    if(index==5)
+    {
+      offset = H.n_ghost*H.nx*H.ny;
+      for(i=0;i<H.nx;i++) {
+        for(j=0;j<H.ny;j++) {
+          for(k=0;k<H.n_ghost;k++) {
+            idx  = i + j*H.nx + (k+H.nz-H.n_ghost)*H.nx*H.ny;
+            gidx = i + j*H.nx + k*H.nx*H.ny;
+            for (ii=0; ii<H.n_fields; ii++) {
+              C.density[idx + ii*H.n_cells] = *(recv_buffer_z1 + gidx + ii*offset);
             }
           }
         }
@@ -1034,39 +1253,16 @@ void Grid3D::Unload_MPI_Comm_Buffers_BLOCK(int index)
     }
   }
 
-  //unload left z communication buffer
-  if(index==4)
-  {
-    offset = H.n_ghost*H.nx*H.ny;
-    for(i=0;i<H.nx;i++) {
-      for(j=0;j<H.ny;j++) {
-        for(k=0;k<H.n_ghost;k++) {
-          idx  = i + j*H.nx + k*H.nx*H.ny;
-          gidx = i + j*H.nx + k*H.nx*H.ny;
-          for (ii=0; ii<H.n_fields; ii++) {
-            C.density[idx + ii*H.n_cells] = *(recv_buffer_z0 + gidx + ii*offset);
-          }
-        }
-      }
-    }
+  #ifdef PARTICLES
+  if ( !transfer_hydro ){
+    if ( index == 0 ) Unload_Particles_Density_Boundary_From_Buffer( 0, 0, recv_buffer_x0 );
+    if ( index == 1 ) Unload_Particles_Density_Boundary_From_Buffer( 0, 1, recv_buffer_x1 );
+    if ( index == 2 ) Unload_Particles_Density_Boundary_From_Buffer( 1, 0, recv_buffer_y0 );
+    if ( index == 3 ) Unload_Particles_Density_Boundary_From_Buffer( 1, 1, recv_buffer_y1 );
+    if ( index == 4 ) Unload_Particles_Density_Boundary_From_Buffer( 2, 0, recv_buffer_z0 );
+    if ( index == 5 ) Unload_Particles_Density_Boundary_From_Buffer( 2, 1, recv_buffer_z1 );
   }
-
-  //unload right z communication buffer
-  if(index==5)
-  {
-    offset = H.n_ghost*H.nx*H.ny;
-    for(i=0;i<H.nx;i++) {
-      for(j=0;j<H.ny;j++) {
-        for(k=0;k<H.n_ghost;k++) {
-          idx  = i + j*H.nx + (k+H.nz-H.n_ghost)*H.nx*H.ny;
-          gidx = i + j*H.nx + k*H.nx*H.ny;
-          for (ii=0; ii<H.n_fields; ii++) {
-            C.density[idx + ii*H.n_cells] = *(recv_buffer_z1 + gidx + ii*offset);
-          }
-        }
-      }
-    }
-  }
+  #endif
 
 }
 

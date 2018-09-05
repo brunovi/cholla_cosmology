@@ -144,7 +144,8 @@ int main(int argc, char *argv[])
   Real time_potential, time_particles_density;
   time_potential = time_particles_density = 0;
   #ifdef GRAVITY
-  Compute_Gravitational_Potential( G, p_solver, &time_potential, &time_particles_density );
+  Compute_Gravitational_Potential( G, p_solver, &time_potential, &time_particles_density, P );
+  chprintf( " Time Particles Density: %f\n", time_particles_density );
   Copy_Potential_To_Hydro_Grid( G );
   #endif
 
@@ -289,7 +290,7 @@ int main(int argc, char *argv[])
 
     //Compute Gravitational potential for next step
     #ifdef GRAVITY
-    Compute_Gravitational_Potential( G, p_solver, &time_potential, &time_particles_density );
+    Compute_Gravitational_Potential( G, p_solver, &time_potential, &time_particles_density, P );
     Copy_Potential_To_Hydro_Grid( G );
     #ifdef CPU_TIME
     chprintf( " Time Potential: %f\n", time_potential );
@@ -410,10 +411,11 @@ int main(int argc, char *argv[])
   chprintf(" Time Average Particles: %f\n", time_particles_total);
   chprintf(" Time Average Total: %f\n", time_all_total);
 
+
   // Output timing values
   ofstream out_file;
   out_file.open("run_timing.log", ios::app);
-  out_file << G.Grav.nz_total << " " << G.Grav.ny_total << " " << G.Grav.nx_total << " ";
+  out_file << P.nz << " " << P.ny << " " << P.nx << " ";
   #ifndef PARTICLES_OMP
   out_file << 0 << " ";
   #endif

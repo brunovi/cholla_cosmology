@@ -67,6 +67,9 @@ void Particles_3D::Initialize( struct parameters P, Grav3D &Grav, Real xblocal, 
 
   Initialize_values_CPU();
 
+  // Initialize_Sphere();
+  Initialize_Uniform_Grid();
+
   if (strcmp(P.init, "Read_Grid")==0)  Load_Particles_Data( *this, P );
 
   chprintf("Particles Initialized: \n n_local: %lu \n", n_local );
@@ -153,10 +156,6 @@ void Particles_3D::Initialize_values_CPU( void ){
     G.gravity_y[id] = 0;
     G.gravity_z[id] = 0;
   }
-
-
-  // Initialize_Sphere();
-  // Initialize_Uniform_Grid();
 }
 
 
@@ -166,9 +165,9 @@ void Particles_3D::Initialize_Uniform_Grid( void ){
   part_int_t pID = 0;
   Real Mparticle = G.dx*G.dy*G.dz;
   Real offset_x, offset_y, offset_z;
-  offset_x = -0.3*G.dx;
-  offset_y = 0.2*G.dy;
-  offset_z = -0.1*G.dz;
+  offset_x = 0.1*G.dx;
+  offset_y = -0.2*G.dy;
+  offset_z = -0.3*G.dz;
   for (k=0; k<G.nz_local; k++ ){
     for (j=0; j<G.ny_local; j++ ){
       for (i=0; i<G.nx_local; i++ ){

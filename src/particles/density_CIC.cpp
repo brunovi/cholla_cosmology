@@ -119,15 +119,18 @@ void Copy_Particles_Density_to_Gravity( Grid3D &G ){
 }
 
 
-void Get_Particles_Density_CIC( Particles_3D &Parts ){
+void Get_Particles_Density_CIC( Grid3D &G, struct parameters P ){
 
   // chprintf(" Computing Particles Density: CIC\n");
 
-  Clear_Density( Parts );
-  Get_Density_CIC( Parts );
+  Clear_Density( G.Particles );
+  Get_Density_CIC( G.Particles );
 
-  Tranfer_Particles_Density_Boundaries( Parts );
-
+  #ifndef MPI_CHOLLA
+  Transfer_Particles_Density_Boundaries( G.Particles );
+  #else
+  Transfer_Particles_Density_Boundaries_MPI( G, P );
+  #endif
 
 }
 

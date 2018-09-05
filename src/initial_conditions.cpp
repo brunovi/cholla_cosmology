@@ -58,6 +58,8 @@ void Grid3D::Set_Initial_Conditions(parameters P) {
     Sphere_explosion_3D();
   } else if (strcmp(P.init, "Sphere_collapse_3D")==0) {
     Sphere_collapse_3D();
+  } else if (strcmp(P.init, "Uniform_Grid")==0) {
+    Uniform_Grid();
   } else if (strcmp(P.init, "Read_Grid")==0) {
     #ifndef ONLY_PM
     Read_Grid(P);
@@ -1072,8 +1074,8 @@ void Grid3D::Sphere_collapse_3D()
 
         // // get the centered cell positions at (i,j,k)
         Get_Position(i, j, k, &x_pos, &y_pos, &z_pos);
-        density = 0.0001;
-        pressure = 0.00001;
+        density = 0.0005;
+        pressure = 0.0005;
 
         r = sqrt( (x_pos-center_x)*(x_pos-center_x) + (y_pos-center_y)*(y_pos-center_y) + (z_pos-center_z)*(z_pos-center_z) );
         if ( r < 0.2 ){

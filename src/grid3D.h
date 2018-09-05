@@ -515,6 +515,11 @@ class Grid3D
     void Unload_MPI_Comm_Buffers(int index);
     void Unload_MPI_Comm_Buffers_SLAB(int index);
     void Unload_MPI_Comm_Buffers_BLOCK(int index);
+
+    #ifdef PARTICLES
+    int Load_Particles_Density_Boundary_to_Buffer( int direction, int side, Real *buffer );
+    void Unload_Particles_Density_Boundary_From_Buffer( int direction, int side, Real *buffer  );
+    #endif
 #endif /*MPI_CHOLLA*/
 
 

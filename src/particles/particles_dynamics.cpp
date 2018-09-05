@@ -44,7 +44,7 @@ void Advance_Particles_step2( Particles_3D &Particles, part_int_t p_start, part_
     Particles.vel_z[pID] += 0.5 * dt * Particles.grav_z[pID];
   }
 }
-
+#ifdef COSMOLOGY
 void Advance_Particles_step1_cosmo_LeapFrog( Particles_3D &Particles, Cosmology &Cosmo, part_int_t p_start, part_int_t p_end ){
 
   part_int_t pIndx;
@@ -149,7 +149,7 @@ void Advance_Particles_step2_cosmo( Particles_3D &Particles, Cosmology &Cosmo, p
   }
 
 }
-
+#endif
 
 Real Get_Particles_dt( Particles_3D &Particles ){
   part_int_t pID;

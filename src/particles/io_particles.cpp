@@ -8,9 +8,9 @@
 #ifdef HDF5
 #include<hdf5.h>
 #endif
-#ifdef MPI_CHOLLA
-#include"mpi_routines.h"
-#endif
+// #ifdef MPI_CHOLLA
+// #include"mpi_routines.h"
+// #endif
 
 #include"io_particles.h"
 
