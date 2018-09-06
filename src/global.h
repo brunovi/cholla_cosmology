@@ -59,6 +59,12 @@ typedef int part_int_t
 #include <vector>
 typedef std::vector<Real> real_vector_t;
 typedef std::vector<part_int_t> int_vector_t;
+
+#ifdef MPI_CHOLLA
+extern int N_PARTICLES_TRANSFER;
+extern int N_DATA_PER_PARTICLE_TRANSFER;
+extern int N_HEADER_PARTICLES_TRANSFER;
+#endif
 #endif
 
 #define SIGN(a) ( ((a) < 0.) ? -1. : 1. )

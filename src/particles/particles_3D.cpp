@@ -5,6 +5,7 @@
 #include "../io.h"
 #include "../random_functions.h"
 #include "io_particles.h"
+#include "../global.h"
 
 
 Particles_3D::Particles_3D( void ){}
@@ -31,6 +32,15 @@ void Particles_3D::Initialize( struct parameters P, Grav3D &Grav, Real xblocal, 
   real_vector_t grav_x;
   real_vector_t grav_y;
   real_vector_t grav_z;
+
+  #ifdef MPI_CHOLLA
+  int_vector_t out_indxs_vec_x0;
+  int_vector_t out_indxs_vec_x1;
+  int_vector_t out_indxs_vec_y0;
+  int_vector_t out_indxs_vec_y1;
+  int_vector_t out_indxs_vec_z0;
+  int_vector_t out_indxs_vec_z1;
+  #endif
 
   G.nx_local = Grav.nx_local;
   G.ny_local = Grav.ny_local;
@@ -100,6 +110,18 @@ void Particles_3D::Initialize( struct parameters P, Grav3D &Grav, Real xblocal, 
     }
   }
   #endif
+
+  #ifdef MPI_CHOLLA
+  int n_max = std::max( G.nx_local, G.ny_local );
+  n_max = std::max( n_max, G.nz_local );
+  N_PARTICLES_TRANSFER = n_max * 10 ;
+  N_DATA_PER_PARTICLE_TRANSFER = 8;
+  N_HEADER_PARTICLES_TRANSFER = 1;
+  chprintf( " N_Particles Boundaries Buffer Size: %d\n", N_PARTICLES_TRANSFER);
+  chprintf( " N_Data per Particle Transfer: %d\n", N_DATA_PER_PARTICLE_TRANSFER);
+  chprintf( " N_Header Particle Transfer: %d\n", N_HEADER_PARTICLES_TRANSFER);
+  #endif
+
   chprintf( "\n");
 
 }
@@ -204,10 +226,11 @@ void Particles_3D::Initialize_Sphere( void ){
   sphereR = 0.2;
 
   part_int_t n_particles_local = G.nx_local*G.ny_local*G.nz_local;
+  part_int_t n_particles_total = G.nx_total*G.ny_total*G.nz_total;
 
   Real rho_start = 1;
   Real M_sphere = 4./3 * M_PI* rho_start * sphereR*sphereR*sphereR;
-  Real Mparticle = M_sphere / n_particles_local;
+  Real Mparticle = M_sphere / n_particles_total;
 
   part_int_t pID = 0;
   Real pPos_x, pPos_y, pPos_z, r;

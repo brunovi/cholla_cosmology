@@ -59,6 +59,12 @@ int x_buffer_length;
 int y_buffer_length;
 int z_buffer_length;
 
+#ifdef PARTICLES
+int x_buffer_length_hydro;
+int y_buffer_length_hydro;
+int z_buffer_length_hydro;
+#endif
+
 /*local domain sizes*/
 /*none of these include ghost cells!*/
 ptrdiff_t nx_global;
@@ -654,6 +660,21 @@ Real ReduceRealAvg(Real x)
   return y;
 }
 
+/* MPI reduction wrapper for sum(part_int)*/
+Real ReducePartIntSum(part_int_t x)
+{
+  part_int_t in = x;
+  part_int_t out;
+  part_int_t y;
+
+  #ifdef LONG_INTS
+  MPI_Allreduce(&in, &out, 1, MPI_LONG, MPI_SUM, world);
+  #else
+  MPI_Allreduce(&in, &out, 1, MPI_INT, MPI_SUM, world);
+  #endif
+  y = (part_int_t) out ;
+  return y;
+}
 
 
 /* Set the domain properties */
@@ -880,6 +901,16 @@ void Allocate_MPI_Buffers_BLOCK(struct Header *H)
     ybsize = H->n_fields*H->n_ghost*(H->nx)*(H->nz-2*H->n_ghost);
     zbsize = H->n_fields*H->n_ghost*(H->nx)*(H->ny);
   }
+
+  #ifdef PARTICLES
+  x_buffer_length_hydro = xbsize;
+  y_buffer_length_hydro = ybsize;
+  z_buffer_length_hydro = zbsize;
+
+  xbsize += N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;
+  ybsize += N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;
+  zbsize += N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;
+  #endif
 
   x_buffer_length = xbsize;
   y_buffer_length = ybsize;

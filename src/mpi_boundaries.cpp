@@ -364,7 +364,16 @@ void Grid3D::Set_Edge_Boundary_Extents(int dir, int edge, int *imin, int *imax)
   }
 }
 
-
+#ifdef PARTICLES
+void Clear_Buffers_For_Particles_Transfers( void ){
+  send_buffer_x0[x_buffer_length_hydro] = 0;
+  send_buffer_x1[x_buffer_length_hydro] = 0;
+  send_buffer_y0[y_buffer_length_hydro] = 0;
+  send_buffer_y1[y_buffer_length_hydro] = 0;
+  send_buffer_z0[z_buffer_length_hydro] = 0;
+  send_buffer_z1[z_buffer_length_hydro] = 0;
+}
+#endif
 
 
 void Grid3D::Load_and_Send_MPI_Comm_Buffers(int dir, int *flags)
@@ -378,6 +387,14 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers(int dir, int *flags)
       break;
     case BLOCK_DECOMP:
       /*load communication buffers*/
+
+      #ifdef PARTICLES
+      if ( !Particles.TRANSFER_DENSITY_BOUNDARIES){
+        Clear_Buffers_For_Particles_Transfers();
+        Particles.Select_Particles_to_Transfer();
+      }
+      #endif
+
       Load_and_Send_MPI_Comm_Buffers_BLOCK(dir, flags);
       break;
   }
@@ -578,6 +595,35 @@ void Grid3D::Unload_Particles_Density_Boundary_From_Buffer( int direction, int s
 
 }
 
+void Grid3D::Load_Particles_to_Buffer_X( void ){
+  Particles.Load_Particles_to_Buffer( 0, 0, x_buffer_length_hydro , send_buffer_x0  );
+  Particles.Load_Particles_to_Buffer( 0, 1, x_buffer_length_hydro , send_buffer_x1  );
+  Particles.Load_Particles_to_Buffer( 1, 0, y_buffer_length_hydro , send_buffer_y0  );
+  Particles.Load_Particles_to_Buffer( 1, 1, y_buffer_length_hydro , send_buffer_y1  );
+  Particles.Load_Particles_to_Buffer( 2, 0, z_buffer_length_hydro , send_buffer_z0  );
+  Particles.Load_Particles_to_Buffer( 2, 1, z_buffer_length_hydro , send_buffer_z1  );
+}
+
+void Grid3D::Load_Particles_to_Buffer_Y( void ){
+  Particles.Unload_Particles_from_Buffer( 0, 0,  x_buffer_length_hydro, recv_buffer_x0, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1  );
+  Particles.Unload_Particles_from_Buffer( 0, 1,  x_buffer_length_hydro, recv_buffer_x1, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1  );
+}
+
+void Grid3D::Load_Particles_to_Buffer_Z( void ){
+  Particles.Unload_Particles_from_Buffer( 1, 0,  y_buffer_length_hydro, recv_buffer_y0, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1  );
+  Particles.Unload_Particles_from_Buffer( 1, 1,  y_buffer_length_hydro, recv_buffer_y1, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1  );
+}
+
+
+
+void Grid3D::Finish_Particles_Transfer( void ){
+  Particles.Unload_Particles_from_Buffer( 2, 0,  z_buffer_length_hydro, recv_buffer_z0, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1  );
+  Particles.Unload_Particles_from_Buffer( 2, 1,  z_buffer_length_hydro, recv_buffer_z1, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1  );
+  Particles.Remove_Transfered_Particles();
+}
+
+
+
 #endif
 
 
@@ -651,7 +697,12 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       if( transfer_hydro ) buffer_length = x_buffer_length;
 
       #ifdef PARTICLES
-      if( !transfer_hydro) buffer_length = Load_Particles_Density_Boundary_to_Buffer( 0, 0, send_buffer_x0  );
+      if ( transfer_hydro ){
+      Load_Particles_to_Buffer_X();
+      }
+      else{
+        buffer_length = Load_Particles_Density_Boundary_to_Buffer( 0, 0, send_buffer_x0  );
+      }
       #endif
 
 
@@ -773,7 +824,12 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       if ( transfer_hydro ) buffer_length = y_buffer_length;
 
       #ifdef PARTICLES
-      if( !transfer_hydro) buffer_length = Load_Particles_Density_Boundary_to_Buffer( 1, 0, send_buffer_y0  );
+      if ( transfer_hydro ){
+      Load_Particles_to_Buffer_Y();
+      }
+      else{
+       buffer_length = Load_Particles_Density_Boundary_to_Buffer( 1, 0, send_buffer_y0  );
+      }
       #endif
 
       //post non-blocking receive left y communication buffer
@@ -868,7 +924,12 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       if ( transfer_hydro ) buffer_length = z_buffer_length;
 
       #ifdef PARTICLES
-      if( !transfer_hydro) buffer_length = Load_Particles_Density_Boundary_to_Buffer( 2, 0, send_buffer_z0  );
+      if ( transfer_hydro ){
+      Load_Particles_to_Buffer_Z();
+      }
+      else{
+        buffer_length = Load_Particles_Density_Boundary_to_Buffer( 2, 0, send_buffer_z0  );
+      }
       #endif
 
       //post non-blocking receive left z communication buffer
@@ -1261,6 +1322,11 @@ void Grid3D::Unload_MPI_Comm_Buffers_BLOCK(int index)
     if ( index == 3 ) Unload_Particles_Density_Boundary_From_Buffer( 1, 1, recv_buffer_y1 );
     if ( index == 4 ) Unload_Particles_Density_Boundary_From_Buffer( 2, 0, recv_buffer_z0 );
     if ( index == 5 ) Unload_Particles_Density_Boundary_From_Buffer( 2, 1, recv_buffer_z1 );
+  }
+  else{
+    if( index == 5){
+      Finish_Particles_Transfer();
+    }
   }
   #endif
 

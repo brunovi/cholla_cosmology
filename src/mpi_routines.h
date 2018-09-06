@@ -65,6 +65,15 @@ extern int x_buffer_length;
 extern int y_buffer_length;
 extern int z_buffer_length;
 
+#ifdef PARTICLES
+extern int x_buffer_length_hydro;
+extern int y_buffer_length_hydro;
+extern int z_buffer_length_hydro;
+#endif
+
+
+
+
 /*local domain sizes*/
 /*none of these include ghost cells!*/
 extern ptrdiff_t nx_global;
@@ -106,6 +115,9 @@ Real ReduceRealMin(Real x);
 
 /* MPI reduction wrapper for avg(Real)*/
 Real ReduceRealAvg(Real x);
+
+/* MPI reduction wrapper for sum(part_int)*/
+Real ReducePartIntSum(part_int_t x);
 
 /* Set the domain properties */
 void Set_Parallel_Domain(Real xmin_global, Real ymin_global, Real zmin_global, Real xlen_global, Real ylen_global, Real zlen_global, struct Header *H);

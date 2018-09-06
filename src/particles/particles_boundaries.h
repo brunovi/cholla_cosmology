@@ -9,7 +9,9 @@
 
 void Tranfer_Particles_Boundaries( Particles_3D &Parts );
 
+#ifdef MPI_CHOLLA
 
+#endif
 
 
 
