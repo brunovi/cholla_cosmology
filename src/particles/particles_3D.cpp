@@ -77,8 +77,9 @@ void Particles_3D::Initialize( struct parameters P, Grav3D &Grav, Real xblocal, 
 
   Initialize_values_CPU();
 
-  // Initialize_Sphere();
-  Initialize_Uniform_Grid();
+  if (strcmp(P.init, "Sphere_collapse_3D")==0) Initialize_Sphere();
+
+  if (strcmp(P.init, "Uniform_Grid")==0) Initialize_Uniform_Grid();
 
   if (strcmp(P.init, "Read_Grid")==0)  Load_Particles_Data( *this, P );
 
@@ -86,6 +87,15 @@ void Particles_3D::Initialize( struct parameters P, Grav3D &Grav, Real xblocal, 
   chprintf(" xDomain_local:  [%.4f %.4f ] [%.4f %.4f ] [%.4f %.4f ]\n", G.xMin, G.xMax, G.yMin, G.yMax, G.zMin, G.zMax );
   chprintf(" xDomain_global: [%.4f %.4f ] [%.4f %.4f ] [%.4f %.4f ]\n", G.domainMin_x, G.domainMax_x, G.domainMin_y, G.domainMax_y, G.domainMin_z, G.domainMax_z);
   chprintf(" dx: %f  %f  %f\n", G.dx, G.dy, G.dz );
+
+  #ifdef MPI_CHOLLA
+  // for ( int i=0; i<nproc; i++ ){
+  //   if ( procID == i ) std::cout << "  [pId:"  << procID << "]  x[ "<<G.xMin<<" "<<G.xMax<<" ]" <<" y[ "<<G.yMin<<" "<<G.yMax<<" ]" <<" z[ "<<G.zMin<<" "<<G.zMax<<" ]" << std::endl;
+  //   MPI_Barrier(world);
+  // }
+  // MPI_Barrier(world);
+  #endif
+
 
 
   #ifdef PARTICLES_OMP
@@ -112,11 +122,11 @@ void Particles_3D::Initialize( struct parameters P, Grav3D &Grav, Real xblocal, 
   #endif
 
   #ifdef MPI_CHOLLA
-  int n_max = std::max( G.nx_local, G.ny_local );
-  n_max = std::max( n_max, G.nz_local );
-  N_PARTICLES_TRANSFER = n_max * 10 ;
-  N_DATA_PER_PARTICLE_TRANSFER = 8;
-  N_HEADER_PARTICLES_TRANSFER = 1;
+  // int n_max = std::max( G.nx_local, G.ny_local );
+  // n_max = std::max( n_max, G.nz_local );
+  // N_PARTICLES_TRANSFER = n_max * n_max * 10 ;
+  // N_DATA_PER_PARTICLE_TRANSFER = 8;
+  // N_HEADER_PARTICLES_TRANSFER = 1;
   chprintf( " N_Particles Boundaries Buffer Size: %d\n", N_PARTICLES_TRANSFER);
   chprintf( " N_Data per Particle Transfer: %d\n", N_DATA_PER_PARTICLE_TRANSFER);
   chprintf( " N_Header Particle Transfer: %d\n", N_HEADER_PARTICLES_TRANSFER);

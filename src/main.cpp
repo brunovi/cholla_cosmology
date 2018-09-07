@@ -197,6 +197,7 @@ int main(int argc, char *argv[])
   time_hydro_total = time_potential_total = time_particles_total = time_all_total, time_boundaries_total = 0;
   #endif
 
+  bool output_now = false;
   // Evolve the grid, one timestep at a time
   chprintf("Starting calculations.\n");
   while (G.H.t < P.tout)
@@ -237,7 +238,11 @@ int main(int argc, char *argv[])
     }
     #ifdef COSMOLOGY
     G.Cosmo.delta_a = G.Cosmo.max_delta_a;
-    if ( (G.Cosmo.current_a + G.Cosmo.delta_a) >  G.Cosmo.next_output ) G.Cosmo.delta_a = G.Cosmo.next_output - G.Cosmo.current_a;
+    if ( (G.Cosmo.current_a + G.Cosmo.delta_a) >  G.Cosmo.next_output ){
+       G.Cosmo.delta_a = G.Cosmo.next_output - G.Cosmo.current_a;
+       output_now = true;
+       chprintf( " ################################## \n");
+    }
     chprintf( "Current_a: %f    delta_a: %f \n", G.Cosmo.current_a, G.Cosmo.delta_a );
     #endif
     #endif
@@ -325,8 +330,12 @@ int main(int argc, char *argv[])
 
     #ifdef CPU_TIME
     #ifdef MPI_CHOLLA
+    part_int_t n_total;
+    n_total = ReducePartIntSum( G.Particles.n_local );
+    chprintf( " Total Particles: %ld\n", n_total );
     chprintf("hydro min: %9.4f  max: %9.4f  avg: %9.4f\n", hydro_min, hydro_max, hydro_avg);
     chprintf("bound min: %9.4f  max: %9.4f  avg: %9.4f\n", bound_min, bound_max, bound_avg);
+    if ( n_total != G.Grav.nx_total * G.Grav.ny_total * G.Grav.nz_total) break;
     #endif //MPI_CHOLLA
     #endif //CPU_TIME
 
@@ -341,12 +350,11 @@ int main(int argc, char *argv[])
     chprintf("n_step: %d   sim time: %10.7f   sim timestep: %7.4e  timestep time = %9.3f ms   total time = %9.4f s\n",
       G.H.n_step, G.H.t, G.H.dt, (stop_step-start_step)*1000, G.H.t_wall);
 
-    #ifndef COSMO
-    if (G.H.t == outtime)
-    #else
-    if ( G.Cosmo.current_a == G.Cosmo.next_output)
+    #ifndef COSMOLOGY
+    if (G.H.t == outtime) output_now = true;
     #endif
-    {
+
+    if ( output_now ){
       #ifdef OUTPUT
       /*output the grid data*/
       WriteData(G, P, nfile);
@@ -355,6 +363,9 @@ int main(int argc, char *argv[])
       #endif //OUTPUT
       // update to the next output time
       outtime += P.outstep;
+
+      output_now = false;
+
     }
 
     #ifdef CPU_TIME

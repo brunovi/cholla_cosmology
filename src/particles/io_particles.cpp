@@ -276,8 +276,9 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
   status = H5Aclose(attribute_id);
   #endif
 
-
+  #ifndef MPI_CHOLL
   chprintf(" Loading %ld particles\n", n_local);
+  #endif
 
   dataset_buffer_px = (Real *) malloc(n_local*sizeof(Real));
   dataset_id = H5Dopen(file_id, "/pos_x", H5P_DEFAULT);
@@ -352,7 +353,15 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
     Particles.grav_z.push_back( 0.0 );
     Particles.n_local += 1;
   }
+  #ifndef MPI_CHOLLA
   chprintf( " Loaded  %ld  particles\n", Particles.n_local );
+  #else
+  for ( int i=0; i<nproc; i++ ){
+    if ( procID == i ) std::cout << "  [pId:"  << procID << "]  N Particles Loaded: " << Particles.n_local <<  std::endl;
+    MPI_Barrier(world);
+  }
+  MPI_Barrier(world);
+  #endif
 }
 #endif
 

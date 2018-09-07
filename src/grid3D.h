@@ -519,9 +519,20 @@ class Grid3D
     #ifdef PARTICLES
     int Load_Particles_Density_Boundary_to_Buffer( int direction, int side, Real *buffer );
     void Unload_Particles_Density_Boundary_From_Buffer( int direction, int side, Real *buffer  );
-    void Load_Particles_to_Buffer_X( void );
-    void Load_Particles_to_Buffer_Y( void );
-    void Load_Particles_to_Buffer_Z( void );
+    void Load_Particles_to_Buffer_X0( void );
+    void Load_Particles_to_Buffer_X1( void );
+    void Load_Particles_to_Buffer_Y0( void );
+    void Load_Particles_to_Buffer_Y1( void );
+    void Load_Particles_to_Buffer_Z0( void );
+    void Load_Particles_to_Buffer_Z1( void );
+
+    void Unload_Particles_from_Buffer_X_0( void );
+    void Unload_Particles_from_Buffer_X_1( void );
+    void Unload_Particles_from_Buffer_Y_0( void );
+    void Unload_Particles_from_Buffer_Y_1( void );
+    void Unload_Particles_from_Buffer_Z_0( void );
+    void Unload_Particles_from_Buffer_Z_1( void );
+    // void Load_Particles_to_Buffer_Z( void );
     void Finish_Particles_Transfer( void );
     #endif
 #endif /*MPI_CHOLLA*/

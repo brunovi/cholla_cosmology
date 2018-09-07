@@ -903,6 +903,11 @@ void Allocate_MPI_Buffers_BLOCK(struct Header *H)
   }
 
   #ifdef PARTICLES
+
+  int n_max = 128;
+  N_PARTICLES_TRANSFER = n_max * n_max * 10 ;
+  N_DATA_PER_PARTICLE_TRANSFER = 8;
+  N_HEADER_PARTICLES_TRANSFER = 1;
   x_buffer_length_hydro = xbsize;
   y_buffer_length_hydro = ybsize;
   z_buffer_length_hydro = zbsize;
