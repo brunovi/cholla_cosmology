@@ -42,8 +42,6 @@ void Tranfer_Particles_Boundaries( Particles_3D &Particles ){
 
 }
 
-#endif
-
 #ifdef MPI_CHOLLA
 
 
@@ -359,5 +357,5 @@ void Particles_3D::Remove_Transfered_Particles( void ){
 }
 
 
-
+#endif
 #endif

@@ -660,6 +660,7 @@ Real ReduceRealAvg(Real x)
   return y;
 }
 
+#ifdef PARTICLES
 /* MPI reduction wrapper for sum(part_int)*/
 Real ReducePartIntSum(part_int_t x)
 {
@@ -675,6 +676,7 @@ Real ReducePartIntSum(part_int_t x)
   y = (part_int_t) out ;
   return y;
 }
+#endif
 
 
 /* Set the domain properties */

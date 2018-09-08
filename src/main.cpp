@@ -141,10 +141,10 @@ int main(int argc, char *argv[])
 
 
 
-  Real time_potential, time_particles_density;
-  time_potential = time_particles_density = 0;
+  Real time_potential, time_particles_density, time_particles_density_transf;
+  time_potential = time_particles_density, time_particles_density_transf = 0;
   #ifdef GRAVITY
-  Compute_Gravitational_Potential( G, p_solver, &time_potential, &time_particles_density, P );
+  Compute_Gravitational_Potential( G, p_solver, &time_potential, &time_particles_density, &time_particles_density_transf, P );
   chprintf( " Time Particles Density: %f\n", time_particles_density );
   Copy_Potential_To_Hydro_Grid( G );
   #endif
@@ -295,7 +295,7 @@ int main(int argc, char *argv[])
 
     //Compute Gravitational potential for next step
     #ifdef GRAVITY
-    Compute_Gravitational_Potential( G, p_solver, &time_potential, &time_particles_density, P );
+    Compute_Gravitational_Potential( G, p_solver, &time_potential, &time_particles_density, &time_particles_density_transf, P );
     Copy_Potential_To_Hydro_Grid( G );
     #ifdef CPU_TIME
     chprintf( " Time Potential: %f\n", time_potential );
@@ -323,6 +323,7 @@ int main(int argc, char *argv[])
     time_advance_particles += Update_Particles( G, 2 );
     #ifdef CPU_TIME
     chprintf( " Time Particles Density: %f\n", time_particles_density );
+    chprintf( " Time PartDensity Transf: %f\n", time_particles_density_transf );
     chprintf( " Time Advance Particles: %f\n", time_advance_particles );
     chprintf( " N Local Particles: %ld\n", G.Particles.n_local );
     #endif
@@ -330,12 +331,14 @@ int main(int argc, char *argv[])
 
     #ifdef CPU_TIME
     #ifdef MPI_CHOLLA
+    #ifdef PARTICLES
     part_int_t n_total;
     n_total = ReducePartIntSum( G.Particles.n_local );
     chprintf( " Total Particles: %ld\n", n_total );
+    if ( n_total != G.Grav.nx_total * G.Grav.ny_total * G.Grav.nz_total) break;
+    #endif
     chprintf("hydro min: %9.4f  max: %9.4f  avg: %9.4f\n", hydro_min, hydro_max, hydro_avg);
     chprintf("bound min: %9.4f  max: %9.4f  avg: %9.4f\n", bound_min, bound_max, bound_avg);
-    if ( n_total != G.Grav.nx_total * G.Grav.ny_total * G.Grav.nz_total) break;
     #endif //MPI_CHOLLA
     #endif //CPU_TIME
 
@@ -379,6 +382,8 @@ int main(int argc, char *argv[])
     }
     step_counter += 1;
     #endif
+
+    if (step_counter == 10) break;
 
     #ifdef COSMOLOGY
     if ( G.Cosmo.current_a >= G.Cosmo.scale_outputs[G.Cosmo.n_outputs-1] ) {

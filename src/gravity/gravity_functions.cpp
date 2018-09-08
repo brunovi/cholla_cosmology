@@ -24,7 +24,7 @@ void Copy_Hydro_Density_to_Gravity( Grid3D &G ){
 
 
 #ifdef POTENTIAL_CUFFT
-void Compute_Gravitational_Potential( Grid3D &G, Potential_CUFFT_3D &p_solver, Real *time_pot, Real *time_set, struct parameters P ){
+void Compute_Gravitational_Potential( Grid3D &G, Potential_CUFFT_3D &p_solver, Real *time_pot, Real *time_pDens, Real *time_pDens_trans, struct parameters P ){
   Real time_potential, start, stop, time_setup;
 
   Copy_Hydro_Density_to_Gravity( G );
@@ -42,57 +42,46 @@ void Compute_Gravitational_Potential( Grid3D &G, Potential_CUFFT_3D &p_solver, R
   // Copy_Potential_To_Hydro_Grid( G );
 
   *time_pot = time_potential;
-  *time_set = time_setup;
+  *time_pDens = time_setup;
 }
 #endif
 
 
 #ifdef POTENTIAL_FFTW
-void Compute_Gravitational_Potential( Grid3D &G, Potential_FFTW_3D &p_solver, Real *time_pot, Real *time_set, struct parameters P ){
-  Real time_potential, start, stop, time_setup;
+void Compute_Gravitational_Potential( Grid3D &G, Potential_FFTW_3D &p_solver, Real *time_pot, Real *time_pDens, Real *time_pDens_trans, struct parameters P ){
+  Real time_potential;
 
   Copy_Hydro_Density_to_Gravity( G );
 
-  start = get_time();
+  // start = get_time();
   #ifdef PARTICLES
-  Get_Particles_Density_CIC( G, P );
+  Get_Particles_Density_CIC( G, P, time_pDens, time_pDens_trans );
   Copy_Particles_Density_to_Gravity( G );
   #endif
-  stop = get_time();
-  time_setup = (stop - start) * 1000.0;
-
+  // stop = get_time();
+  // time_setup = (stop - start) * 1000.0;
 
   time_potential = p_solver.Get_Potential( G.Grav );
 
   *time_pot = time_potential;
-  *time_set = time_setup;
-  // Extrapolate_Grav_Potential( G.Grav );
-  // Copy_Potential_To_Hydro_Grid( G );
 }
 #endif
 
 
 #ifdef POTENTIAL_PFFT
-void Compute_Gravitational_Potential( Grid3D &G, Potential_PFFT_3D &p_solver, Real *time_pot, Real *time_set, struct parameters P ){
-  Real time_potential, start, stop, time_setup;
+void Compute_Gravitational_Potential( Grid3D &G, Potential_PFFT_3D &p_solver, Real *time_pot, Real *time_pDens, Real *time_pDens_trans, struct parameters P ){
+  Real time_potential;
 
   Copy_Hydro_Density_to_Gravity( G );
 
-  start = get_time();
   #ifdef PARTICLES
-  Get_Particles_Density_CIC( G, P );
+  Get_Particles_Density_CIC( G, P, time_pDens, time_pDens_trans );
   Copy_Particles_Density_to_Gravity( G );
   #endif
-  stop = get_time();
-  time_setup = (stop - start) * 1000.0;
-
 
   time_potential = p_solver.Get_Potential( G.Grav );
 
   *time_pot = time_potential;
-  *time_set = time_setup;
-  // Extrapolate_Grav_Potential( G.Grav );
-  // Copy_Potential_To_Hydro_Grid( G );
 }
 #endif
 

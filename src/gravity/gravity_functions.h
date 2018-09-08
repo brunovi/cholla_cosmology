@@ -27,15 +27,15 @@
 void Copy_Hydro_Density_to_Gravity( Grid3D &G );
 
 #ifdef POTENTIAL_CUFFT
-void Compute_Gravitational_Potential( Grid3D &G,  Potential_CUFFT_3D &p_solver, Real *time_pot, Real *time_set, struct parameters P);
+void Compute_Gravitational_Potential( Grid3D &G,  Potential_CUFFT_3D &p_solver, Real *time_pot, Real *time_pDens, Real *time_pDens_trans, struct parameters P);
 #endif
 
 #ifdef POTENTIAL_FFTW
-void Compute_Gravitational_Potential( Grid3D &G,  Potential_FFTW_3D &p_solver, Real *time_pot, Real *time_set, struct parameters P);
+void Compute_Gravitational_Potential( Grid3D &G,  Potential_FFTW_3D &p_solver, Real *time_pot, Real *time_pDens, Real *time_pDens_trans, struct parameters P);
 #endif
 
 #ifdef POTENTIAL_PFFT
-void Compute_Gravitational_Potential( Grid3D &G,  Potential_PFFT_3D &p_solver, Real *time_pot, Real *time_set, struct parameters P);
+void Compute_Gravitational_Potential( Grid3D &G,  Potential_PFFT_3D &p_solver, Real *time_pot, Real *time_pDens, Real *time_pDens_trans, struct parameters P);
 #endif
 
 void Copy_Potential_To_Hydro_Grid( Grid3D &G );
