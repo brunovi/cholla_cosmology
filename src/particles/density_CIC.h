@@ -16,6 +16,10 @@
 #include"particles_omp.h"
 #endif
 
+#ifdef PARTICLES_CUDA
+#include"density_CIC_CUDA.h"
+#endif
+
 
 
 void Clear_Density( Particles_3D &Parts );
@@ -25,6 +29,10 @@ void Get_Indexes_CIC( Real xMin, Real yMin, Real zMin, Real dx, Real dy, Real dz
 void Get_Particles_Density_CIC( Grid3D &G, struct parameters P, Real *time_pDens, Real *time_pDens_trans );
 
 void Copy_Particles_Density_to_Gravity( Grid3D &G );
+
+// #ifdef PARTICLES_CUDA
+// void Get_Density_CIC_CUDA( Particles_3D &Parts );
+// #endif
 
 #endif
 #endif

@@ -264,10 +264,12 @@ void Get_Particles_Density_CIC( Grid3D &G, struct parameters P, Real *time_pDens
   Clear_Density( G.Particles );
 
   start = get_time();
-  #ifndef PARTICLES
-  Get_Density_CIC( G.Particles );
-  #else
+  #ifdef PARTICLES_OMP
   Get_Density_CIC_OMP( G.Particles );
+  #elif PARTICLES_CUDA
+  Get_Density_CIC_CUDA( G.Particles );
+  #else
+  Get_Density_CIC( G.Particles );
   #endif
   stop = get_time();
   time_dens = (stop - start) * 1000.0;
