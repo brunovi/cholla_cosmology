@@ -581,52 +581,52 @@ void Grid3D::Unload_Particles_Density_Boundary_From_Buffer( int direction, int s
 
 }
 
-void Grid3D::Load_Particles_to_Buffer_X0( void ){
-  Particles.Load_Particles_to_Buffer( 0, 0, x_buffer_length_hydro , send_buffer_x0  );
+void Grid3D::Load_Particles_to_Buffer_X0( int buffer_start ){
+  Particles.Load_Particles_to_Buffer( 0, 0, buffer_start , send_buffer_x0, N_PARTICLES_TRANSFER  );
 }
 
-void Grid3D::Load_Particles_to_Buffer_X1( void ){
-  Particles.Load_Particles_to_Buffer( 0, 1, x_buffer_length_hydro , send_buffer_x1  );
+void Grid3D::Load_Particles_to_Buffer_X1( int buffer_start ){
+  Particles.Load_Particles_to_Buffer( 0, 1, buffer_start , send_buffer_x1, N_PARTICLES_TRANSFER  );
 }
 
-void Grid3D::Load_Particles_to_Buffer_Y0( void ){
-  Particles.Load_Particles_to_Buffer( 1, 0, y_buffer_length_hydro , send_buffer_y0  );
+void Grid3D::Load_Particles_to_Buffer_Y0( int buffer_start ){
+  Particles.Load_Particles_to_Buffer( 1, 0, buffer_start , send_buffer_y0, N_PARTICLES_TRANSFER  );
 }
 
-void Grid3D::Load_Particles_to_Buffer_Y1( void ){
-  Particles.Load_Particles_to_Buffer( 1, 1, y_buffer_length_hydro , send_buffer_y1  );
+void Grid3D::Load_Particles_to_Buffer_Y1( int buffer_start ){
+  Particles.Load_Particles_to_Buffer( 1, 1, buffer_start , send_buffer_y1, N_PARTICLES_TRANSFER  );
 }
 
-void Grid3D::Load_Particles_to_Buffer_Z0( void ){
-  Particles.Load_Particles_to_Buffer( 2, 0, z_buffer_length_hydro , send_buffer_z0  );
+void Grid3D::Load_Particles_to_Buffer_Z0( int buffer_start ){
+  Particles.Load_Particles_to_Buffer( 2, 0, buffer_start , send_buffer_z0, N_PARTICLES_TRANSFER  );
 }
 
-void Grid3D::Load_Particles_to_Buffer_Z1( void ){
-  Particles.Load_Particles_to_Buffer( 2, 1, z_buffer_length_hydro , send_buffer_z1  );
+void Grid3D::Load_Particles_to_Buffer_Z1( int buffer_start ){
+  Particles.Load_Particles_to_Buffer( 2, 1, buffer_start , send_buffer_z1, N_PARTICLES_TRANSFER  );
 }
 
-void Grid3D::Unload_Particles_from_Buffer_X_0( void ){
-  Particles.Unload_Particles_from_Buffer( 0, 0,  x_buffer_length_hydro, recv_buffer_x0, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro  );
+void Grid3D::Unload_Particles_from_Buffer_X_0( int buffer_start ){
+  Particles.Unload_Particles_from_Buffer( 0, 0,  buffer_start, recv_buffer_x0, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro  );
 }
 
-void Grid3D::Unload_Particles_from_Buffer_X_1( void ){
-  Particles.Unload_Particles_from_Buffer( 0, 1,  x_buffer_length_hydro, recv_buffer_x1, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro  );
+void Grid3D::Unload_Particles_from_Buffer_X_1( int buffer_start ){
+  Particles.Unload_Particles_from_Buffer( 0, 1,  buffer_start, recv_buffer_x1, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro  );
 }
 
-void Grid3D::Unload_Particles_from_Buffer_Y_0( void ){
-  Particles.Unload_Particles_from_Buffer( 1, 0,  y_buffer_length_hydro, recv_buffer_y0, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro  );
+void Grid3D::Unload_Particles_from_Buffer_Y_0( int buffer_start ){
+  Particles.Unload_Particles_from_Buffer( 1, 0,  buffer_start, recv_buffer_y0, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro  );
 }
 
-void Grid3D::Unload_Particles_from_Buffer_Y_1( void ){
-  Particles.Unload_Particles_from_Buffer( 1, 1,  y_buffer_length_hydro, recv_buffer_y1, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro  );
+void Grid3D::Unload_Particles_from_Buffer_Y_1( int buffer_start ){
+  Particles.Unload_Particles_from_Buffer( 1, 1,  buffer_start, recv_buffer_y1, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro  );
 }
 
-void Grid3D::Unload_Particles_from_Buffer_Z_0( void ){
-  Particles.Unload_Particles_from_Buffer( 2, 0,  z_buffer_length_hydro, recv_buffer_z0, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro  );
+void Grid3D::Unload_Particles_from_Buffer_Z_0( int buffer_start ){
+  Particles.Unload_Particles_from_Buffer( 2, 0,  buffer_start, recv_buffer_z0, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro  );
 }
 
-void Grid3D::Unload_Particles_from_Buffer_Z_1( void ){
-  Particles.Unload_Particles_from_Buffer( 2, 1,  z_buffer_length_hydro, recv_buffer_z1, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro  );
+void Grid3D::Unload_Particles_from_Buffer_Z_1( int buffer_start ){
+  Particles.Unload_Particles_from_Buffer( 2, 1,  buffer_start, recv_buffer_z1, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro  );
 }
 
 void Clear_Buffers_For_Particles_Transfers( void ){
@@ -725,7 +725,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
 
       #ifdef PARTICLES
       if ( transfer_hydro ){
-      Load_Particles_to_Buffer_X0();
+      Load_Particles_to_Buffer_X0( x_buffer_length_hydro );
       }
       else{
         buffer_length = Load_Particles_Density_Boundary_to_Buffer( 0, 0, send_buffer_x0  );
@@ -795,7 +795,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
 
       #ifdef PARTICLES
       if ( transfer_hydro ){
-      Load_Particles_to_Buffer_X1();
+      Load_Particles_to_Buffer_X1( x_buffer_length_hydro );
       }
       else{
         buffer_length = Load_Particles_Density_Boundary_to_Buffer( 0, 1, send_buffer_x1  );
@@ -858,7 +858,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
 
       #ifdef PARTICLES
       if ( transfer_hydro ){
-      Load_Particles_to_Buffer_Y0();
+      Load_Particles_to_Buffer_Y0( y_buffer_length_hydro );
       }
       else{
        buffer_length = Load_Particles_Density_Boundary_to_Buffer( 1, 0, send_buffer_y0  );
@@ -916,7 +916,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
 
       #ifdef PARTICLES
       if ( transfer_hydro ){
-      Load_Particles_to_Buffer_Y1();
+      Load_Particles_to_Buffer_Y1( y_buffer_length_hydro );
       }
       else{
         buffer_length = Load_Particles_Density_Boundary_to_Buffer( 1, 1, send_buffer_y1  );
@@ -963,7 +963,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
 
       #ifdef PARTICLES
       if ( transfer_hydro ){
-      Load_Particles_to_Buffer_Z0();
+      Load_Particles_to_Buffer_Z0( z_buffer_length_hydro );
       }
       else{
         buffer_length = Load_Particles_Density_Boundary_to_Buffer( 2, 0, send_buffer_z0  );
@@ -1006,7 +1006,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
 
       #ifdef PARTICLES
       if ( transfer_hydro ){
-      Load_Particles_to_Buffer_Z1();
+      Load_Particles_to_Buffer_Z1( z_buffer_length_hydro );
       }
       else{
         buffer_length = Load_Particles_Density_Boundary_to_Buffer( 2, 1, send_buffer_z1  );
@@ -1375,13 +1375,13 @@ void Grid3D::Unload_MPI_Comm_Buffers_BLOCK(int index)
     if ( index == 5 ) Unload_Particles_Density_Boundary_From_Buffer( 2, 1, recv_buffer_z1 );
   }
   else{
-    if( index == 0) Unload_Particles_from_Buffer_X_0();
-    if( index == 1) Unload_Particles_from_Buffer_X_1();
-    if( index == 2) Unload_Particles_from_Buffer_Y_0();
-    if( index == 3) Unload_Particles_from_Buffer_Y_1();
-    if( index == 4) Unload_Particles_from_Buffer_Z_0();
+    if( index == 0) Unload_Particles_from_Buffer_X_0( x_buffer_length_hydro );
+    if( index == 1) Unload_Particles_from_Buffer_X_1( x_buffer_length_hydro );
+    if( index == 2) Unload_Particles_from_Buffer_Y_0( y_buffer_length_hydro );
+    if( index == 3) Unload_Particles_from_Buffer_Y_1( y_buffer_length_hydro );
+    if( index == 4) Unload_Particles_from_Buffer_Z_0( z_buffer_length_hydro );
     if( index == 5){
-      Unload_Particles_from_Buffer_Z_1();
+      Unload_Particles_from_Buffer_Z_1( z_buffer_length_hydro );
       Finish_Particles_Transfer();
     }
   }

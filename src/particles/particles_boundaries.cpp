@@ -136,7 +136,7 @@ void Particles_3D::Select_Particles_to_Transfer( void ){
 
 }
 
-void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer_start, Real *send_buffer  ){
+void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer_start, Real *send_buffer,int MAX_PARTICLES_IN_BUFFER  ){
 
   int n_out;
   int_vector_t *out_indxs_vec;
@@ -189,6 +189,7 @@ void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer
     out_indxs_vec->pop_back();
     offset += N_DATA_PER_PARTICLE_TRANSFER;
   }
+  send_buffer[buffer_start+1] = 0;
   // for ( indx = n_out-1; indx>=0; indx-- ){
   //   pIndx = (*out_indxs_vec)[indx];
   //   // pIndx = out
