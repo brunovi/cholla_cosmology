@@ -669,7 +669,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
 
   #ifdef PARTICLES
   if ( Particles.TRANSFER_DENSITY_BOUNDARIES ) transfer_hydro = false;
-  int n_transfer_secondary;
+  int n_transfer_secondary, buffer_length_secondary;
   MPI_Status status_particles_secondary_0, status_particles_secondary_1;
   #endif
 
@@ -748,6 +748,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       n_transfer_secondary = send_buffer_x0[x_buffer_length_hydro + 1];
       if ( n_transfer_secondary > 0 ){
         std::cout << "  N_secondary transfer x0: " << n_transfer_secondary << std::endl;
+        buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_transfer_secondary*N_DATA_PER_PARTICLE_TRANSFER;
         MPI_Wait( &send_request[0], &status_particles_secondary_0);
       }
       #endif
@@ -825,6 +826,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       n_transfer_secondary = send_buffer_x1[x_buffer_length_hydro + 1];
       if ( n_transfer_secondary > 0 ){
         std::cout << "  N_secondary transfer x1: " << n_transfer_secondary << std::endl;
+        buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_transfer_secondary*N_DATA_PER_PARTICLE_TRANSFER;
         MPI_Wait( &send_request[1], &status_particles_secondary_1);
       }
       #endif
@@ -894,6 +896,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       n_transfer_secondary = send_buffer_y0[y_buffer_length_hydro + 1];
       if ( n_transfer_secondary > 0 ){
         std::cout << "  N_secondary transfer y0: " << n_transfer_secondary << std::endl;
+        buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_transfer_secondary*N_DATA_PER_PARTICLE_TRANSFER;
         MPI_Wait( &send_request[0], &status_particles_secondary_0);
       }
       #endif
@@ -959,6 +962,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       n_transfer_secondary = send_buffer_y1[y_buffer_length_hydro + 1];
       if ( n_transfer_secondary > 0 ){
         std::cout << "  N_secondary transfer y1: " << n_transfer_secondary << std::endl;
+        buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_transfer_secondary*N_DATA_PER_PARTICLE_TRANSFER;
         MPI_Wait( &send_request[1], &status_particles_secondary_1);
       }
       #endif
@@ -1014,6 +1018,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       n_transfer_secondary = send_buffer_z0[z_buffer_length_hydro + 1];
       if ( n_transfer_secondary > 0 ){
         std::cout << "  N_secondary transfer z0: " << n_transfer_secondary << std::endl;
+        buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_transfer_secondary*N_DATA_PER_PARTICLE_TRANSFER;
         MPI_Wait( &send_request[0], &status_particles_secondary_0);
       }
       #endif
@@ -1065,6 +1070,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       int n_transfer_secondary = send_buffer_z1[z_buffer_length_hydro + 1];
       if ( n_transfer_secondary > 0 ){
         std::cout << "  N_secondary transfer z1: " << n_transfer_secondary << std::endl;
+        buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_transfer_secondary*N_DATA_PER_PARTICLE_TRANSFER;
         MPI_Wait( &send_request[1], &status_particles_secondary_1);
       }
       #endif
