@@ -519,12 +519,12 @@ class Grid3D
     #ifdef PARTICLES
     int Load_Particles_Density_Boundary_to_Buffer( int direction, int side, Real *buffer );
     void Unload_Particles_Density_Boundary_From_Buffer( int direction, int side, Real *buffer  );
-    void Load_Particles_to_Buffer_X0( int buffer_start );
-    void Load_Particles_to_Buffer_X1( int buffer_start );
-    void Load_Particles_to_Buffer_Y0( int buffer_start );
-    void Load_Particles_to_Buffer_Y1( int buffer_start );
-    void Load_Particles_to_Buffer_Z0( int buffer_start );
-    void Load_Particles_to_Buffer_Z1( int buffer_start );
+    void Load_Particles_to_Buffer_X0( int buffer_start, int max_partices );
+    void Load_Particles_to_Buffer_X1( int buffer_start, int max_partices );
+    void Load_Particles_to_Buffer_Y0( int buffer_start, int max_partices );
+    void Load_Particles_to_Buffer_Y1( int buffer_start, int max_partices );
+    void Load_Particles_to_Buffer_Z0( int buffer_start, int max_partices );
+    void Load_Particles_to_Buffer_Z1( int buffer_start, int max_partices );
 
     void Unload_Particles_from_Buffer_X_0( int buffer_start );
     void Unload_Particles_from_Buffer_X_1( int buffer_start );

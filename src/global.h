@@ -62,6 +62,7 @@ typedef std::vector<part_int_t> int_vector_t;
 
 #ifdef MPI_CHOLLA
 extern int N_PARTICLES_TRANSFER;
+extern int N_PARTICLES_TRANSFER_SECONDARY;
 extern int N_DATA_PER_PARTICLE_TRANSFER;
 extern int N_HEADER_PARTICLES_TRANSFER;
 #endif
