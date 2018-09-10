@@ -906,8 +906,9 @@ void Allocate_MPI_Buffers_BLOCK(struct Header *H)
 
   #ifdef PARTICLES
 
-  int n_max = 128;
-  N_PARTICLES_TRANSFER = n_max * n_max * 10 ;
+  int n_max = std::max( H->nx, H->ny );
+  n_max = std::max( H->nz, n_max );
+  N_PARTICLES_TRANSFER = n_max  * 10 ;
   N_DATA_PER_PARTICLE_TRANSFER = 8;
   N_HEADER_PARTICLES_TRANSFER = 2;
   x_buffer_length_hydro = xbsize;
@@ -917,6 +918,9 @@ void Allocate_MPI_Buffers_BLOCK(struct Header *H)
   xbsize += N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;
   ybsize += N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;
   zbsize += N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;
+  int n_min = std::min( xbsize, ybsize );
+  n_min = std::min( zbsize, n_min );
+  N_PARTICLES_TRANSFER_SECONDARY = (n_min - N_HEADER_PARTICLES_TRANSFER) / N_DATA_PER_PARTICLE_TRANSFER;
   #endif
 
   x_buffer_length = xbsize;

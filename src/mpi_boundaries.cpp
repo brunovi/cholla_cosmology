@@ -582,27 +582,27 @@ void Grid3D::Unload_Particles_Density_Boundary_From_Buffer( int direction, int s
 }
 
 void Grid3D::Load_Particles_to_Buffer_X0( int buffer_start, int max_partices ){
-  Particles.Load_Particles_to_Buffer( 0, 0, buffer_start , send_buffer_x0, N_PARTICLES_TRANSFER  );
+  Particles.Load_Particles_to_Buffer( 0, 0, buffer_start , send_buffer_x0, max_partices  );
 }
 
 void Grid3D::Load_Particles_to_Buffer_X1( int buffer_start, int max_partices ){
-  Particles.Load_Particles_to_Buffer( 0, 1, buffer_start , send_buffer_x1, N_PARTICLES_TRANSFER  );
+  Particles.Load_Particles_to_Buffer( 0, 1, buffer_start , send_buffer_x1, max_partices  );
 }
 
 void Grid3D::Load_Particles_to_Buffer_Y0( int buffer_start, int max_partices ){
-  Particles.Load_Particles_to_Buffer( 1, 0, buffer_start , send_buffer_y0, N_PARTICLES_TRANSFER  );
+  Particles.Load_Particles_to_Buffer( 1, 0, buffer_start , send_buffer_y0, max_partices  );
 }
 
 void Grid3D::Load_Particles_to_Buffer_Y1( int buffer_start, int max_partices ){
-  Particles.Load_Particles_to_Buffer( 1, 1, buffer_start , send_buffer_y1, N_PARTICLES_TRANSFER  );
+  Particles.Load_Particles_to_Buffer( 1, 1, buffer_start , send_buffer_y1, max_partices  );
 }
 
 void Grid3D::Load_Particles_to_Buffer_Z0( int buffer_start, int max_partices ){
-  Particles.Load_Particles_to_Buffer( 2, 0, buffer_start , send_buffer_z0, N_PARTICLES_TRANSFER  );
+  Particles.Load_Particles_to_Buffer( 2, 0, buffer_start , send_buffer_z0, max_partices  );
 }
 
 void Grid3D::Load_Particles_to_Buffer_Z1( int buffer_start, int max_partices ){
-  Particles.Load_Particles_to_Buffer( 2, 1, buffer_start , send_buffer_z1, N_PARTICLES_TRANSFER  );
+  Particles.Load_Particles_to_Buffer( 2, 1, buffer_start , send_buffer_z1, max_partices  );
 }
 
 void Grid3D::Unload_Particles_from_Buffer_X_0( int buffer_start ){
