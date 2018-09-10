@@ -126,6 +126,14 @@ void Particles_3D::Select_Particles_to_Transfer( void ){
       continue;
     }
   }
+
+  std::sort(out_indxs_vec_x0.begin(), out_indxs_vec_x0.end());
+  std::sort(out_indxs_vec_x1.begin(), out_indxs_vec_x1.end());
+  std::sort(out_indxs_vec_y0.begin(), out_indxs_vec_y0.end());
+  std::sort(out_indxs_vec_y1.begin(), out_indxs_vec_y1.end());
+  std::sort(out_indxs_vec_z0.begin(), out_indxs_vec_z0.end());
+  std::sort(out_indxs_vec_z1.begin(), out_indxs_vec_z1.end());
+
 }
 
 void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer_start, Real *send_buffer  ){
@@ -166,19 +174,35 @@ void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer
   n_in_buffer = real_to_int( send_buffer[buffer_start] ) ;
 
   offset = buffer_start + N_HEADER_PARTICLES_TRANSFER + n_in_buffer*N_DATA_PER_PARTICLE_TRANSFER;
-  for ( indx = 0; indx<n_out; indx++ ){
-    pIndx = (*out_indxs_vec)[indx];
-    send_buffer[ offset + 0 ] = (Real) partIDs[pIndx];
-    send_buffer[ offset + 1 ] = mass[ pIndx ];
-    send_buffer[ offset + 2 ] = pos_x[ pIndx ];
-    send_buffer[ offset + 3 ] = pos_y[ pIndx ];
-    send_buffer[ offset + 4 ] = pos_z[ pIndx ];
-    send_buffer[ offset + 5 ] = vel_x[ pIndx ];
-    send_buffer[ offset + 6 ] = vel_y[ pIndx ];
-    send_buffer[ offset + 7 ] = vel_z[ pIndx ];
+  for ( indx=0; indx<n_out; indx++ ){
+    pIndx = out_indxs_vec->back();
+    send_buffer[ offset + 0 ] = (Real) Get_and_Remove_partID( pIndx, partIDs );
+    send_buffer[ offset + 1 ] = Get_and_Remove_Real( pIndx, mass );
+    send_buffer[ offset + 2 ] = Get_and_Remove_Real( pIndx, pos_x );
+    send_buffer[ offset + 3 ] = Get_and_Remove_Real( pIndx, pos_y );
+    send_buffer[ offset + 4 ] = Get_and_Remove_Real( pIndx, pos_z );
+    send_buffer[ offset + 5 ] = Get_and_Remove_Real( pIndx, vel_x );
+    send_buffer[ offset + 6 ] = Get_and_Remove_Real( pIndx, vel_y );
+    send_buffer[ offset + 7 ] = Get_and_Remove_Real( pIndx, vel_z );
     send_buffer[buffer_start] += 1;
+    n_local -= 1;
+    out_indxs_vec->pop_back();
     offset += N_DATA_PER_PARTICLE_TRANSFER;
   }
+  // for ( indx = n_out-1; indx>=0; indx-- ){
+  //   pIndx = (*out_indxs_vec)[indx];
+  //   // pIndx = out
+  //   send_buffer[ offset + 0 ] = (Real) partIDs[pIndx];
+  //   send_buffer[ offset + 1 ] = mass[ pIndx ];
+  //   send_buffer[ offset + 2 ] = pos_x[ pIndx ];
+  //   send_buffer[ offset + 3 ] = pos_y[ pIndx ];
+  //   send_buffer[ offset + 4 ] = pos_z[ pIndx ];
+  //   send_buffer[ offset + 5 ] = vel_x[ pIndx ];
+  //   send_buffer[ offset + 6 ] = vel_y[ pIndx ];
+  //   send_buffer[ offset + 7 ] = vel_z[ pIndx ];
+  //   send_buffer[buffer_start] += 1;
+  //   offset += N_DATA_PER_PARTICLE_TRANSFER;
+  // }
   // send_buffer[buffer_start] = 10;
 
 }
@@ -305,55 +329,61 @@ void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int bu
 }
 
 void Particles_3D::Remove_Transfered_Particles( void ){
-  part_int_t n_delete = 0;
-  n_delete += out_indxs_vec_x0.size();
-  n_delete += out_indxs_vec_x1.size();
-  n_delete += out_indxs_vec_y0.size();
-  n_delete += out_indxs_vec_y1.size();
-  n_delete += out_indxs_vec_z0.size();
-  n_delete += out_indxs_vec_z1.size();
+  // part_int_t n_delete = 0;
+  // n_delete += out_indxs_vec_x0.size();
+  // n_delete += out_indxs_vec_x1.size();
+  // n_delete += out_indxs_vec_y0.size();
+  // n_delete += out_indxs_vec_y1.size();
+  // n_delete += out_indxs_vec_z0.size();
+  // n_delete += out_indxs_vec_z1.size();
+  //
+  // int_vector_t delete_indxs_vec;
+  // delete_indxs_vec.insert( delete_indxs_vec.end(), out_indxs_vec_x0.begin(), out_indxs_vec_x0.end() );
+  // delete_indxs_vec.insert( delete_indxs_vec.end(), out_indxs_vec_x1.begin(), out_indxs_vec_x1.end() );
+  // delete_indxs_vec.insert( delete_indxs_vec.end(), out_indxs_vec_y0.begin(), out_indxs_vec_y0.end() );
+  // delete_indxs_vec.insert( delete_indxs_vec.end(), out_indxs_vec_y1.begin(), out_indxs_vec_y1.end() );
+  // delete_indxs_vec.insert( delete_indxs_vec.end(), out_indxs_vec_z0.begin(), out_indxs_vec_z0.end() );
+  // delete_indxs_vec.insert( delete_indxs_vec.end(), out_indxs_vec_z1.begin(), out_indxs_vec_z1.end() );
+  //
+  // out_indxs_vec_x0.clear();
+  // out_indxs_vec_x1.clear();
+  // out_indxs_vec_y0.clear();
+  // out_indxs_vec_y1.clear();
+  // out_indxs_vec_z0.clear();
+  // out_indxs_vec_z1.clear();
+  //
+  //
+  // std::sort(delete_indxs_vec.begin(), delete_indxs_vec.end());
+  //
+  // part_int_t indx, pIndx;
+  // for ( indx=0; indx<n_delete; indx++ ){
+  //   pIndx = delete_indxs_vec.back();
+  //   Remove_ID( pIndx, partIDs );
+  //   Remove_Real( pIndx, mass );
+  //   Remove_Real( pIndx, pos_x );
+  //   Remove_Real( pIndx, pos_y );
+  //   Remove_Real( pIndx, pos_z );
+  //   Remove_Real( pIndx, vel_x );
+  //   Remove_Real( pIndx, vel_y );
+  //   Remove_Real( pIndx, vel_z );
+  //   Remove_Real( pIndx, grav_x );
+  //   Remove_Real( pIndx, grav_y );
+  //   Remove_Real( pIndx, grav_z );
+  //   delete_indxs_vec.pop_back();
+  //   n_local -= 1;
+  // }
+  // if ( delete_indxs_vec.size() != 0 ) std::cout << "ERROR: Deleting Transfered Particles " << std::endl;
 
-  int_vector_t delete_indxs_vec;
-  delete_indxs_vec.insert( delete_indxs_vec.end(), out_indxs_vec_x0.begin(), out_indxs_vec_x0.end() );
-  delete_indxs_vec.insert( delete_indxs_vec.end(), out_indxs_vec_x1.begin(), out_indxs_vec_x1.end() );
-  delete_indxs_vec.insert( delete_indxs_vec.end(), out_indxs_vec_y0.begin(), out_indxs_vec_y0.end() );
-  delete_indxs_vec.insert( delete_indxs_vec.end(), out_indxs_vec_y1.begin(), out_indxs_vec_y1.end() );
-  delete_indxs_vec.insert( delete_indxs_vec.end(), out_indxs_vec_z0.begin(), out_indxs_vec_z0.end() );
-  delete_indxs_vec.insert( delete_indxs_vec.end(), out_indxs_vec_z1.begin(), out_indxs_vec_z1.end() );
-
-  out_indxs_vec_x0.clear();
-  out_indxs_vec_x1.clear();
-  out_indxs_vec_y0.clear();
-  out_indxs_vec_y1.clear();
-  out_indxs_vec_z0.clear();
-  out_indxs_vec_z1.clear();
-
-  std::sort(delete_indxs_vec.begin(), delete_indxs_vec.end());
-
-  part_int_t indx, pIndx;
-  for ( indx=0; indx<n_delete; indx++ ){
-    pIndx = delete_indxs_vec.back();
-    Remove_ID( pIndx, partIDs );
-    Remove_Real( pIndx, mass );
-    Remove_Real( pIndx, pos_x );
-    Remove_Real( pIndx, pos_y );
-    Remove_Real( pIndx, pos_z );
-    Remove_Real( pIndx, vel_x );
-    Remove_Real( pIndx, vel_y );
-    Remove_Real( pIndx, vel_z );
-    Remove_Real( pIndx, grav_x );
-    Remove_Real( pIndx, grav_y );
-    Remove_Real( pIndx, grav_z );
-    delete_indxs_vec.pop_back();
-    n_local -= 1;
-  }
-
+  int n_in_out_vectors, n_in_vectors;
+  n_in_vectors = ( partIDs.size() + mass.size() + pos_x.size() + pos_y.size() + pos_z.size() + vel_x.size() + vel_y.size() + vel_z.size() ) / N_DATA_PER_PARTICLE_TRANSFER;
+  if ( n_in_vectors != n_local ) std::cout << "ERROR PARTICLES TRANSFER: DATA IN VECTORS DIFFERENT FROM N_LOCAL###########" << std::endl;
+  n_in_out_vectors = out_indxs_vec_x0.size() + out_indxs_vec_x1.size() + out_indxs_vec_y0.size() + out_indxs_vec_y1.size() + out_indxs_vec_z0.size() + out_indxs_vec_z1.size();
+  if ( n_in_out_vectors != 0 ) std::cout << "ERROR PARTICLES TRANSFER: OUPTUT VECTORS NOT EMPTY###########" << std::endl;
   // for ( int i=0; i<nproc; i++ ){
     // MPI_Barrier(world);
   // }
   // MPI_Barrier(world);
   // std::cout << "   Removed: "<< n_delete << std::endl;
-  if ( delete_indxs_vec.size() != 0 ) std::cout << "ERROR: Deleting Transfered Particles " << std::endl;
 
 }
 
