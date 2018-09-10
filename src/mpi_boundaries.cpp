@@ -4,6 +4,32 @@
 #include"error_handling.h"
 #ifdef MPI_CHOLLA
 
+
+
+
+#ifdef PARTICLES
+void Clear_Buffers_For_Particles_Transfers( void ){
+  send_buffer_x0[x_buffer_length_hydro] = 0;
+  send_buffer_x1[x_buffer_length_hydro] = 0;
+  send_buffer_y0[y_buffer_length_hydro] = 0;
+  send_buffer_y1[y_buffer_length_hydro] = 0;
+  send_buffer_z0[z_buffer_length_hydro] = 0;
+  send_buffer_z1[z_buffer_length_hydro] = 0;
+}
+
+void Grid3D::Finish_Particles_Transfer( void ){
+  
+  Particles.Remove_Transfered_Particles();
+  Clear_Buffers_For_Particles_Transfers();
+
+  // part_int_t n_total;
+  // n_total = ReducePartIntSum( Particles.n_local );
+  // chprintf( " Total Particles: %ld\n", n_total );
+  // std::cout << "N_Local: " << Particles.n_local << std::endl;
+}
+#endif
+
+
 void Grid3D::Set_Boundaries_MPI(struct parameters P)
 {
   int flags[6] = {0,0,0,0,0,0};
@@ -116,6 +142,10 @@ void Grid3D::Set_Boundaries_MPI_BLOCK(int *flags, struct parameters P)
       Wait_and_Unload_MPI_Comm_Buffers_BLOCK(2, flags);
     }
   }
+
+  #ifdef PARTICLES
+  if ( !Particles.TRANSFER_DENSITY_BOUNDARIES)  Finish_Particles_Transfer();
+  #endif
 
 }
 
@@ -629,25 +659,6 @@ void Grid3D::Unload_Particles_from_Buffer_Z_1( int buffer_start ){
   Particles.Unload_Particles_from_Buffer( 2, 1,  buffer_start, recv_buffer_z1, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro  );
 }
 
-void Clear_Buffers_For_Particles_Transfers( void ){
-  send_buffer_x0[x_buffer_length_hydro] = 0;
-  send_buffer_x1[x_buffer_length_hydro] = 0;
-  send_buffer_y0[y_buffer_length_hydro] = 0;
-  send_buffer_y1[y_buffer_length_hydro] = 0;
-  send_buffer_z0[z_buffer_length_hydro] = 0;
-  send_buffer_z1[z_buffer_length_hydro] = 0;
-}
-
-void Grid3D::Finish_Particles_Transfer( void ){
-  MPI_Barrier(world);
-  Particles.Remove_Transfered_Particles();
-  Clear_Buffers_For_Particles_Transfers();
-
-  // part_int_t n_total;
-  // n_total = ReducePartIntSum( Particles.n_local );
-  // chprintf( " Total Particles: %ld\n", n_total );
-  // std::cout << "N_Local: " << Particles.n_local << std::endl;
-}
 
 
 
@@ -1142,6 +1153,8 @@ void Grid3D::Wait_and_Unload_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
     //depending on which face arrived, load the buffer into the ghost grid
     Unload_MPI_Comm_Buffers(status.MPI_TAG);
   }
+
+
 }
 
 
@@ -1434,7 +1447,7 @@ void Grid3D::Unload_MPI_Comm_Buffers_BLOCK(int index)
     if( index == 4) Unload_Particles_from_Buffer_Z_0( z_buffer_length_hydro );
     if( index == 5){
       Unload_Particles_from_Buffer_Z_1( z_buffer_length_hydro );
-      Finish_Particles_Transfer();
+
     }
   }
   #endif
