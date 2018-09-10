@@ -383,7 +383,7 @@ int main(int argc, char *argv[])
     step_counter += 1;
     #endif
 
-    if (step_counter == 10) break;
+    // if (step_counter == 10) break;
 
     #ifdef COSMOLOGY
     if ( G.Cosmo.current_a >= G.Cosmo.scale_outputs[G.Cosmo.n_outputs-1] ) {

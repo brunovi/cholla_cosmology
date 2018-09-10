@@ -115,14 +115,16 @@ void Get_Density_CIC_OMP( Particles_3D &Parts ){
 
     g_start -= nGHST;
     g_end   -= nGHST;
-    Real xMin, yMin, zMin, dx, dy, dz, zMax;
+    Real xMin, yMin, zMin, dx, dy, dz, zMin_local, zMax_local;
     dx = Parts.G.dx;
     dy = Parts.G.dy;
     dz = Parts.G.dz;
     xMin = Parts.G.xMin;
     yMin = Parts.G.yMin;
-    zMin = Parts.G.zMin + g_start*dz;
-    zMax = Parts.G.zMin + g_end * dz;
+    zMin = Parts.G.zMin;
+
+    zMin_local = Parts.G.zMin + g_start*dz;
+    zMax_local = Parts.G.zMin + g_end * dz;
 
     int indx_x, indx_y, indx_z, indx;
     Real pMass, x_pos, y_pos, z_pos;
@@ -136,7 +138,7 @@ void Get_Density_CIC_OMP( Particles_3D &Parts ){
     part_int_t pIndx;
     for ( pIndx=0; pIndx<Parts.n_local; pIndx++ ){
       z_pos = Parts.pos_z[pIndx];
-      if ( ( z_pos < zMin ) || ( z_pos >= zMax ) ) continue;
+      if ( ( z_pos < zMin_local ) || ( z_pos >= zMax_local ) ) continue;
       pMass = Parts.mass[pIndx] * dV_inv;
       x_pos = Parts.pos_x[pIndx];
       y_pos = Parts.pos_y[pIndx];
