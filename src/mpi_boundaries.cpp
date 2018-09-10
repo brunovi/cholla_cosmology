@@ -18,7 +18,7 @@ void Clear_Buffers_For_Particles_Transfers( void ){
 }
 
 void Grid3D::Finish_Particles_Transfer( void ){
-  
+
   Particles.Remove_Transfered_Particles();
   Clear_Buffers_For_Particles_Transfers();
 
@@ -1168,6 +1168,9 @@ void Grid3D::Unload_MPI_Comm_Buffers(int index)
       break;
     case BLOCK_DECOMP:
       Unload_MPI_Comm_Buffers_BLOCK(index);
+      #ifdef PARTICLES
+      Unload_Particles_From_Buffers_BLOCK(index);
+      #endif
       break;
   }
 }
@@ -1439,20 +1442,37 @@ void Grid3D::Unload_MPI_Comm_Buffers_BLOCK(int index)
     if ( index == 4 ) Unload_Particles_Density_Boundary_From_Buffer( 2, 0, recv_buffer_z0 );
     if ( index == 5 ) Unload_Particles_Density_Boundary_From_Buffer( 2, 1, recv_buffer_z1 );
   }
-  else{
-    if( index == 0) Unload_Particles_from_Buffer_X_0( x_buffer_length_hydro );
-    if( index == 1) Unload_Particles_from_Buffer_X_1( x_buffer_length_hydro );
-    if( index == 2) Unload_Particles_from_Buffer_Y_0( y_buffer_length_hydro );
-    if( index == 3) Unload_Particles_from_Buffer_Y_1( y_buffer_length_hydro );
-    if( index == 4) Unload_Particles_from_Buffer_Z_0( z_buffer_length_hydro );
-    if( index == 5){
-      Unload_Particles_from_Buffer_Z_1( z_buffer_length_hydro );
-
-    }
-  }
+  // else{
+    // if( index == 0) Unload_Particles_from_Buffer_X_0( x_buffer_length_hydro );
+    // if( index == 1) Unload_Particles_from_Buffer_X_1( x_buffer_length_hydro );
+    // if( index == 2) Unload_Particles_from_Buffer_Y_0( y_buffer_length_hydro );
+    // if( index == 3) Unload_Particles_from_Buffer_Y_1( y_buffer_length_hydro );
+    // if( index == 4) Unload_Particles_from_Buffer_Z_0( z_buffer_length_hydro );
+    // if( index == 5){
+    //   Unload_Particles_from_Buffer_Z_1( z_buffer_length_hydro );
+    //
+    // }
+  // }
   #endif
 
 }
+
+
+#ifdef PARTICLES
+void Grid3D::Unload_Particles_From_Buffers_BLOCK(int index){
+
+  if ( Particles.TRANSFER_DENSITY_BOUNDARIES ) return;
+
+  if( index == 0) Unload_Particles_from_Buffer_X_0( x_buffer_length_hydro );
+  if( index == 1) Unload_Particles_from_Buffer_X_1( x_buffer_length_hydro );
+  if( index == 2) Unload_Particles_from_Buffer_Y_0( y_buffer_length_hydro );
+  if( index == 3) Unload_Particles_from_Buffer_Y_1( y_buffer_length_hydro );
+  if( index == 4) Unload_Particles_from_Buffer_Z_0( z_buffer_length_hydro );
+  if( index == 5) Unload_Particles_from_Buffer_Z_1( z_buffer_length_hydro );
+
+}
+#endif
+
 
 
 #endif /*MPI_CHOLLA*/

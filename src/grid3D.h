@@ -532,7 +532,7 @@ class Grid3D
     void Unload_Particles_from_Buffer_Y_1( int buffer_start );
     void Unload_Particles_from_Buffer_Z_0( int buffer_start );
     void Unload_Particles_from_Buffer_Z_1( int buffer_start );
-    // void Load_Particles_to_Buffer_Z( void );
+    void Unload_Particles_From_Buffers_BLOCK( int indx );
     void Finish_Particles_Transfer( void );
     #endif
 #endif /*MPI_CHOLLA*/
