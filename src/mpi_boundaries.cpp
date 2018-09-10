@@ -669,6 +669,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
 
   #ifdef PARTICLES
   if ( Particles.TRANSFER_DENSITY_BOUNDARIES ) transfer_hydro = false;
+  int n_transfer_secondary;
   #endif
 
   /* x boundaries */
@@ -741,6 +742,13 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
 
       //keep track of how many sends and receives are expected
       ireq++;
+
+      #ifdef PARTICLES
+      n_transfer_secondary = send_buffer_x0[x_buffer_length_hydro + 1];
+      if ( n_transfer_secondary > 0 ){
+        std::cout << "  N_secondary transfer x0: " << n_transfer_secondary << std::endl;
+      }
+      #endif
     }
 
     if(flags[1]==5)
@@ -811,6 +819,12 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
 
       //keep track of how many sends and receives are expected
       ireq++;
+      #ifdef PARTICLES
+      n_transfer_secondary = send_buffer_x1[x_buffer_length_hydro + 1];
+      if ( n_transfer_secondary > 0 ){
+        std::cout << "  N_secondary transfer x1: " << n_transfer_secondary << std::endl;
+      }
+      #endif
     }
 
   }
@@ -873,6 +887,12 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
 
       //keep track of how many sends and receives are expected
       ireq++;
+      #ifdef PARTICLES
+      n_transfer_secondary = send_buffer_y0[y_buffer_length_hydro + 1];
+      if ( n_transfer_secondary > 0 ){
+        std::cout << "  N_secondary transfer y0: " << n_transfer_secondary << std::endl;
+      }
+      #endif
     }
 
     // load right y communication buffer
@@ -931,6 +951,12 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
 
       //keep track of how many sends and receives are expected
       ireq++;
+      #ifdef PARTICLES
+      n_transfer_secondary = send_buffer_y1[y_buffer_length_hydro + 1];
+      if ( n_transfer_secondary > 0 ){
+        std::cout << "  N_secondary transfer y1: " << n_transfer_secondary << std::endl;
+      }
+      #endif
     }
   }
 
@@ -979,6 +1005,12 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
 
       //keep track of how many sends and receives are expected
       ireq++;
+      #ifdef PARTICLES
+      n_transfer_secondary = send_buffer_z0[z_buffer_length_hydro + 1];
+      if ( n_transfer_secondary > 0 ){
+        std::cout << "  N_secondary transfer z0: " << n_transfer_secondary << std::endl;
+      }
+      #endif
     }
 
     // load right z communication buffer
@@ -1022,6 +1054,13 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
 
       //keep track of how many sends and receives are expected
       ireq++;
+
+      #ifdef PARTICLES
+      int n_transfer_secondary = send_buffer_z1[z_buffer_length_hydro + 1];
+      if ( n_transfer_secondary > 0 ){
+        std::cout << "  N_secondary transfer z1: " << n_transfer_secondary << std::endl;
+      }
+      #endif
     }
   }
 
