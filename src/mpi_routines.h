@@ -66,6 +66,25 @@ extern int y_buffer_length;
 extern int z_buffer_length;
 
 #ifdef PARTICLES
+// For BLOCK
+extern Real *send_buffer_x0_second_particles;
+extern Real *send_buffer_x1_second_particles;
+extern Real *send_buffer_y0_second_particles;
+extern Real *send_buffer_y1_second_particles;
+extern Real *send_buffer_z0_second_particles;
+extern Real *send_buffer_z1_second_particles;
+extern Real *recv_buffer_x0_second_particles;
+extern Real *recv_buffer_x1_second_particles;
+extern Real *recv_buffer_y0_second_particles;
+extern Real *recv_buffer_y1_second_particles;
+extern Real *recv_buffer_z0_second_particles;
+extern Real *recv_buffer_z1_second_particles;
+extern int buffer_length_second_particles_x0;
+extern int buffer_length_second_particles_x1;
+extern int buffer_length_second_particles_y0;
+extern int buffer_length_second_particles_y1;
+extern int buffer_length_second_particles_z0;
+extern int buffer_length_second_particles_z1;
 extern int x_buffer_length_hydro;
 extern int y_buffer_length_hydro;
 extern int z_buffer_length_hydro;
