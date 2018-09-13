@@ -162,7 +162,7 @@ void Allocate_MPI_Buffers_SLAB(struct Header *H);
 void Allocate_MPI_Buffers_BLOCK(struct Header *H);
 
 #ifdef PARTICLES
-void Check_and_Grow_Particles_Buffer( Real **part_buffer, int current_size, int new_size );
+void Check_and_Grow_Particles_Buffer( Real **part_buffer, int *current_size_ptr, int new_size );
 #endif
 
 /* find the greatest prime factor of an integer */
