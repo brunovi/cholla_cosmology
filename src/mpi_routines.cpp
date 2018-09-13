@@ -60,6 +60,8 @@ int y_buffer_length;
 int z_buffer_length;
 
 #ifdef PARTICLES
+MPI_Request *send_request_secondary_particles;
+MPI_Request *recv_request_secondary_particles;
 int x_buffer_length_hydro;
 int y_buffer_length_hydro;
 int z_buffer_length_hydro;
@@ -129,6 +131,20 @@ void InitializeChollaMPI(int *pargc, char **pargv[])
     chprintf("Error allocating recv_request.\n");
     chexit(-2);
   }
+
+  #ifdef PARTICLES
+  /*create the MPI_Request arrays for non-blocking secondary particles sends*/
+  if(!(send_request_secondary_particles = (MPI_Request *) malloc(2*sizeof(MPI_Request))))
+  {
+    chprintf("Error allocating send_request for secondary particles transfer.\n");
+    chexit(-2);
+  }
+  if(!(recv_request_secondary_particles = (MPI_Request *) malloc(2*sizeof(MPI_Request))))
+  {
+    chprintf("Error allocating recv_request for secondary particles transfer.\n");
+    chexit(-2);
+  }
+  #endif
 
   /*set up node communicator*/
   node = MPI_Comm_node(&procID_node, &nproc_node);
@@ -908,7 +924,7 @@ void Allocate_MPI_Buffers_BLOCK(struct Header *H)
 
   int n_max = std::max( H->nx, H->ny );
   n_max = std::max( H->nz, n_max );
-  N_PARTICLES_TRANSFER = n_max  * 10 ;
+  N_PARTICLES_TRANSFER = n_max  * 1 ;
   N_DATA_PER_PARTICLE_TRANSFER = 8;
   N_HEADER_PARTICLES_TRANSFER = 2;
   x_buffer_length_hydro = xbsize;

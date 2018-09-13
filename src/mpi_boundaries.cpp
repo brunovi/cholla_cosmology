@@ -758,9 +758,10 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       #ifdef PARTICLES
       n_transfer_secondary = send_buffer_x0[x_buffer_length_hydro + 1];
       if ( n_transfer_secondary > 0 ){
-        std::cout << "  N_secondary transfer x0: " << n_transfer_secondary << std::endl;
+        std::cout << "  N_secondary send x0: " << n_transfer_secondary << std::endl;
         buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_transfer_secondary*N_DATA_PER_PARTICLE_TRANSFER;
         MPI_Wait( &send_request[0], &status_particles_secondary_0);
+        Load_Particles_to_Buffer_X0( 0, N_PARTICLES_TRANSFER_SECONDARY );
       }
       #endif
     }
@@ -836,9 +837,10 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       #ifdef PARTICLES
       n_transfer_secondary = send_buffer_x1[x_buffer_length_hydro + 1];
       if ( n_transfer_secondary > 0 ){
-        std::cout << "  N_secondary transfer x1: " << n_transfer_secondary << std::endl;
+        std::cout << "  N_secondary send x1: " << n_transfer_secondary << std::endl;
         buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_transfer_secondary*N_DATA_PER_PARTICLE_TRANSFER;
         MPI_Wait( &send_request[1], &status_particles_secondary_1);
+        Load_Particles_to_Buffer_X1( 0, N_PARTICLES_TRANSFER_SECONDARY );
       }
       #endif
     }
@@ -906,9 +908,10 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       #ifdef PARTICLES
       n_transfer_secondary = send_buffer_y0[y_buffer_length_hydro + 1];
       if ( n_transfer_secondary > 0 ){
-        std::cout << "  N_secondary transfer y0: " << n_transfer_secondary << std::endl;
+        std::cout << "  N_secondary send y0: " << n_transfer_secondary << std::endl;
         buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_transfer_secondary*N_DATA_PER_PARTICLE_TRANSFER;
         MPI_Wait( &send_request[0], &status_particles_secondary_0);
+        Load_Particles_to_Buffer_Y0( 0, N_PARTICLES_TRANSFER_SECONDARY );
       }
       #endif
     }
@@ -972,9 +975,10 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       #ifdef PARTICLES
       n_transfer_secondary = send_buffer_y1[y_buffer_length_hydro + 1];
       if ( n_transfer_secondary > 0 ){
-        std::cout << "  N_secondary transfer y1: " << n_transfer_secondary << std::endl;
+        std::cout << "  N_secondary send y1: " << n_transfer_secondary << std::endl;
         buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_transfer_secondary*N_DATA_PER_PARTICLE_TRANSFER;
         MPI_Wait( &send_request[1], &status_particles_secondary_1);
+        Load_Particles_to_Buffer_Y1( 0, N_PARTICLES_TRANSFER_SECONDARY );
       }
       #endif
     }
@@ -1028,9 +1032,10 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       #ifdef PARTICLES
       n_transfer_secondary = send_buffer_z0[z_buffer_length_hydro + 1];
       if ( n_transfer_secondary > 0 ){
-        std::cout << "  N_secondary transfer z0: " << n_transfer_secondary << std::endl;
+        std::cout << "  N_secondary send z0: " << n_transfer_secondary << std::endl;
         buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_transfer_secondary*N_DATA_PER_PARTICLE_TRANSFER;
         MPI_Wait( &send_request[0], &status_particles_secondary_0);
+        Load_Particles_to_Buffer_Z0( 0, N_PARTICLES_TRANSFER_SECONDARY );
       }
       #endif
     }
@@ -1080,9 +1085,10 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       #ifdef PARTICLES
       int n_transfer_secondary = send_buffer_z1[z_buffer_length_hydro + 1];
       if ( n_transfer_secondary > 0 ){
-        std::cout << "  N_secondary transfer z1: " << n_transfer_secondary << std::endl;
+        std::cout << "  N_secondary send z1: " << n_transfer_secondary << std::endl;
         buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_transfer_secondary*N_DATA_PER_PARTICLE_TRANSFER;
         MPI_Wait( &send_request[1], &status_particles_secondary_1);
+        Load_Particles_to_Buffer_Z1( 0, N_PARTICLES_TRANSFER_SECONDARY );
       }
       #endif
     }
@@ -1463,13 +1469,59 @@ void Grid3D::Unload_Particles_From_Buffers_BLOCK(int index){
 
   if ( Particles.TRANSFER_DENSITY_BOUNDARIES ) return;
 
-  if( index == 0) Unload_Particles_from_Buffer_X_0( x_buffer_length_hydro );
-  if( index == 1) Unload_Particles_from_Buffer_X_1( x_buffer_length_hydro );
-  if( index == 2) Unload_Particles_from_Buffer_Y_0( y_buffer_length_hydro );
-  if( index == 3) Unload_Particles_from_Buffer_Y_1( y_buffer_length_hydro );
-  if( index == 4) Unload_Particles_from_Buffer_Z_0( z_buffer_length_hydro );
-  if( index == 5) Unload_Particles_from_Buffer_Z_1( z_buffer_length_hydro );
+  if( index == 0) {
+    Unload_Particles_from_Buffer_X_0( x_buffer_length_hydro );
+    Set_Particles_Secondary_Transfer( index, x_buffer_length_hydro);
+  }
 
+  if( index == 1){
+    Unload_Particles_from_Buffer_X_1( x_buffer_length_hydro );
+    Set_Particles_Secondary_Transfer( index, x_buffer_length_hydro);
+  }
+
+  if( index == 2){
+    Unload_Particles_from_Buffer_Y_0( y_buffer_length_hydro );
+    Set_Particles_Secondary_Transfer( index, y_buffer_length_hydro);
+  }
+
+  if( index == 3){
+    Unload_Particles_from_Buffer_Y_1( y_buffer_length_hydro );
+    Set_Particles_Secondary_Transfer( index, y_buffer_length_hydro);
+  }
+
+  if( index == 4){
+    Unload_Particles_from_Buffer_Z_0( z_buffer_length_hydro );
+    Set_Particles_Secondary_Transfer( index, z_buffer_length_hydro);
+  }
+
+  if( index == 5){
+    Unload_Particles_from_Buffer_Z_1( z_buffer_length_hydro );
+    Set_Particles_Secondary_Transfer( index, z_buffer_length_hydro);
+  }
+
+}
+
+void Grid3D::Set_Particles_Secondary_Transfer( int index, int buffer_start ){
+
+  Real *recv_buffer;
+
+  if ( index == 0 ) recv_buffer = recv_buffer_x0;
+  if ( index == 1 ) recv_buffer = recv_buffer_x1;
+  if ( index == 2 ) recv_buffer = recv_buffer_y0;
+  if ( index == 3 ) recv_buffer = recv_buffer_y1;
+  if ( index == 4 ) recv_buffer = recv_buffer_z0;
+  if ( index == 5 ) recv_buffer = recv_buffer_z1;
+
+  int n_secondary_transfer;
+  n_secondary_transfer = recv_buffer[buffer_start+1];
+  if ( n_secondary_transfer > 0 ) {
+    if ( index == 0 ) std::cout << "  N Secondary Recv X0: " << n_secondary_transfer << std::endl;
+    if ( index == 1 ) std::cout << "  N Secondary Recv X1: " << n_secondary_transfer << std::endl;
+    if ( index == 2 ) std::cout << "  N Secondary Recv Y0: " << n_secondary_transfer << std::endl;
+    if ( index == 3 ) std::cout << "  N Secondary Recv Y1: " << n_secondary_transfer << std::endl;
+    if ( index == 4 ) std::cout << "  N Secondary Recv Z0: " << n_secondary_transfer << std::endl;
+    if ( index == 5 ) std::cout << "  N Secondary Recv Z1: " << n_secondary_transfer << std::endl;
+  }
 }
 #endif
 
