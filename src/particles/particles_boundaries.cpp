@@ -172,8 +172,8 @@ void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer
   n_out = out_indxs_vec->size();
   if ( n_out > MAX_PARTICLES_IN_BUFFER ) n_out = MAX_PARTICLES_IN_BUFFER;
 
-  // n_in_buffer = real_to_int( send_buffer[buffer_start] ) ;
-  n_in_buffer = 0;
+  n_in_buffer = real_to_int( send_buffer[buffer_start] ) ;
+  // n_in_buffer = 0;
 
   offset = buffer_start + N_HEADER_PARTICLES_TRANSFER + n_in_buffer*N_DATA_PER_PARTICLE_TRANSFER;
   for ( indx=0; indx<n_out; indx++ ){

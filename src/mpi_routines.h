@@ -79,12 +79,18 @@ extern Real *recv_buffer_y0_second_particles;
 extern Real *recv_buffer_y1_second_particles;
 extern Real *recv_buffer_z0_second_particles;
 extern Real *recv_buffer_z1_second_particles;
-extern int buffer_length_second_particles_x0;
-extern int buffer_length_second_particles_x1;
-extern int buffer_length_second_particles_y0;
-extern int buffer_length_second_particles_y1;
-extern int buffer_length_second_particles_z0;
-extern int buffer_length_second_particles_z1;
+extern int buffer_length_second_particles_x0_send;
+extern int buffer_length_second_particles_x0_recv;
+extern int buffer_length_second_particles_x1_send;
+extern int buffer_length_second_particles_x1_recv;
+extern int buffer_length_second_particles_y0_send;
+extern int buffer_length_second_particles_y0_recv;
+extern int buffer_length_second_particles_y1_send;
+extern int buffer_length_second_particles_y1_recv;
+extern int buffer_length_second_particles_z0_send;
+extern int buffer_length_second_particles_z0_recv;
+extern int buffer_length_second_particles_z1_send;
+extern int buffer_length_second_particles_z1_recv;
 extern int x_buffer_length_hydro;
 extern int y_buffer_length_hydro;
 extern int z_buffer_length_hydro;
@@ -154,6 +160,10 @@ void Allocate_MPI_Buffers_SLAB(struct Header *H);
 
 /* Allocate MPI communication buffers for a BLOCK decomposition */
 void Allocate_MPI_Buffers_BLOCK(struct Header *H);
+
+#ifdef PARTICLES
+void Check_and_Grow_Particles_Buffer( Real **part_buffer, int current_size, int new_size );
+#endif
 
 /* find the greatest prime factor of an integer */
 int greatest_prime_factor(int n);
