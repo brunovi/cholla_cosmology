@@ -211,21 +211,37 @@ void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer
 }
 
 
-void Particles_3D::Add_Particle_To_Buffer( Real *buffer, int buffer_start, Real pId, Real pMass,
+void Particles_3D::Add_Particle_To_Buffer( Real *buffer, int buffer_start, int max_particles, Real *buffer_secondary, int buffer_start_secondary, Real pId, Real pMass,
                             Real pPos_x, Real pPos_y, Real pPos_z,
                             Real pVel_x, Real pVel_y, Real pVel_z ){
   int n_in_buffer, offset_out;
   n_in_buffer = real_to_int( buffer[buffer_start] );
-  offset_out = buffer_start + N_HEADER_PARTICLES_TRANSFER + n_in_buffer*N_DATA_PER_PARTICLE_TRANSFER;
-  buffer[offset_out + 0] = pId;
-  buffer[offset_out + 1] = pMass;
-  buffer[offset_out + 2] = pPos_x;
-  buffer[offset_out + 3] = pPos_y;
-  buffer[offset_out + 4] = pPos_z;
-  buffer[offset_out + 5] = pVel_x;
-  buffer[offset_out + 6] = pVel_y;
-  buffer[offset_out + 7] = pVel_z;
-  buffer[buffer_start] += 1;
+  if ( n_in_buffer < max_particles ){
+    offset_out = buffer_start + N_HEADER_PARTICLES_TRANSFER + n_in_buffer*N_DATA_PER_PARTICLE_TRANSFER;
+    buffer[offset_out + 0] = pId;
+    buffer[offset_out + 1] = pMass;
+    buffer[offset_out + 2] = pPos_x;
+    buffer[offset_out + 3] = pPos_y;
+    buffer[offset_out + 4] = pPos_z;
+    buffer[offset_out + 5] = pVel_x;
+    buffer[offset_out + 6] = pVel_y;
+    buffer[offset_out + 7] = pVel_z;
+    buffer[buffer_start] += 1;
+  }
+  else{
+    buffer[buffer_start+1] += 1;
+    n_in_buffer = real_to_int( buffer_secondary[buffer_start_secondary] );
+    offset_out = buffer_start + N_HEADER_PARTICLES_TRANSFER + n_in_buffer*N_DATA_PER_PARTICLE_TRANSFER;
+    buffer_secondary[offset_out + 0] = pId;
+    buffer_secondary[offset_out + 1] = pMass;
+    buffer_secondary[offset_out + 2] = pPos_x;
+    buffer_secondary[offset_out + 3] = pPos_y;
+    buffer_secondary[offset_out + 4] = pPos_z;
+    buffer_secondary[offset_out + 5] = pVel_x;
+    buffer_secondary[offset_out + 6] = pVel_y;
+    buffer_secondary[offset_out + 7] = pVel_z;
+    buffer_secondary[buffer_start_secondary] += 1;
+  }
 }
 
 void Particles_3D::Add_Particle_To_Vectors( Real pId, Real pMass,
@@ -248,7 +264,7 @@ void Particles_3D::Add_Particle_To_Vectors( Real pId, Real pMass,
 
 void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int buffer_start, Real *recv_buffer,
       Real *send_buffer_y0, Real *send_buffer_y1, Real *send_buffer_z0, Real *send_buffer_z1, int buffer_start_y, int buffer_start_z,
-      Real *send_buffer_y0_second, Real *send_buffer_y1_second, Real *send_buffer_z0_second, Real *send_buffer_z1_second, bool secondary  ){
+      Real *send_buffer_y0_second, Real *send_buffer_y1_second, Real *send_buffer_z0_second, Real *send_buffer_z1_second, int max_particles, bool secondary  ){
 
   int n_recv;
   int offset_buff, indx, offset_out, n_in_out;
@@ -293,12 +309,12 @@ void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int bu
     if (direction  != 1 ){
       if ( pPos_y < G.yMin ){
         // std::cout << "  Adding to Y0 " << std::endl;
-        Add_Particle_To_Buffer( send_buffer_y0, buffer_start_y, pId, pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pPos_z);
+        Add_Particle_To_Buffer( send_buffer_y0, buffer_start_y, max_particles, send_buffer_y0_second, 0, pId, pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pPos_z);
         continue;
       }
       if ( pPos_y >= G.yMax ){
         // std::cout << "  Adding to Y1 " << std::endl;
-        Add_Particle_To_Buffer( send_buffer_y1, buffer_start_y, pId, pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pPos_z);
+        Add_Particle_To_Buffer( send_buffer_y1, buffer_start_y, max_particles, send_buffer_y1_second, 0, pId, pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pPos_z);
         continue;
       }
     }
@@ -318,12 +334,12 @@ void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int bu
     if (direction  !=2 ){
       if ( pPos_z < G.zMin ){
         // std::cout << "  Adding to Z0 " << std::endl;
-        Add_Particle_To_Buffer( send_buffer_z0, buffer_start_z, pId, pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pPos_z);
+        Add_Particle_To_Buffer( send_buffer_z0, buffer_start_z, max_particles, send_buffer_z0_second, 0, pId, pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pPos_z);
         continue;
       }
       if ( pPos_z >= G.zMax ){
         // std::cout << "  Adding to Z1 " << std::endl;
-        Add_Particle_To_Buffer( send_buffer_z1, buffer_start_z, pId, pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pPos_z);
+        Add_Particle_To_Buffer( send_buffer_z1, buffer_start_z, max_particles, send_buffer_z1_second, 0, pId, pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pPos_z);
         continue;
       }
     }

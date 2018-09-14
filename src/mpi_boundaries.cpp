@@ -15,12 +15,24 @@ void Clear_Buffers_For_Particles_Transfers( void ){
   send_buffer_y1[y_buffer_length_hydro] = 0;
   send_buffer_z0[z_buffer_length_hydro] = 0;
   send_buffer_z1[z_buffer_length_hydro] = 0;
+  send_buffer_x0[x_buffer_length_hydro+1] = 0;
+  send_buffer_x1[x_buffer_length_hydro+1] = 0;
+  send_buffer_y0[y_buffer_length_hydro+1] = 0;
+  send_buffer_y1[y_buffer_length_hydro+1] = 0;
+  send_buffer_z0[z_buffer_length_hydro+1] = 0;
+  send_buffer_z1[z_buffer_length_hydro+1] = 0;
   send_buffer_x0_second_particles[0] = 0;
   send_buffer_x1_second_particles[0] = 0;
   send_buffer_y0_second_particles[0] = 0;
   send_buffer_y1_second_particles[0] = 0;
   send_buffer_z0_second_particles[0] = 0;
   send_buffer_z1_second_particles[0] = 0;
+  send_buffer_x0_second_particles[1] = 0;
+  send_buffer_x1_second_particles[1] = 0;
+  send_buffer_y0_second_particles[1] = 0;
+  send_buffer_y1_second_particles[1] = 0;
+  send_buffer_z0_second_particles[1] = 0;
+  send_buffer_z1_second_particles[1] = 0;
 }
 
 void Grid3D::Finish_Particles_Transfer( void ){
@@ -618,92 +630,92 @@ void Grid3D::Unload_Particles_Density_Boundary_From_Buffer( int direction, int s
 }
 
 void Grid3D::Load_Particles_to_Buffer_X0( bool secondary ){
-  int buffer_start, max_partices;
+  int buffer_start, max_particles;
   if ( !secondary ){
     buffer_start = x_buffer_length_hydro;
-    max_partices = N_PARTICLES_TRANSFER;
-    Particles.Load_Particles_to_Buffer( 0, 0, buffer_start , send_buffer_x0, max_partices  );
+    max_particles = N_PARTICLES_TRANSFER;
+    Particles.Load_Particles_to_Buffer( 0, 0, buffer_start , send_buffer_x0, max_particles  );
   }
   else{
     int buffer_start = 0;
-    int max_partices = ( buffer_length_second_particles_x0_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER;
-    Particles.Load_Particles_to_Buffer( 0, 0, buffer_start , send_buffer_x0_second_particles, max_partices  );
+    int max_particles = ( buffer_length_second_particles_x0_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER;
+    Particles.Load_Particles_to_Buffer( 0, 0, buffer_start , send_buffer_x0_second_particles, max_particles  );
   }
 }
 
 void Grid3D::Load_Particles_to_Buffer_X1( bool secondary ){
-  int buffer_start, max_partices;
+  int buffer_start, max_particles;
   if ( !secondary ){
     buffer_start = x_buffer_length_hydro;
-    max_partices = N_PARTICLES_TRANSFER;
-    Particles.Load_Particles_to_Buffer( 0, 1, buffer_start , send_buffer_x1, max_partices  );
+    max_particles = N_PARTICLES_TRANSFER;
+    Particles.Load_Particles_to_Buffer( 0, 1, buffer_start , send_buffer_x1, max_particles  );
   }
   else{
     int buffer_start = 0;
-    int max_partices = ( buffer_length_second_particles_x1_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER;
-    Particles.Load_Particles_to_Buffer( 0, 1, buffer_start , send_buffer_x1_second_particles, max_partices  );
+    int max_particles = ( buffer_length_second_particles_x1_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER;
+    Particles.Load_Particles_to_Buffer( 0, 1, buffer_start , send_buffer_x1_second_particles, max_particles  );
   }
 }
 
 void Grid3D::Load_Particles_to_Buffer_Y0( bool secondary ){
-  int buffer_start, max_partices;
+  int buffer_start, max_particles;
   if ( !secondary ){
     buffer_start = y_buffer_length_hydro;
-    max_partices = N_PARTICLES_TRANSFER;
-    Particles.Load_Particles_to_Buffer( 1, 0, buffer_start , send_buffer_y0, max_partices  );
+    max_particles = N_PARTICLES_TRANSFER;
+    Particles.Load_Particles_to_Buffer( 1, 0, buffer_start , send_buffer_y0, max_particles  );
   }
   else{
     int buffer_start = 0;
-    int max_partices = ( buffer_length_second_particles_y0_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER;
-    Particles.Load_Particles_to_Buffer( 1, 0, buffer_start , send_buffer_y0_second_particles, max_partices  );
+    int max_particles = ( buffer_length_second_particles_y0_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER;
+    Particles.Load_Particles_to_Buffer( 1, 0, buffer_start , send_buffer_y0_second_particles, max_particles  );
   }
 }
 
 void Grid3D::Load_Particles_to_Buffer_Y1( bool secondary ){
-  int buffer_start, max_partices;
+  int buffer_start, max_particles;
   if ( !secondary ){
     buffer_start = y_buffer_length_hydro;
-    max_partices = N_PARTICLES_TRANSFER;
-    Particles.Load_Particles_to_Buffer( 1, 1, buffer_start , send_buffer_y1, max_partices  );
+    max_particles = N_PARTICLES_TRANSFER;
+    Particles.Load_Particles_to_Buffer( 1, 1, buffer_start , send_buffer_y1, max_particles  );
   }
   else{
     int buffer_start = 0;
-    int max_partices = ( buffer_length_second_particles_y1_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER;
-    Particles.Load_Particles_to_Buffer( 1, 1, buffer_start , send_buffer_y1_second_particles, max_partices  );
+    int max_particles = ( buffer_length_second_particles_y1_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER;
+    Particles.Load_Particles_to_Buffer( 1, 1, buffer_start , send_buffer_y1_second_particles, max_particles  );
   }
 }
 
 void Grid3D::Load_Particles_to_Buffer_Z0( bool secondary ){
-  int buffer_start, max_partices;
+  int buffer_start, max_particles;
   if ( !secondary ){
     buffer_start = z_buffer_length_hydro;
-    max_partices = N_PARTICLES_TRANSFER;
-    Particles.Load_Particles_to_Buffer( 2, 0, buffer_start , send_buffer_z0, max_partices  );
+    max_particles = N_PARTICLES_TRANSFER;
+    Particles.Load_Particles_to_Buffer( 2, 0, buffer_start , send_buffer_z0, max_particles  );
   }
   else{
     int buffer_start = 0;
-    int max_partices = ( buffer_length_second_particles_z0_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER;
-    Particles.Load_Particles_to_Buffer( 2, 0, buffer_start , send_buffer_z0_second_particles, max_partices  );
+    int max_particles = ( buffer_length_second_particles_z0_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER;
+    Particles.Load_Particles_to_Buffer( 2, 0, buffer_start , send_buffer_z0_second_particles, max_particles  );
   }
 }
 
 void Grid3D::Load_Particles_to_Buffer_Z1( bool secondary ){
-  int buffer_start, max_partices;
+  int buffer_start, max_particles;
   if ( !secondary ){
     buffer_start = z_buffer_length_hydro;
-    max_partices = N_PARTICLES_TRANSFER;
-    Particles.Load_Particles_to_Buffer( 2, 1, buffer_start , send_buffer_z1, max_partices  );
+    max_particles = N_PARTICLES_TRANSFER;
+    Particles.Load_Particles_to_Buffer( 2, 1, buffer_start , send_buffer_z1, max_particles  );
   }
   else{
     int buffer_start = 0;
-    int max_partices = ( buffer_length_second_particles_z1_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER;
-    Particles.Load_Particles_to_Buffer( 2, 1, buffer_start , send_buffer_z1_second_particles, max_partices  );
+    int max_particles = ( buffer_length_second_particles_z1_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER;
+    Particles.Load_Particles_to_Buffer( 2, 1, buffer_start , send_buffer_z1_second_particles, max_particles  );
   }
 }
 
 void Grid3D::Unload_Particles_from_Buffer_X_0( bool secondary ){
   if (!secondary){
-    Particles.Unload_Particles_from_Buffer( 0, 0,  x_buffer_length_hydro, recv_buffer_x0, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, false  );
+    Particles.Unload_Particles_from_Buffer( 0, 0,  x_buffer_length_hydro, recv_buffer_x0, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, N_PARTICLES_TRANSFER, false  );
   }
   else{
 
@@ -712,7 +724,7 @@ void Grid3D::Unload_Particles_from_Buffer_X_0( bool secondary ){
 
 void Grid3D::Unload_Particles_from_Buffer_X_1( bool secondary ){
   if (!secondary){
-    Particles.Unload_Particles_from_Buffer( 0, 1,  x_buffer_length_hydro, recv_buffer_x1, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, false  );
+    Particles.Unload_Particles_from_Buffer( 0, 1,  x_buffer_length_hydro, recv_buffer_x1, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, N_PARTICLES_TRANSFER, false  );
   }
   else{
 
@@ -721,7 +733,7 @@ void Grid3D::Unload_Particles_from_Buffer_X_1( bool secondary ){
 
 void Grid3D::Unload_Particles_from_Buffer_Y_0( bool secondary ){
   if (!secondary){
-    Particles.Unload_Particles_from_Buffer( 1, 0,  y_buffer_length_hydro, recv_buffer_y0, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, false  );
+    Particles.Unload_Particles_from_Buffer( 1, 0,  y_buffer_length_hydro, recv_buffer_y0, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, N_PARTICLES_TRANSFER, false  );
   }
   else{
 
@@ -730,7 +742,7 @@ void Grid3D::Unload_Particles_from_Buffer_Y_0( bool secondary ){
 
 void Grid3D::Unload_Particles_from_Buffer_Y_1( bool secondary ){
   if (!secondary){
-    Particles.Unload_Particles_from_Buffer( 1, 1,  y_buffer_length_hydro, recv_buffer_y1, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, false  );
+    Particles.Unload_Particles_from_Buffer( 1, 1,  y_buffer_length_hydro, recv_buffer_y1, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, N_PARTICLES_TRANSFER, false  );
   }
   else{
 
@@ -739,7 +751,7 @@ void Grid3D::Unload_Particles_from_Buffer_Y_1( bool secondary ){
 
 void Grid3D::Unload_Particles_from_Buffer_Z_0( bool secondary ){
   if (!secondary){
-    Particles.Unload_Particles_from_Buffer( 2, 0,  z_buffer_length_hydro, recv_buffer_z0, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, false  );
+    Particles.Unload_Particles_from_Buffer( 2, 0,  z_buffer_length_hydro, recv_buffer_z0, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, N_PARTICLES_TRANSFER, false  );
   }
   else{
 
@@ -748,7 +760,7 @@ void Grid3D::Unload_Particles_from_Buffer_Z_0( bool secondary ){
 
 void Grid3D::Unload_Particles_from_Buffer_Z_1( bool secondary ){
   if (!secondary){
-    Particles.Unload_Particles_from_Buffer( 2, 1,  z_buffer_length_hydro, recv_buffer_z1, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, false  );
+    Particles.Unload_Particles_from_Buffer( 2, 1,  z_buffer_length_hydro, recv_buffer_z1, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, N_PARTICLES_TRANSFER, false  );
   }
   else{
 
