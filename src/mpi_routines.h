@@ -66,6 +66,8 @@ extern int y_buffer_length;
 extern int z_buffer_length;
 
 #ifdef PARTICLES
+extern MPI_Request *send_request_secondary_particles;
+extern MPI_Request *recv_request_secondary_particles;
 // For BLOCK
 extern Real *send_buffer_x0_second_particles;
 extern Real *send_buffer_x1_second_particles;

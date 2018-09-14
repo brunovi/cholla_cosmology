@@ -871,9 +871,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
         buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_transfer_secondary*N_DATA_PER_PARTICLE_TRANSFER;
         Check_and_Grow_Particles_Buffer( &send_buffer_x0_second_particles, &buffer_length_second_particles_x0_send, buffer_length_secondary );
         Load_Particles_to_Buffer_X0( true );
-        // MPI_Wait( &send_request[0], &status_particles_secondary_0);
-        // Load_Particles_to_Buffer_X0( 0, N_PARTICLES_TRANSFER_SECONDARY );
-        // MPI_Isend(send_buffer_x0, buffer_length_secondary, MPI_CHREAL, dest[0],   21, world, &send_request[0]);
+        MPI_Isend(send_buffer_x0_second_particles, buffer_length_secondary, MPI_CHREAL, dest[0],   7, world, &send_request_secondary_particles[0]);
       }
       #endif
     }
@@ -953,9 +951,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
         buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_transfer_secondary*N_DATA_PER_PARTICLE_TRANSFER;
         Check_and_Grow_Particles_Buffer( &send_buffer_x1_second_particles, &buffer_length_second_particles_x1_send, buffer_length_secondary );
         Load_Particles_to_Buffer_X1( true );
-        // MPI_Wait( &send_request[1], &status_particles_secondary_1);
-        // Load_Particles_to_Buffer_X1( 0, N_PARTICLES_TRANSFER_SECONDARY );
-        // MPI_Isend(send_buffer_x1, buffer_length_secondary, MPI_CHREAL, dest[1],   11, world, &send_request[1]);
+        MPI_Isend(send_buffer_x1_second_particles, buffer_length_secondary, MPI_CHREAL, dest[1], 6, world, &send_request_secondary_particles[1]);
       }
       #endif
     }
@@ -1027,9 +1023,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
         buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_transfer_secondary*N_DATA_PER_PARTICLE_TRANSFER;
         Check_and_Grow_Particles_Buffer( &send_buffer_y0_second_particles, &buffer_length_second_particles_y0_send, buffer_length_secondary );
         Load_Particles_to_Buffer_Y0( true );
-        // MPI_Wait( &send_request[0], &status_particles_secondary_0);
-        // Load_Particles_to_Buffer_Y0( 0, N_PARTICLES_TRANSFER_SECONDARY );
-        // MPI_Isend(send_buffer_y0, buffer_length_secondary, MPI_CHREAL, dest[2],   41, world, &send_request[0]);
+        MPI_Isend(send_buffer_y0_second_particles, buffer_length_secondary, MPI_CHREAL, dest[2], 9, world, &send_request_secondary_particles[0]);
       }
       #endif
     }
@@ -1097,9 +1091,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
         buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_transfer_secondary*N_DATA_PER_PARTICLE_TRANSFER;
         Check_and_Grow_Particles_Buffer( &send_buffer_y1_second_particles, &buffer_length_second_particles_y1_send, buffer_length_secondary );
         Load_Particles_to_Buffer_Y1( true );
-        // MPI_Wait( &send_request[1], &status_particles_secondary_1);
-        // Load_Particles_to_Buffer_Y1( 0, N_PARTICLES_TRANSFER_SECONDARY );
-        // MPI_Isend(send_buffer_y1, buffer_length_secondary, MPI_CHREAL, dest[3],   31, world, &send_request[1]);
+        MPI_Isend(send_buffer_y1_second_particles, buffer_length_secondary, MPI_CHREAL, dest[3], 8, world, &send_request_secondary_particles[1]);
       }
       #endif
     }
@@ -1157,9 +1149,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
         buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_transfer_secondary*N_DATA_PER_PARTICLE_TRANSFER;
         Check_and_Grow_Particles_Buffer( &send_buffer_z0_second_particles, &buffer_length_second_particles_z0_send, buffer_length_secondary );
         Load_Particles_to_Buffer_Z0( true );
-        // MPI_Wait( &send_request[0], &status_particles_secondary_0);
-        // Load_Particles_to_Buffer_Z0( 0, N_PARTICLES_TRANSFER_SECONDARY );
-        // MPI_Isend(send_buffer_z0, buffer_length_secondary, MPI_CHREAL, dest[4],   61, world, &send_request[0]);
+        MPI_Isend(send_buffer_z0_second_particles, buffer_length_secondary, MPI_CHREAL, dest[4],   11, world, &send_request_secondary_particles[0]);
       }
       #endif
     }
@@ -1213,9 +1203,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
         buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_transfer_secondary*N_DATA_PER_PARTICLE_TRANSFER;
         Check_and_Grow_Particles_Buffer( &send_buffer_z1_second_particles, &buffer_length_second_particles_z1_send, buffer_length_secondary );
         Load_Particles_to_Buffer_Z1( true );
-        // MPI_Wait( &send_request[1], &status_particles_secondary_1);
-        // Load_Particles_to_Buffer_Z1( 0, N_PARTICLES_TRANSFER_SECONDARY );
-        // MPI_Isend(send_buffer_z1, buffer_length_secondary, MPI_CHREAL, dest[5],   51, world, &send_request[1]);
+        MPI_Isend(send_buffer_z1_second_particles, buffer_length_secondary, MPI_CHREAL, dest[5], 10, world, &send_request_secondary_particles[1]);
       }
       #endif
     }
