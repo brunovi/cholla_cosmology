@@ -246,7 +246,9 @@ void Particles_3D::Add_Particle_To_Vectors( Real pId, Real pMass,
   n_local += 1;
 }
 
-void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int buffer_start, Real *recv_buffer, Real *send_buffer_y0, Real *send_buffer_y1, Real *send_buffer_z0, Real *send_buffer_z1, Real buffer_start_y, Real buffer_start_z  ){
+void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int buffer_start, Real *recv_buffer,
+      Real *send_buffer_y0, Real *send_buffer_y1, Real *send_buffer_z0, Real *send_buffer_z1, int buffer_start_y, int buffer_start_z,
+      Real *send_buffer_y0_second, Real *send_buffer_y1_second, Real *send_buffer_z0_second, Real *send_buffer_z1_second, bool secondary  ){
 
   int n_recv;
   int offset_buff, indx, offset_out, n_in_out;
