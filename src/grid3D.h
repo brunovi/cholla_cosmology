@@ -526,12 +526,12 @@ class Grid3D
     void Load_Particles_to_Buffer_Z0( bool secondary );
     void Load_Particles_to_Buffer_Z1( bool secondary );
 
-    void Unload_Particles_from_Buffer_X_0( int buffer_start );
-    void Unload_Particles_from_Buffer_X_1( int buffer_start );
-    void Unload_Particles_from_Buffer_Y_0( int buffer_start );
-    void Unload_Particles_from_Buffer_Y_1( int buffer_start );
-    void Unload_Particles_from_Buffer_Z_0( int buffer_start );
-    void Unload_Particles_from_Buffer_Z_1( int buffer_start );
+    void Unload_Particles_from_Buffer_X_0( bool secondary );
+    void Unload_Particles_from_Buffer_X_1( bool secondary );
+    void Unload_Particles_from_Buffer_Y_0( bool secondary );
+    void Unload_Particles_from_Buffer_Y_1( bool secondary );
+    void Unload_Particles_from_Buffer_Z_0( bool secondary );
+    void Unload_Particles_from_Buffer_Z_1( bool secondary );
     void Unload_Particles_From_Buffers_BLOCK( int indx );
     void Set_Particles_Secondary_Transfer_Recv( int index, int buffer_start );
     void Finish_Particles_Transfer( void );
