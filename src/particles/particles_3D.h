@@ -106,7 +106,7 @@ class Particles_3D
   void Load_Particles_to_Buffer_Y( void );
   void Load_Particles_to_Buffer_Z( void );
   void Unload_Particles_from_Buffer( int direction, int side, int buffer_start, Real *recv_buffer, Real *send_buffer_y0, Real *send_buffer_y1, Real *send_buffer_z0, Real *send_buffer_z1, int buffer_start_y, int buffer_start_z, Real *send_buffer_y0_second, Real *send_buffer_y1_second, Real *send_buffer_z0_second, Real *send_buffer_z1_second, int max_particles, bool secondary  );
-  void Add_Particle_To_Buffer( Real *buffer, int buffer_start, int max_particles, Real *buffer_secondary, int buffer_start_secondary, Real pId, Real pMass, Real pPos_x, Real pPos_y, Real pPos_z, Real pVel_x, Real pVel_y, Real pVel_z );
+  void Add_Particle_To_Buffer( Real *buffer, int buffer_start, int max_particles, Real *buffer_secondary, int buffer_start_secondary, Real pId, Real pMass, Real pPos_x, Real pPos_y, Real pPos_z, Real pVel_x, Real pVel_y, Real pVel_z, bool secondary );
   void Add_Particle_To_Vectors( Real pId, Real pMass, Real pPos_x, Real pPos_y, Real pPos_z, Real pVel_x, Real pVel_y, Real pVel_z );
   void Remove_Transfered_Particles( void );
   #endif
