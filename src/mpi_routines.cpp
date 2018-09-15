@@ -1127,8 +1127,8 @@ void Check_and_Grow_Particles_Buffer( Real **part_buffer, int *current_size_ptr,
   int current_size = *current_size_ptr;
   if ( new_size <= current_size ) return;
 
-  new_size = (int) 1.5 * new_size;
-  std::cout << " Growing Particles Buffer, size: " << current_size << "new_size: " << new_size << std::endl;
+  new_size = (int) 2 * new_size;
+  std::cout << " #####################################Growing Particles Buffer, size: " << current_size << "  new_size: " << new_size << std::endl;
 
   Real *new_buffer;
   new_buffer = (Real *) realloc( *part_buffer, new_size*sizeof(Real) );

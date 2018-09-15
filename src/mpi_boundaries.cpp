@@ -718,7 +718,7 @@ void Grid3D::Unload_Particles_from_Buffer_X_0( bool secondary ){
     Particles.Unload_Particles_from_Buffer( 0, 0,  x_buffer_length_hydro, recv_buffer_x0, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, N_PARTICLES_TRANSFER, false  );
   }
   else{
-
+    Particles.Unload_Particles_from_Buffer( 0, 0,  0, recv_buffer_x0_second_particles, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, 0, 0, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, N_PARTICLES_TRANSFER, true  );
   }
 }
 
@@ -727,7 +727,7 @@ void Grid3D::Unload_Particles_from_Buffer_X_1( bool secondary ){
     Particles.Unload_Particles_from_Buffer( 0, 1,  x_buffer_length_hydro, recv_buffer_x1, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, N_PARTICLES_TRANSFER, false  );
   }
   else{
-
+    Particles.Unload_Particles_from_Buffer( 0, 1,  0, recv_buffer_x1_second_particles, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, 0, 0, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, N_PARTICLES_TRANSFER, true  );
   }
 }
 
@@ -736,7 +736,7 @@ void Grid3D::Unload_Particles_from_Buffer_Y_0( bool secondary ){
     Particles.Unload_Particles_from_Buffer( 1, 0,  y_buffer_length_hydro, recv_buffer_y0, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, N_PARTICLES_TRANSFER, false  );
   }
   else{
-
+    Particles.Unload_Particles_from_Buffer( 1, 0,  0, recv_buffer_y0_second_particles, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, 0, 0, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, N_PARTICLES_TRANSFER, true  );
   }
 }
 
@@ -745,7 +745,7 @@ void Grid3D::Unload_Particles_from_Buffer_Y_1( bool secondary ){
     Particles.Unload_Particles_from_Buffer( 1, 1,  y_buffer_length_hydro, recv_buffer_y1, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, N_PARTICLES_TRANSFER, false  );
   }
   else{
-
+    Particles.Unload_Particles_from_Buffer( 1, 1,  0, recv_buffer_y1_second_particles, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, 0, 0, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, N_PARTICLES_TRANSFER, true  );
   }
 }
 
@@ -754,7 +754,7 @@ void Grid3D::Unload_Particles_from_Buffer_Z_0( bool secondary ){
     Particles.Unload_Particles_from_Buffer( 2, 0,  z_buffer_length_hydro, recv_buffer_z0, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, N_PARTICLES_TRANSFER, false  );
   }
   else{
-
+    Particles.Unload_Particles_from_Buffer( 2, 0,  0, recv_buffer_z0_second_particles, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, 0, 0, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, N_PARTICLES_TRANSFER, true  );
   }
 }
 
@@ -763,7 +763,7 @@ void Grid3D::Unload_Particles_from_Buffer_Z_1( bool secondary ){
     Particles.Unload_Particles_from_Buffer( 2, 1,  z_buffer_length_hydro, recv_buffer_z1, send_buffer_y0, send_buffer_y1, send_buffer_z0, send_buffer_z1, y_buffer_length_hydro, z_buffer_length_hydro, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, N_PARTICLES_TRANSFER, false  );
   }
   else{
-
+    Particles.Unload_Particles_from_Buffer( 2, 1,  0, recv_buffer_z1_second_particles, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, 0, 0, send_buffer_y0_second_particles, send_buffer_y1_second_particles, send_buffer_z0_second_particles, send_buffer_z1_second_particles, N_PARTICLES_TRANSFER, true  );
   }
 }
 
@@ -1637,6 +1637,7 @@ void Grid3D::Set_Particles_Secondary_Transfer_Recv( int index, int buffer_start 
     Check_and_Grow_Particles_Buffer( &recv_buffer_x0_second_particles, &buffer_length_second_particles_x0_recv, buffer_length_secondary );
     MPI_Irecv(recv_buffer_x0_second_particles, buffer_length_secondary, MPI_CHREAL, source[0], 6, world, &recv_request_secondary_particles[0]);
     MPI_Wait( &recv_request_secondary_particles[0], &status );
+    // std::cout << "  N Secondary Recv X0_buff: " << recv_buffer_x0_second_particles[0] << std::endl;
     Unload_Particles_from_Buffer_X_0( true );
     return;
   }
@@ -1645,6 +1646,7 @@ void Grid3D::Set_Particles_Secondary_Transfer_Recv( int index, int buffer_start 
     Check_and_Grow_Particles_Buffer( &recv_buffer_x1_second_particles, &buffer_length_second_particles_x1_recv, buffer_length_secondary );
     MPI_Irecv(recv_buffer_x1_second_particles, buffer_length_secondary, MPI_CHREAL, source[1], 7, world, &recv_request_secondary_particles[1]);
     MPI_Wait( &recv_request_secondary_particles[1], &status );
+    // std::cout << "  N Secondary Recv X1_buff: " << recv_buffer_x1_second_particles[0] << std::endl;
     Unload_Particles_from_Buffer_X_1( true );
     return;
   }
@@ -1653,6 +1655,7 @@ void Grid3D::Set_Particles_Secondary_Transfer_Recv( int index, int buffer_start 
     Check_and_Grow_Particles_Buffer( &recv_buffer_y0_second_particles, &buffer_length_second_particles_y0_recv, buffer_length_secondary );
     MPI_Irecv(recv_buffer_y0_second_particles, buffer_length_secondary, MPI_CHREAL, source[2], 8, world, &recv_request_secondary_particles[0]);
     MPI_Wait( &recv_request_secondary_particles[0], &status );
+    // std::cout << "  N Secondary Recv Y0_buff: " << recv_buffer_y0_second_particles[0] << std::endl;
     Unload_Particles_from_Buffer_Y_0( true );
     return;
   }
@@ -1661,6 +1664,7 @@ void Grid3D::Set_Particles_Secondary_Transfer_Recv( int index, int buffer_start 
     Check_and_Grow_Particles_Buffer( &recv_buffer_y1_second_particles, &buffer_length_second_particles_y1_recv, buffer_length_secondary );
     MPI_Irecv(recv_buffer_y1_second_particles, buffer_length_secondary, MPI_CHREAL, source[3], 9, world, &recv_request_secondary_particles[1]);
     MPI_Wait( &recv_request_secondary_particles[1], &status );
+    // std::cout << "  N Secondary Recv Y1_buff: " << recv_buffer_y1_second_particles[0] << std::endl;
     Unload_Particles_from_Buffer_Y_1( true );
     return;
   }
@@ -1669,6 +1673,7 @@ void Grid3D::Set_Particles_Secondary_Transfer_Recv( int index, int buffer_start 
     Check_and_Grow_Particles_Buffer( &recv_buffer_z0_second_particles, &buffer_length_second_particles_z0_recv, buffer_length_secondary );
     MPI_Irecv(recv_buffer_z0_second_particles, buffer_length_secondary, MPI_CHREAL, source[4], 10, world, &recv_request_secondary_particles[0]);
     MPI_Wait( &recv_request_secondary_particles[0], &status );
+    // std::cout << "  N Secondary Recv Z0_buff: " << recv_buffer_z0_second_particles[0] << std::endl;
     Unload_Particles_from_Buffer_Z_0( true );
     return;
   }
@@ -1677,6 +1682,7 @@ void Grid3D::Set_Particles_Secondary_Transfer_Recv( int index, int buffer_start 
    Check_and_Grow_Particles_Buffer( &recv_buffer_z1_second_particles, &buffer_length_second_particles_z1_recv, buffer_length_secondary );
    MPI_Irecv(recv_buffer_z1_second_particles, buffer_length_secondary, MPI_CHREAL, source[5], 11, world, &recv_request_secondary_particles[1]);
    MPI_Wait( &recv_request_secondary_particles[1], &status );
+   // std::cout << "  N Secondary Recv Z1_buff: " << recv_buffer_z1_second_particles[0] << std::endl;
    Unload_Particles_from_Buffer_Z_1( true );
    return;
  }

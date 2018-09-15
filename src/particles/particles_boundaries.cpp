@@ -170,9 +170,10 @@ void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer
   part_int_t indx, pIndx;
 
   n_out = out_indxs_vec->size();
-  if ( n_out > MAX_PARTICLES_IN_BUFFER ) n_out = MAX_PARTICLES_IN_BUFFER;
-
   n_in_buffer = real_to_int( send_buffer[buffer_start] ) ;
+
+  if ( (n_out + n_in_buffer) >= MAX_PARTICLES_IN_BUFFER ) n_out = MAX_PARTICLES_IN_BUFFER - n_in_buffer;
+
   // n_in_buffer = 0;
 
   offset = buffer_start + N_HEADER_PARTICLES_TRANSFER + n_in_buffer*N_DATA_PER_PARTICLE_TRANSFER;
@@ -191,23 +192,14 @@ void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer
     out_indxs_vec->pop_back();
     offset += N_DATA_PER_PARTICLE_TRANSFER;
   }
-  send_buffer[buffer_start+1] += out_indxs_vec->size();
-  // for ( indx = n_out-1; indx>=0; indx-- ){
-  //   pIndx = (*out_indxs_vec)[indx];
-  //   // pIndx = out
-  //   send_buffer[ offset + 0 ] = (Real) partIDs[pIndx];
-  //   send_buffer[ offset + 1 ] = mass[ pIndx ];
-  //   send_buffer[ offset + 2 ] = pos_x[ pIndx ];
-  //   send_buffer[ offset + 3 ] = pos_y[ pIndx ];
-  //   send_buffer[ offset + 4 ] = pos_z[ pIndx ];
-  //   send_buffer[ offset + 5 ] = vel_x[ pIndx ];
-  //   send_buffer[ offset + 6 ] = vel_y[ pIndx ];
-  //   send_buffer[ offset + 7 ] = vel_z[ pIndx ];
-  //   send_buffer[buffer_start] += 1;
-  //   offset += N_DATA_PER_PARTICLE_TRANSFER;
+  // out_indxs_vec->clear();
+  // if (direction==0 && side==1){
+  //   out_indxs_vec_x1.clear();
+  //   std::cout << " size: " << out_indxs_vec->size() <<  out_indxs_vec_x1.size() << std::endl;
   // }
-  // send_buffer[buffer_start] = 10;
-
+  // n_local -= n_out;
+  send_buffer[buffer_start+1] += out_indxs_vec->size();
+  // std::cout << " send_next: " << out_indxs_vec->size() << std::endl;
 }
 
 
@@ -232,7 +224,7 @@ void Particles_3D::Add_Particle_To_Buffer( Real *buffer, int buffer_start, int m
     else{
       buffer[buffer_start+1] += 1;
       n_in_buffer = real_to_int( buffer_secondary[buffer_start_secondary] );
-      offset_out = buffer_start + N_HEADER_PARTICLES_TRANSFER + n_in_buffer*N_DATA_PER_PARTICLE_TRANSFER;
+      offset_out = buffer_start_secondary + N_HEADER_PARTICLES_TRANSFER + n_in_buffer*N_DATA_PER_PARTICLE_TRANSFER;
       buffer_secondary[offset_out + 0] = pId;
       buffer_secondary[offset_out + 1] = pMass;
       buffer_secondary[offset_out + 2] = pPos_x;
@@ -286,7 +278,7 @@ void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int bu
   part_int_t pId;
   Real pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pVel_z;
 
-  n_recv = ( int ) recv_buffer[buffer_start];
+  n_recv = real_to_int( recv_buffer[buffer_start] );
   int n_added = 0;
   offset_buff = buffer_start + N_HEADER_PARTICLES_TRANSFER;
   for ( indx = 0; indx<n_recv; indx++ ){
@@ -412,9 +404,43 @@ void Particles_3D::Remove_Transfered_Particles( void ){
 
   int n_in_out_vectors, n_in_vectors;
   n_in_vectors = ( partIDs.size() + mass.size() + pos_x.size() + pos_y.size() + pos_z.size() + vel_x.size() + vel_y.size() + vel_z.size() ) / N_DATA_PER_PARTICLE_TRANSFER;
-  if ( n_in_vectors != n_local ) std::cout << "ERROR PARTICLES TRANSFER: DATA IN VECTORS DIFFERENT FROM N_LOCAL###########" << std::endl;
+  if ( n_in_vectors != n_local ){
+    std::cout << "ERROR PARTICLES TRANSFER: DATA IN VECTORS DIFFERENT FROM N_LOCAL###########" << std::endl;
+    exit(-1);
+  }
   n_in_out_vectors = out_indxs_vec_x0.size() + out_indxs_vec_x1.size() + out_indxs_vec_y0.size() + out_indxs_vec_y1.size() + out_indxs_vec_z0.size() + out_indxs_vec_z1.size();
-  if ( n_in_out_vectors != 0 ) std::cout << "ERROR PARTICLES TRANSFER: OUPTUT VECTORS NOT EMPTY###########" << std::endl;
+  // if ( n_in_out_vectors != 0 ){
+  //   std::cout << "#################ERROR PARTICLES TRANSFER: OUPTUT VECTORS NOT EMPTY, N_IN_VECTORS: " << n_in_out_vectors << std::endl;
+  //   part_int_t pId;
+  //   if ( out_indxs_vec_x0.size()>0){
+  //     std::cout << " In x0" << std::endl;
+  //     pId = out_indxs_vec_x0[0];
+  //   }
+  //   if ( out_indxs_vec_x1.size()>0){
+  //     std::cout << " In x1" << std::endl;
+  //     pId = out_indxs_vec_x1[0];
+  //   }
+  //   if ( out_indxs_vec_y0.size()>0){
+  //     std::cout << " In y0" << std::endl;
+  //     pId = out_indxs_vec_y0[0];
+  //   }
+  //   if ( out_indxs_vec_y1.size()>0){
+  //     std::cout << " In y1" << std::endl;
+  //     pId = out_indxs_vec_y1[0];
+  //   }
+  //   if ( out_indxs_vec_z0.size()>0){
+  //     std::cout << " In z0" << std::endl;
+  //     pId = out_indxs_vec_z0[0];
+  //   }
+  //   if ( out_indxs_vec_z1.size()>0){
+  //     std::cout << " In z1" << std::endl;
+  //     pId = out_indxs_vec_z1[0];
+  //   }
+  //   std::cout  << "pos_x: " << pos_x[pId] << " x: " << G.xMin << "  " << G.xMax << std::endl;
+  //   std::cout  << "pos_y: " << pos_y[pId] << " y: " << G.yMin << "  " << G.yMax << std::endl;
+  //   std::cout  << "pos_z: " << pos_z[pId] << " z: " << G.zMin << "  " << G.zMax << std::endl;
+  //   // exit(-1);
+  // }
   // for ( int i=0; i<nproc; i++ ){
     // MPI_Barrier(world);
   // }
