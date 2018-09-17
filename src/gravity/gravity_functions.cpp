@@ -15,8 +15,12 @@ void Copy_Hydro_Density_to_Gravity( Grid3D &G ){
         #ifdef ONLY_PM
         G.Grav.F.density_h[id_grav] = 0;
         #else
+        #ifdef COSMOLOGY
+        G.Grav.F.density_h[id_grav] = 4 * M_PI * G.Cosmo.cosmo_G * ( G.C.density[id]*G.Cosmo.rho_0_gas - G.Cosmo.rho_0_gas ) / G.Cosmo.current_a ;
+        #else
         G.Grav.F.density_h[id_grav] = 4 * M_PI * G.C.density[id] ;
-        #endif
+        #endif //COSMOLOGY
+        #endif //ONLY_PM
       }
     }
   }
@@ -115,6 +119,11 @@ void Extrapolate_Grav_Potential( Grid3D &G ){
           pot_prev = G.Grav.F.potential_1_h[id_pot];
           pot_extrp = pot_now + 0.5 * G.Grav.dt_now * ( pot_now - pot_prev ) / G.Grav.dt_prev;
         }
+
+        #ifdef COSMOLOGY
+        pot_extrp *= G.Cosmo.current_a * G.Cosmo.current_a / G.Cosmo.phi_0_gas;
+        #endif
+
         G.C.Grav_potential[id_grid] = pot_extrp;
         G.Grav.F.potential_1_h[id_pot] = pot_now;
       }
@@ -166,6 +175,48 @@ void Copy_Potential_From_Hydro_Grid( Grid3D &G ){
       }
     }
   }
+}
+
+void Set_dt( Grid3D &G, bool &output_now ){
+
+  #ifdef COSMOLOGY
+  G.Cosmo.delta_a = G.Cosmo.max_delta_a;
+  if ( (G.Cosmo.current_a + G.Cosmo.delta_a) >  G.Cosmo.next_output ){
+    G.Cosmo.delta_a = G.Cosmo.next_output - G.Cosmo.current_a;
+    output_now = true;
+    chprintf( " ################################## \n");
+  }
+  Real dt_courant, dt_gas;
+  dt_courant = G.H.dt;
+  dt_gas = G.Cosmo.Get_Cosmology_dt( G.Cosmo.delta_a );
+  G.H.dt = dt_gas;
+
+  chprintf( "Current_a: %f    delta_a: %f   dt: %f    dt/dt_courant: %f\n", G.Cosmo.current_a, G.Cosmo.delta_a, dt_gas, dt_gas/dt_courant );
+  #endif
+
+
+
+  if ( G.Grav.INITIAL ){
+    G.Grav.dt_prev = G.H.dt;
+    G.Grav.dt_now = G.H.dt;
+  }else{
+    G.Grav.dt_prev = G.Grav.dt_now;
+    G.Grav.dt_now = G.H.dt;
+  }
+
+  // #ifdef PARTICLES
+  // dt_particles = Get_Particles_dt( G.Particles );
+  // dt_min = std::min( G.H.dt, dt_particles );
+  // G.H.dt = dt_min;
+  // G.Particles.dt = dt_min;
+  // // G.Particles.dt = 0;
+  // #endif
+
+
+
+
+
+
 }
 
 

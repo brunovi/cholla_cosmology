@@ -10,6 +10,7 @@
 #include"../grid3D.h"
 
 void Change_DM_Frame_System( Grid3D &G, bool forward );
+void Change_GAS_Frame_System( Grid3D &G, bool forward );
 void Change_Cosmological_Frame_Sytem( Grid3D &G, bool forward );
 
 

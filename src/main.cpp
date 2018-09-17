@@ -219,32 +219,34 @@ int main(int argc, char *argv[])
     G.H.dt = ReduceRealMin(G.H.dt);
     #endif
 
-    #ifdef PARTICLES
-    dt_particles = Get_Particles_dt( G.Particles );
-    dt_min = std::min( G.H.dt, dt_particles );
-    G.H.dt = dt_min;
-    G.Particles.dt = dt_min;
-    // G.Particles.dt = 0;
-    #endif
+    // #ifdef PARTICLES
+    // dt_particles = Get_Particles_dt( G.Particles );
+    // dt_min = std::min( G.H.dt, dt_particles );
+    // G.H.dt = dt_min;
+    // G.Particles.dt = dt_min;
+    // // G.Particles.dt = 0;
+    // #endif
 
     #ifdef GRAVITY
-    if ( G.Grav.INITIAL ){
-      G.Grav.dt_prev = G.H.dt;
-      G.Grav.dt_now = G.H.dt;
-      // G.Grav.INITIAL = false;
-    }else{
-      G.Grav.dt_prev = G.Grav.dt_now;
-      G.Grav.dt_now = G.H.dt;
-    }
-    #ifdef COSMOLOGY
-    G.Cosmo.delta_a = G.Cosmo.max_delta_a;
-    if ( (G.Cosmo.current_a + G.Cosmo.delta_a) >  G.Cosmo.next_output ){
-       G.Cosmo.delta_a = G.Cosmo.next_output - G.Cosmo.current_a;
-       output_now = true;
-       chprintf( " ################################## \n");
-    }
-    chprintf( "Current_a: %f    delta_a: %f \n", G.Cosmo.current_a, G.Cosmo.delta_a );
-    #endif
+
+    Set_dt( G, output_now );
+    // if ( G.Grav.INITIAL ){
+    //   G.Grav.dt_prev = G.H.dt;
+    //   G.Grav.dt_now = G.H.dt;
+    //   // G.Grav.INITIAL = false;
+    // }else{
+    //   G.Grav.dt_prev = G.Grav.dt_now;
+    //   G.Grav.dt_now = G.H.dt;
+    // }
+    // #ifdef COSMOLOGY
+    // G.Cosmo.delta_a = G.Cosmo.max_delta_a;
+    // if ( (G.Cosmo.current_a + G.Cosmo.delta_a) >  G.Cosmo.next_output ){
+    //    G.Cosmo.delta_a = G.Cosmo.next_output - G.Cosmo.current_a;
+    //    output_now = true;
+    //    chprintf( " ################################## \n");
+    // }
+    // chprintf( "Current_a: %f    delta_a: %f \n", G.Cosmo.current_a, G.Cosmo.delta_a );
+    // #endif
     #endif
 
     #ifdef PARTICLES

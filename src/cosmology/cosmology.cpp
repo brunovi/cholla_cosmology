@@ -31,6 +31,14 @@ void Initialize_Cosmology( Cosmology &Cosmo, struct parameters P, Particles_3D &
   Cosmo.v_0_dm   = Cosmo.r_0_dm / Cosmo.t_0_dm / Cosmo.cosmo_h;
   Cosmo.rho_0_dm = 3*Cosmo.H0*Cosmo.H0 / ( 8*M_PI*Cosmo.cosmo_G ) * Cosmo.Omega_M /Cosmo.cosmo_h/Cosmo.cosmo_h;
 
+  Cosmo.r_0_gas = 1.0;
+  Cosmo.rho_0_gas = 3*Cosmo.H0*Cosmo.H0 / ( 8*M_PI*Cosmo.cosmo_G ) * Cosmo.Omega_M /Cosmo.cosmo_h/Cosmo.cosmo_h;
+  Cosmo.t_0_gas = 1/Cosmo.H0*Cosmo.cosmo_h;
+  Cosmo.v_0_gas = Cosmo.r_0_gas / Cosmo.t_0_gas;
+  Cosmo.phi_0_gas = Cosmo.v_0_gas * Cosmo.v_0_gas;
+  Cosmo.p_0_gas = Cosmo.rho_0_gas * Cosmo.v_0_gas * Cosmo.v_0_gas;
+  Cosmo.e_0_gas = Cosmo.v_0_gas * Cosmo.v_0_gas;
+
   chprintf( " H0: %f\n", Cosmo.H0 * 1000 );
   chprintf( " Omega_M: %f\n", Cosmo.Omega_M );
   chprintf( " Omega_L: %f\n", Cosmo.Omega_L );
@@ -64,6 +72,13 @@ Real Scale_Function( Real a, Real Omega_M, Real Omega_L, Real Omega_K ){
   Real a3 = a * a * a;
   Real factor = ( Omega_M + a*Omega_K + a3*Omega_L ) / a;
   return 1./sqrt(factor);
+}
+
+Real Cosmology::Get_Cosmology_dt( Real da ){
+  Real dt;
+  dt = Get_dt_from_da( da );
+  return dt;
+
 }
 
 #endif

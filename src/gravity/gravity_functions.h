@@ -44,5 +44,7 @@ void Copy_Potential_From_Hydro_Grid( Grid3D &G );
 
 void Extrapolate_Grav_Potential( Grid3D &G  );
 
+void Set_dt( Grid3D &G, bool &output_now );
+
 #endif //SELF_GRAV_FUNC_H
 #endif //SELF_GRAVITY
