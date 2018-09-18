@@ -228,7 +228,6 @@ int main(int argc, char *argv[])
     // #endif
 
     #ifdef GRAVITY
-
     Set_dt( G, output_now );
     // if ( G.Grav.INITIAL ){
     //   G.Grav.dt_prev = G.H.dt;
