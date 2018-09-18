@@ -40,7 +40,7 @@ void Set_Next_Scale_Output( Cosmology &Cosmo ){
 
   int scale_indx = Cosmo.next_output_indx;
   Real a_value = Cosmo.scale_outputs[scale_indx];
-  if  ( ( scale_indx == 0 ) && ( abs(a_value - Cosmo.current_a )<1e-3 ) )scale_indx = 1;
+  if  ( ( scale_indx == 0 ) && ( abs(a_value - Cosmo.current_a )<1e-4 ) )scale_indx = 1;
   a_value = Cosmo.scale_outputs[scale_indx];
   while ( a_value <= Cosmo.current_a ){
     // chprintf( "%f   %f\n", a_value, Cosmo.current_a);
