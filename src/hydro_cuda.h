@@ -34,6 +34,11 @@ __global__ void Sync_Energies_2D(Real *dev_conserved, int nx, int ny, int n_ghos
 
 __global__ void Sync_Energies_3D(Real *dev_conserved, int nx, int ny, int nz, int n_ghost, Real gamma, int n_fields);
 
+#ifdef COSMOLOGY
+__global__ void Apply_Internal_Energy_Floor(Real *dev_conserved, int nx, int ny, int nz, int n_ghost, int n_fields );
+#endif
+
+
 
 #endif //HYDRO_CUDA_H
 #endif //CUDA
