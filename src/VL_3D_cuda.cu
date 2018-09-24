@@ -40,7 +40,7 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
 
 
   // dimensions of subgrid blocks
-  int nx_s, ny_s, nz_s; 
+  int nx_s, ny_s, nz_s;
   // x, y, and z offsets for subgrid blocks
   int x_off_s, y_off_s, z_off_s;
   // total number of subgrid blocks needed
@@ -63,10 +63,10 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
   // dimensions for the 1D GPU grid
   int  ngrid = (BLOCK_VOL + TPB - 1) / TPB;
 
-  //number of blocks per 1D grid  
+  //number of blocks per 1D grid
   dim3 dim1dGrid(ngrid, 1, 1);
 
-  //number of threads per 1D block   
+  //number of threads per 1D block
   dim3 dim1dBlock(TPB, 1, 1);
 
   // Set up pointers for the location to copy from and to
@@ -96,7 +96,7 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
   Real min_dt = 1e10;
   Real *host_dt_array;
   host_dt_array = (Real *) malloc(ngrid*sizeof(Real));
-  #endif  
+  #endif
 
   // allocate GPU arrays
   // conserved variables
@@ -110,7 +110,7 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
   #ifdef COOLING_GPU
   // array of timesteps for dt calculation (cooling restriction)
   Real *dev_dt_array;
-  #endif  
+  #endif
 
   // allocate memory on the GPU
   CudaSafeCall( cudaMalloc((void**)&dev_conserved, n_fields*BLOCK_VOL*sizeof(Real)) );
@@ -133,7 +133,7 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
   CudaSafeCall( cudaMalloc((void**)&dev_dti_array, ngrid*sizeof(Real)) );
   #ifdef COOLING_GPU
   CudaSafeCall( cudaMalloc((void**)&dev_dt_array, ngrid*sizeof(Real)) );
-  #endif  
+  #endif
 
   // START LOOP OVER SUBGRID BLOCKS
   while (block < block_tot) {
@@ -146,14 +146,14 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
 
     // copy the conserved variables onto the GPU
     CudaSafeCall( cudaMemcpy(dev_conserved, tmp1, n_fields*BLOCK_VOL*sizeof(Real), cudaMemcpyHostToDevice) );
-  
+
 
     // Step 1: Use PCM reconstruction to put primitive variables into interface arrays
     PCM_Reconstruction_3D<<<dim1dGrid,dim1dBlock>>>(dev_conserved, Q_Lx, Q_Rx, Q_Ly, Q_Ry, Q_Lz, Q_Rz, nx_s, ny_s, nz_s, n_ghost, gama, n_fields);
     CudaCheckError();
 
 
-    // Step 2: Calculate first-order upwind fluxes 
+    // Step 2: Calculate first-order upwind fluxes
     #ifdef EXACT
     Calculate_Exact_Fluxes_CUDA<<<dim1dGrid,dim1dBlock>>>(Q_Lx, Q_Rx, F_x, nx_s, ny_s, nz_s, n_ghost, gama, 0, n_fields);
     Calculate_Exact_Fluxes_CUDA<<<dim1dGrid,dim1dBlock>>>(Q_Ly, Q_Ry, F_y, nx_s, ny_s, nz_s, n_ghost, gama, 1, n_fields);
@@ -164,7 +164,7 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
     Calculate_Roe_Fluxes_CUDA<<<dim1dGrid,dim1dBlock>>>(Q_Ly, Q_Ry, F_y, nx_s, ny_s, nz_s, n_ghost, gama, etah_y, 1, n_fields);
     Calculate_Roe_Fluxes_CUDA<<<dim1dGrid,dim1dBlock>>>(Q_Lz, Q_Rz, F_z, nx_s, ny_s, nz_s, n_ghost, gama, etah_z, 2, n_fields);
     #endif //ROE
-    #ifdef HLLC 
+    #ifdef HLLC
     Calculate_HLLC_Fluxes_CUDA<<<dim1dGrid,dim1dBlock>>>(Q_Lx, Q_Rx, F_x, nx_s, ny_s, nz_s, n_ghost, gama, etah_x, 0, n_fields);
     Calculate_HLLC_Fluxes_CUDA<<<dim1dGrid,dim1dBlock>>>(Q_Ly, Q_Ry, F_y, nx_s, ny_s, nz_s, n_ghost, gama, etah_y, 1, n_fields);
     Calculate_HLLC_Fluxes_CUDA<<<dim1dGrid,dim1dBlock>>>(Q_Lz, Q_Rz, F_z, nx_s, ny_s, nz_s, n_ghost, gama, etah_z, 2, n_fields);
@@ -172,7 +172,7 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
     CudaCheckError();
 
 
-    // Step 3: Update the conserved variables half a timestep 
+    // Step 3: Update the conserved variables half a timestep
     Update_Conserved_Variables_3D_half<<<dim1dGrid,dim1dBlock>>>(dev_conserved, dev_conserved_half, F_x, F_y, F_z, nx_s, ny_s, nz_s, n_ghost, dx, dy, dz, 0.5*dt, gama, n_fields);
     CudaCheckError();
 
@@ -185,11 +185,11 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
     PLMP_cuda<<<dim1dGrid,dim1dBlock>>>(dev_conserved_half, Q_Lx, Q_Rx, nx_s, ny_s, nz_s, n_ghost, dx, dt, gama, 0, n_fields);
     PLMP_cuda<<<dim1dGrid,dim1dBlock>>>(dev_conserved_half, Q_Ly, Q_Ry, nx_s, ny_s, nz_s, n_ghost, dy, dt, gama, 1, n_fields);
     PLMP_cuda<<<dim1dGrid,dim1dBlock>>>(dev_conserved_half, Q_Lz, Q_Rz, nx_s, ny_s, nz_s, n_ghost, dz, dt, gama, 2, n_fields);
-    #endif //PLMP 
+    #endif //PLMP
     #ifdef PLMC
     PLMC_cuda<<<dim1dGrid,dim1dBlock>>>(dev_conserved_half, Q_Lx, Q_Rx, nx_s, ny_s, nz_s, n_ghost, dx, dt, gama, 0, n_fields);
     PLMC_cuda<<<dim1dGrid,dim1dBlock>>>(dev_conserved_half, Q_Ly, Q_Ry, nx_s, ny_s, nz_s, n_ghost, dy, dt, gama, 1, n_fields);
-    PLMC_cuda<<<dim1dGrid,dim1dBlock>>>(dev_conserved_half, Q_Lz, Q_Rz, nx_s, ny_s, nz_s, n_ghost, dz, dt, gama, 2, n_fields);  
+    PLMC_cuda<<<dim1dGrid,dim1dBlock>>>(dev_conserved_half, Q_Lz, Q_Rz, nx_s, ny_s, nz_s, n_ghost, dz, dt, gama, 2, n_fields);
     #endif
     #ifdef PPMP
     PPMP_cuda<<<dim1dGrid,dim1dBlock>>>(dev_conserved_half, Q_Lx, Q_Rx, nx_s, ny_s, nz_s, n_ghost, dx, dt, gama, 0, n_fields);
@@ -202,7 +202,7 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
     PPMC_cuda<<<dim1dGrid,dim1dBlock>>>(dev_conserved_half, Q_Lz, Q_Rz, nx_s, ny_s, nz_s, n_ghost, dz, dt, gama, 2, n_fields);
     #endif //PPMC
     CudaCheckError();
-    
+
 
     #ifdef H_CORRECTION
     // Step 4.5: Calculate eta values for H correction
@@ -229,7 +229,7 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
     Calculate_Roe_Fluxes_CUDA<<<dim1dGrid,dim1dBlock>>>(Q_Ly, Q_Ry, F_y, nx_s, ny_s, nz_s, n_ghost, gama, etah_y, 1, n_fields);
     Calculate_Roe_Fluxes_CUDA<<<dim1dGrid,dim1dBlock>>>(Q_Lz, Q_Rz, F_z, nx_s, ny_s, nz_s, n_ghost, gama, etah_z, 2, n_fields);
     #endif //ROE
-    #ifdef HLLC 
+    #ifdef HLLC
     Calculate_HLLC_Fluxes_CUDA<<<dim1dGrid,dim1dBlock>>>(Q_Lx, Q_Rx, F_x, nx_s, ny_s, nz_s, n_ghost, gama, etah_x, 0, n_fields);
     Calculate_HLLC_Fluxes_CUDA<<<dim1dGrid,dim1dBlock>>>(Q_Ly, Q_Ry, F_y, nx_s, ny_s, nz_s, n_ghost, gama, etah_y, 1, n_fields);
     Calculate_HLLC_Fluxes_CUDA<<<dim1dGrid,dim1dBlock>>>(Q_Lz, Q_Rz, F_z, nx_s, ny_s, nz_s, n_ghost, gama, etah_z, 2, n_fields);
@@ -246,12 +246,16 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
     CudaCheckError();
     #endif
 
+    #ifdef COSMOLOGY
+    Apply_Internal_Energy_Floor<<<dim1dGrid,dim1dBlock>>>(dev_conserved, nx_s, ny_s, nz_s, n_ghost, n_fields);
+    #endif
+
     // Apply cooling
     #ifdef COOLING_GPU
-    cooling_kernel<<<dim1dGrid,dim1dBlock>>>(dev_conserved, nx_s, ny_s, nz_s, n_ghost, n_fields, dt, gama, dev_dt_array);  
+    cooling_kernel<<<dim1dGrid,dim1dBlock>>>(dev_conserved, nx_s, ny_s, nz_s, n_ghost, n_fields, dt, gama, dev_dt_array);
     CudaCheckError();
     #endif
-  
+
     // Step 7: Calculate the next time step
     Calc_dt_3D<<<dim1dGrid,dim1dBlock>>>(dev_conserved, nx_s, ny_s, nz_s, n_ghost, dx, dy, dz, dev_dti_array, gama);
     CudaCheckError();
@@ -274,7 +278,7 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
     // find maximum inverse timestep from cooling time
     for (int i=0; i<ngrid; i++) {
       min_dt = fmin(min_dt, host_dt_array[i]);
-    }  
+    }
     if (min_dt < C_cfl/max_dti) {
       max_dti = C_cfl/min_dt;
     }
@@ -286,11 +290,11 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
   }
 
   // free CPU memory
-  free(host_dti_array);  
+  free(host_dti_array);
   if (block_tot > 1) free(buffer);
   #ifdef COOLING_GPU
-  free(host_dt_array);  
-  #endif  
+  free(host_dt_array);
+  #endif
 
   // free the GPU memory
   cudaFree(dev_conserved);
@@ -360,45 +364,45 @@ __global__ void Update_Conserved_Variables_3D_half(Real *dev_conserved, Real *de
     ipo = xid+1 + yid*nx + zid*nx*ny;
     jpo = xid + (yid+1)*nx + zid*nx*ny;
     kpo = xid + yid*nx + (zid+1)*nx*ny;
-    vx_imo = dev_conserved[1*n_cells + imo] / dev_conserved[imo]; 
-    vx_ipo = dev_conserved[1*n_cells + ipo] / dev_conserved[ipo]; 
-    vy_jmo = dev_conserved[2*n_cells + jmo] / dev_conserved[jmo]; 
-    vy_jpo = dev_conserved[2*n_cells + jpo] / dev_conserved[jpo]; 
-    vz_kmo = dev_conserved[3*n_cells + kmo] / dev_conserved[kmo]; 
-    vz_kpo = dev_conserved[3*n_cells + kpo] / dev_conserved[kpo]; 
+    vx_imo = dev_conserved[1*n_cells + imo] / dev_conserved[imo];
+    vx_ipo = dev_conserved[1*n_cells + ipo] / dev_conserved[ipo];
+    vy_jmo = dev_conserved[2*n_cells + jmo] / dev_conserved[jmo];
+    vy_jpo = dev_conserved[2*n_cells + jpo] / dev_conserved[jpo];
+    vz_kmo = dev_conserved[3*n_cells + kmo] / dev_conserved[kmo];
+    vz_kpo = dev_conserved[3*n_cells + kpo] / dev_conserved[kpo];
     #endif
-  
+
     // update the conserved variable array
     dev_conserved_half[            id] = dev_conserved[            id]
                                        + dtodx * (dev_F_x[            imo] - dev_F_x[            id])
                                        + dtody * (dev_F_y[            jmo] - dev_F_y[            id])
                                        + dtodz * (dev_F_z[            kmo] - dev_F_z[            id]);
-    dev_conserved_half[  n_cells + id] = dev_conserved[  n_cells + id] 
+    dev_conserved_half[  n_cells + id] = dev_conserved[  n_cells + id]
                                        + dtodx * (dev_F_x[  n_cells + imo] - dev_F_x[  n_cells + id])
                                        + dtody * (dev_F_y[  n_cells + jmo] - dev_F_y[  n_cells + id])
                                        + dtodz * (dev_F_z[  n_cells + kmo] - dev_F_z[  n_cells + id]);
-    dev_conserved_half[2*n_cells + id] = dev_conserved[2*n_cells + id] 
+    dev_conserved_half[2*n_cells + id] = dev_conserved[2*n_cells + id]
                                        + dtodx * (dev_F_x[2*n_cells + imo] - dev_F_x[2*n_cells + id])
                                        + dtody * (dev_F_y[2*n_cells + jmo] - dev_F_y[2*n_cells + id])
                                        + dtodz * (dev_F_z[2*n_cells + kmo] - dev_F_z[2*n_cells + id]);
-    dev_conserved_half[3*n_cells + id] = dev_conserved[3*n_cells + id] 
+    dev_conserved_half[3*n_cells + id] = dev_conserved[3*n_cells + id]
                                        + dtodx * (dev_F_x[3*n_cells + imo] - dev_F_x[3*n_cells + id])
                                        + dtody * (dev_F_y[3*n_cells + jmo] - dev_F_y[3*n_cells + id])
                                        + dtodz * (dev_F_z[3*n_cells + kmo] - dev_F_z[3*n_cells + id]);
-    dev_conserved_half[4*n_cells + id] = dev_conserved[4*n_cells + id] 
+    dev_conserved_half[4*n_cells + id] = dev_conserved[4*n_cells + id]
                                        + dtodx * (dev_F_x[4*n_cells + imo] - dev_F_x[4*n_cells + id])
                                        + dtody * (dev_F_y[4*n_cells + jmo] - dev_F_y[4*n_cells + id])
                                        + dtodz * (dev_F_z[4*n_cells + kmo] - dev_F_z[4*n_cells + id]);
-    #ifdef SCALAR                                   
+    #ifdef SCALAR
     for (int i=0; i<NSCALARS; i++) {
-      dev_conserved_half[(5+i)*n_cells + id] = dev_conserved[(5+i)*n_cells + id] 
+      dev_conserved_half[(5+i)*n_cells + id] = dev_conserved[(5+i)*n_cells + id]
                                          + dtodx * (dev_F_x[(5+i)*n_cells + imo] - dev_F_x[(5+i)*n_cells + id])
                                          + dtody * (dev_F_y[(5+i)*n_cells + jmo] - dev_F_y[(5+i)*n_cells + id])
                                          + dtodz * (dev_F_z[(5+i)*n_cells + kmo] - dev_F_z[(5+i)*n_cells + id]);
-    }                                   
+    }
     #endif
     #ifdef DE
-    dev_conserved_half[(n_fields-1)*n_cells + id] = dev_conserved[(n_fields-1)*n_cells + id] 
+    dev_conserved_half[(n_fields-1)*n_cells + id] = dev_conserved[(n_fields-1)*n_cells + id]
                                        + dtodx * (dev_F_x[(n_fields-1)*n_cells + imo] - dev_F_x[(n_fields-1)*n_cells + id])
                                        + dtody * (dev_F_y[(n_fields-1)*n_cells + jmo] - dev_F_y[(n_fields-1)*n_cells + id])
                                        + dtodz * (dev_F_z[(n_fields-1)*n_cells + kmo] - dev_F_z[(n_fields-1)*n_cells + id])
@@ -406,7 +410,7 @@ __global__ void Update_Conserved_Variables_3D_half(Real *dev_conserved, Real *de
     #endif
     //if (dev_conserved_half[id] < 0.0 || dev_conserved_half[id] != dev_conserved_half[id] || dev_conserved_half[4*n_cells+id] < 0.0 || dev_conserved_half[4*n_cells+id] != dev_conserved_half[4*n_cells+id]) {
       //printf("%3d %3d %3d Thread crashed in half step update. d: %e E: %e\n", xid, yid, zid, dev_conserved_half[id], dev_conserved_half[4*n_cells+id]);
-    //}    
+    //}
 
   }
 
