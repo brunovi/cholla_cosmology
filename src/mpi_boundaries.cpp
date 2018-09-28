@@ -2,6 +2,7 @@
 #include"mpi_routines.h"
 #include"io.h"
 #include"error_handling.h"
+#include <iostream>
 #ifdef MPI_CHOLLA
 
 
