@@ -7,6 +7,7 @@
 #include "io.h"
 #include "cuda_mpi_routines.h"
 #include "MPI_Comm_node.h"
+#include <iostream>
 
 /*Global MPI Variables*/
 int procID; /*process rank*/
