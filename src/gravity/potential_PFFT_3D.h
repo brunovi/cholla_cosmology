@@ -46,6 +46,8 @@ class Potential_PFFT_3D : public Poisson_Solver_3D
   pfft_plan plan_fwd;
   pfft_plan plan_bwd;
 
+  int index_0;
+
   struct Fields
   {
 

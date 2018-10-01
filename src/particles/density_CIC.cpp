@@ -145,8 +145,9 @@ void Get_Density_CIC_OMP( Particles_3D &Parts ){
     n_omp_procs = omp_get_num_threads();
     Get_OMP_Grid_Indxs( n_omp_procs, omp_id, Parts.G.nz_local+2*nGHST,  &g_start, &g_end );
 
-    g_start -= nGHST;
-    g_end   -= nGHST;
+    // g_start -= nGHST;
+    // g_end   -= nGHST;
+
     Real xMin, yMin, zMin, dx, dy, dz, zMin_local, zMax_local;
     dx = Parts.G.dx;
     dy = Parts.G.dy;
@@ -155,8 +156,11 @@ void Get_Density_CIC_OMP( Particles_3D &Parts ){
     yMin = Parts.G.yMin;
     zMin = Parts.G.zMin;
 
-    zMin_local = Parts.G.zMin + g_start*dz;
-    zMax_local = Parts.G.zMin + g_end * dz;
+    // zMin_local = Parts.G.zMin + g_start*dz;
+    // zMax_local = Parts.G.zMin + g_end * dz;
+
+    zMin_local = Parts.G.zMin + g_start*dz - 0.5*dz;
+    zMax_local = Parts.G.zMin + g_end * dz + 0.5*dz;
 
     int indx_x, indx_y, indx_z, indx;
     Real pMass, x_pos, y_pos, z_pos;
@@ -165,7 +169,7 @@ void Get_Density_CIC_OMP( Particles_3D &Parts ){
     Real delta_x, delta_y, delta_z;
     Real dV_inv = 1./(Parts.G.dx*Parts.G.dy*Parts.G.dz);
 
-    int_vector_t onHold_indxs;
+
 
     part_int_t pIndx;
     for ( pIndx=0; pIndx<Parts.n_local; pIndx++ ){
@@ -175,94 +179,187 @@ void Get_Density_CIC_OMP( Particles_3D &Parts ){
       x_pos = Parts.pos_x[pIndx];
       y_pos = Parts.pos_y[pIndx];
       Get_Indexes_CIC( xMin, yMin, zMin, dx, dy, dz, x_pos, y_pos, z_pos, indx_x, indx_y, indx_z );
-      if ( (indx_z == g_end-1 ) || (indx_z == g_end-2 ) ){
-        onHold_indxs.push_back( pIndx);
-        continue;
+
+
+      cell_center_x = xMin + indx_x*dx + 0.5*dx;
+      cell_center_y = yMin + indx_y*dy + 0.5*dy;
+      cell_center_z = zMin + indx_z*dz + 0.5*dz;
+      delta_x = 1 - ( x_pos - cell_center_x ) / dx;
+      delta_y = 1 - ( y_pos - cell_center_y ) / dy;
+      delta_z = 1 - ( z_pos - cell_center_z ) / dz;
+      indx_x += nGHST;
+      indx_y += nGHST;
+      indx_z += nGHST;
+
+      if ( indx_z >= g_start){
+
+        indx = indx_x + indx_y*nx_g + indx_z*nx_g*ny_g;
+        Parts.G.density[indx] += pMass  * delta_x * delta_y * delta_z;
+
+        indx = (indx_x+1) + indx_y*nx_g + indx_z*nx_g*ny_g;
+        Parts.G.density[indx] += pMass  * (1-delta_x) * delta_y * delta_z;
+
+        indx = indx_x + (indx_y+1)*nx_g + indx_z*nx_g*ny_g;
+        Parts.G.density[indx] += pMass  * delta_x * (1-delta_y) * delta_z;
+
+
+        indx = (indx_x+1) + (indx_y+1)*nx_g + indx_z*nx_g*ny_g;
+        Parts.G.density[indx] += pMass  * (1-delta_x) * (1-delta_y) * delta_z;
       }
+      if ( indx_z+1 < g_end){
 
-      cell_center_x = xMin + indx_x*dx + 0.5*dx;
-      cell_center_y = yMin + indx_y*dy + 0.5*dy;
-      cell_center_z = zMin + indx_z*dz + 0.5*dz;
-      delta_x = 1 - ( x_pos - cell_center_x ) / dx;
-      delta_y = 1 - ( y_pos - cell_center_y ) / dy;
-      delta_z = 1 - ( z_pos - cell_center_z ) / dz;
-      indx_x += nGHST;
-      indx_y += nGHST;
-      indx_z += nGHST;
+        indx = indx_x + indx_y*nx_g + (indx_z+1)*nx_g*ny_g;
+        Parts.G.density[indx] += pMass  * delta_x * delta_y * (1-delta_z);
 
-      indx = indx_x + indx_y*nx_g + indx_z*nx_g*ny_g;
-      Parts.G.density[indx] += pMass  * delta_x * delta_y * delta_z;
+        indx = (indx_x+1) + indx_y*nx_g + (indx_z+1)*nx_g*ny_g;
+        Parts.G.density[indx] += pMass  * (1-delta_x) * delta_y * (1-delta_z);
 
-      indx = (indx_x+1) + indx_y*nx_g + indx_z*nx_g*ny_g;
-      Parts.G.density[indx] += pMass  * (1-delta_x) * delta_y * delta_z;
+        indx = indx_x + (indx_y+1)*nx_g + (indx_z+1)*nx_g*ny_g;
+        Parts.G.density[indx] += pMass  * delta_x * (1-delta_y) * (1-delta_z);
 
-      indx = indx_x + (indx_y+1)*nx_g + indx_z*nx_g*ny_g;
-      Parts.G.density[indx] += pMass  * delta_x * (1-delta_y) * delta_z;
-
-      indx = indx_x + indx_y*nx_g + (indx_z+1)*nx_g*ny_g;
-      Parts.G.density[indx] += pMass  * delta_x * delta_y * (1-delta_z);
-
-      indx = (indx_x+1) + (indx_y+1)*nx_g + indx_z*nx_g*ny_g;
-      Parts.G.density[indx] += pMass  * (1-delta_x) * (1-delta_y) * delta_z;
-
-      indx = (indx_x+1) + indx_y*nx_g + (indx_z+1)*nx_g*ny_g;
-      Parts.G.density[indx] += pMass  * (1-delta_x) * delta_y * (1-delta_z);
-
-      indx = indx_x + (indx_y+1)*nx_g + (indx_z+1)*nx_g*ny_g;
-      Parts.G.density[indx] += pMass  * delta_x * (1-delta_y) * (1-delta_z);
-
-      indx = (indx_x+1) + (indx_y+1)*nx_g + (indx_z+1)*nx_g*ny_g;
-      Parts.G.density[indx] += pMass * (1-delta_x) * (1-delta_y) * (1-delta_z);
+        indx = (indx_x+1) + (indx_y+1)*nx_g + (indx_z+1)*nx_g*ny_g;
+        Parts.G.density[indx] += pMass * (1-delta_x) * (1-delta_y) * (1-delta_z);
+      }
     }
-
-    part_int_t indx_p;
-    for (indx_p=0; indx_p<onHold_indxs.size(); indx_p++ ){
-      pIndx = onHold_indxs[indx_p];
-      pMass = Parts.mass[pIndx] * dV_inv;
-      x_pos = Parts.pos_x[pIndx];
-      y_pos = Parts.pos_y[pIndx];
-      z_pos = Parts.pos_z[pIndx];
-      Get_Indexes_CIC( xMin, yMin, zMin, dx, dy, dz, x_pos, y_pos, z_pos, indx_x, indx_y, indx_z );
-
-      cell_center_x = xMin + indx_x*dx + 0.5*dx;
-      cell_center_y = yMin + indx_y*dy + 0.5*dy;
-      cell_center_z = zMin + indx_z*dz + 0.5*dz;
-      delta_x = 1 - ( x_pos - cell_center_x ) / dx;
-      delta_y = 1 - ( y_pos - cell_center_y ) / dy;
-      delta_z = 1 - ( z_pos - cell_center_z ) / dz;
-      indx_x += nGHST;
-      indx_y += nGHST;
-      indx_z += nGHST;
-
-      indx = indx_x + indx_y*nx_g + indx_z*nx_g*ny_g;
-      Parts.G.density[indx] += pMass  * delta_x * delta_y * delta_z;
-
-      indx = (indx_x+1) + indx_y*nx_g + indx_z*nx_g*ny_g;
-      Parts.G.density[indx] += pMass  * (1-delta_x) * delta_y * delta_z;
-
-      indx = indx_x + (indx_y+1)*nx_g + indx_z*nx_g*ny_g;
-      Parts.G.density[indx] += pMass  * delta_x * (1-delta_y) * delta_z;
-
-      indx = indx_x + indx_y*nx_g + (indx_z+1)*nx_g*ny_g;
-      Parts.G.density[indx] += pMass  * delta_x * delta_y * (1-delta_z);
-
-      indx = (indx_x+1) + (indx_y+1)*nx_g + indx_z*nx_g*ny_g;
-      Parts.G.density[indx] += pMass  * (1-delta_x) * (1-delta_y) * delta_z;
-
-      indx = (indx_x+1) + indx_y*nx_g + (indx_z+1)*nx_g*ny_g;
-      Parts.G.density[indx] += pMass  * (1-delta_x) * delta_y * (1-delta_z);
-
-      indx = indx_x + (indx_y+1)*nx_g + (indx_z+1)*nx_g*ny_g;
-      Parts.G.density[indx] += pMass  * delta_x * (1-delta_y) * (1-delta_z);
-
-      indx = (indx_x+1) + (indx_y+1)*nx_g + (indx_z+1)*nx_g*ny_g;
-      Parts.G.density[indx] += pMass * (1-delta_x) * (1-delta_y) * (1-delta_z);
-
-    }
-
 
   }
 }
+//
+// void Get_Density_CIC_OMP( Particles_3D &Parts ){
+//
+//   #pragma omp parallel num_threads( N_OMP_PARTICLE_THREADS )
+//   {
+//     int omp_id, n_omp_procs;
+//     int g_start, g_end;
+//     int nGHST, nx_g, ny_g, nz_g;
+//     nGHST = Parts.G.n_ghost_particles_grid;
+//     nx_g = Parts.G.nx_local + 2*nGHST;
+//     ny_g = Parts.G.ny_local + 2*nGHST;
+//     nz_g = Parts.G.nz_local + 2*nGHST;
+//
+//     omp_id = omp_get_thread_num();
+//     n_omp_procs = omp_get_num_threads();
+//     Get_OMP_Grid_Indxs( n_omp_procs, omp_id, Parts.G.nz_local+2*nGHST,  &g_start, &g_end );
+//
+//     g_start -= nGHST;
+//     g_end   -= nGHST;
+//     Real xMin, yMin, zMin, dx, dy, dz, zMin_local, zMax_local;
+//     dx = Parts.G.dx;
+//     dy = Parts.G.dy;
+//     dz = Parts.G.dz;
+//     xMin = Parts.G.xMin;
+//     yMin = Parts.G.yMin;
+//     zMin = Parts.G.zMin;
+//
+//     zMin_local = Parts.G.zMin + g_start*dz;
+//     zMax_local = Parts.G.zMin + g_end * dz;
+//
+//     int indx_x, indx_y, indx_z, indx;
+//     Real pMass, x_pos, y_pos, z_pos;
+//
+//     Real cell_center_x, cell_center_y, cell_center_z;
+//     Real delta_x, delta_y, delta_z;
+//     Real dV_inv = 1./(Parts.G.dx*Parts.G.dy*Parts.G.dz);
+//
+//     int_vector_t onHold_indxs;
+//
+//     part_int_t pIndx;
+//     for ( pIndx=0; pIndx<Parts.n_local; pIndx++ ){
+//       z_pos = Parts.pos_z[pIndx];
+//       if ( ( z_pos < zMin_local ) || ( z_pos >= zMax_local ) ) continue;
+//       pMass = Parts.mass[pIndx] * dV_inv;
+//       x_pos = Parts.pos_x[pIndx];
+//       y_pos = Parts.pos_y[pIndx];
+//       Get_Indexes_CIC( xMin, yMin, zMin, dx, dy, dz, x_pos, y_pos, z_pos, indx_x, indx_y, indx_z );
+//       if ( (indx_z == g_end-1 ) || (indx_z == g_end-2 ) ){
+//         onHold_indxs.push_back( pIndx);
+//         continue;
+//       }
+//
+//       cell_center_x = xMin + indx_x*dx + 0.5*dx;
+//       cell_center_y = yMin + indx_y*dy + 0.5*dy;
+//       cell_center_z = zMin + indx_z*dz + 0.5*dz;
+//       delta_x = 1 - ( x_pos - cell_center_x ) / dx;
+//       delta_y = 1 - ( y_pos - cell_center_y ) / dy;
+//       delta_z = 1 - ( z_pos - cell_center_z ) / dz;
+//       indx_x += nGHST;
+//       indx_y += nGHST;
+//       indx_z += nGHST;
+//
+//       indx = indx_x + indx_y*nx_g + indx_z*nx_g*ny_g;
+//       Parts.G.density[indx] += pMass  * delta_x * delta_y * delta_z;
+//
+//       indx = (indx_x+1) + indx_y*nx_g + indx_z*nx_g*ny_g;
+//       Parts.G.density[indx] += pMass  * (1-delta_x) * delta_y * delta_z;
+//
+//       indx = indx_x + (indx_y+1)*nx_g + indx_z*nx_g*ny_g;
+//       Parts.G.density[indx] += pMass  * delta_x * (1-delta_y) * delta_z;
+//
+//       indx = indx_x + indx_y*nx_g + (indx_z+1)*nx_g*ny_g;
+//       Parts.G.density[indx] += pMass  * delta_x * delta_y * (1-delta_z);
+//
+//       indx = (indx_x+1) + (indx_y+1)*nx_g + indx_z*nx_g*ny_g;
+//       Parts.G.density[indx] += pMass  * (1-delta_x) * (1-delta_y) * delta_z;
+//
+//       indx = (indx_x+1) + indx_y*nx_g + (indx_z+1)*nx_g*ny_g;
+//       Parts.G.density[indx] += pMass  * (1-delta_x) * delta_y * (1-delta_z);
+//
+//       indx = indx_x + (indx_y+1)*nx_g + (indx_z+1)*nx_g*ny_g;
+//       Parts.G.density[indx] += pMass  * delta_x * (1-delta_y) * (1-delta_z);
+//
+//       indx = (indx_x+1) + (indx_y+1)*nx_g + (indx_z+1)*nx_g*ny_g;
+//       Parts.G.density[indx] += pMass * (1-delta_x) * (1-delta_y) * (1-delta_z);
+//     }
+//
+//     part_int_t indx_p;
+//     for (indx_p=0; indx_p<onHold_indxs.size(); indx_p++ ){
+//       pIndx = onHold_indxs[indx_p];
+//       pMass = Parts.mass[pIndx] * dV_inv;
+//       x_pos = Parts.pos_x[pIndx];
+//       y_pos = Parts.pos_y[pIndx];
+//       z_pos = Parts.pos_z[pIndx];
+//       Get_Indexes_CIC( xMin, yMin, zMin, dx, dy, dz, x_pos, y_pos, z_pos, indx_x, indx_y, indx_z );
+//
+//       cell_center_x = xMin + indx_x*dx + 0.5*dx;
+//       cell_center_y = yMin + indx_y*dy + 0.5*dy;
+//       cell_center_z = zMin + indx_z*dz + 0.5*dz;
+//       delta_x = 1 - ( x_pos - cell_center_x ) / dx;
+//       delta_y = 1 - ( y_pos - cell_center_y ) / dy;
+//       delta_z = 1 - ( z_pos - cell_center_z ) / dz;
+//       indx_x += nGHST;
+//       indx_y += nGHST;
+//       indx_z += nGHST;
+//
+//       indx = indx_x + indx_y*nx_g + indx_z*nx_g*ny_g;
+//       Parts.G.density[indx] += pMass  * delta_x * delta_y * delta_z;
+//
+//       indx = (indx_x+1) + indx_y*nx_g + indx_z*nx_g*ny_g;
+//       Parts.G.density[indx] += pMass  * (1-delta_x) * delta_y * delta_z;
+//
+//       indx = indx_x + (indx_y+1)*nx_g + indx_z*nx_g*ny_g;
+//       Parts.G.density[indx] += pMass  * delta_x * (1-delta_y) * delta_z;
+//
+//       indx = indx_x + indx_y*nx_g + (indx_z+1)*nx_g*ny_g;
+//       Parts.G.density[indx] += pMass  * delta_x * delta_y * (1-delta_z);
+//
+//       indx = (indx_x+1) + (indx_y+1)*nx_g + indx_z*nx_g*ny_g;
+//       Parts.G.density[indx] += pMass  * (1-delta_x) * (1-delta_y) * delta_z;
+//
+//       indx = (indx_x+1) + indx_y*nx_g + (indx_z+1)*nx_g*ny_g;
+//       Parts.G.density[indx] += pMass  * (1-delta_x) * delta_y * (1-delta_z);
+//
+//       indx = indx_x + (indx_y+1)*nx_g + (indx_z+1)*nx_g*ny_g;
+//       Parts.G.density[indx] += pMass  * delta_x * (1-delta_y) * (1-delta_z);
+//
+//       indx = (indx_x+1) + (indx_y+1)*nx_g + (indx_z+1)*nx_g*ny_g;
+//       Parts.G.density[indx] += pMass * (1-delta_x) * (1-delta_y) * (1-delta_z);
+//
+//     }
+//
+//
+//   }
+// }
+
 #endif
 
 void Copy_Particles_Density_to_Gravity( Grid3D &G ){

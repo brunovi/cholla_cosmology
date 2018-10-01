@@ -9,7 +9,8 @@
 // }
 
 void Get_Particles_Acceleration( Grid3D &G, part_int_t p_start, part_int_t p_end, int g_start, int g_end ){
-  Get_Gravity_Field( G, g_start, g_end );
+  // Get_Gravity_Field( G, g_start, g_end );
+  Get_Gravity_Field_order4( G, g_start, g_end )
   Get_Gravity_CIC( G.Particles, p_start, p_end );
 }
 

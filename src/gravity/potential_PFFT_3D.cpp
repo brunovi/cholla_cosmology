@@ -2,6 +2,7 @@
 #ifdef POTENTIAL_PFFT
 
 #include "potential_PFFT_3D.h"
+#include<iostream>
 
 Potential_PFFT_3D::Potential_PFFT_3D( void ){}
 
@@ -23,9 +24,12 @@ void Potential_PFFT_3D::Initialize( Grav3D Grav){
   dy = Grav.dy;
   dz = Grav.dz;
 
+  index_0 = -1;
+
   n_cells_local = nx_local*ny_local*nz_local;
   n_cells_total = nx_total*ny_total*nz_total;
   chprintf( " Using Poisson Solver: PFFT\n");
+  chprintf( "  Index 0: %d\n", index_0);
 
   nproc_pfft = nproc;
 
@@ -132,6 +136,11 @@ void Potential_PFFT_3D::Get_K_for_Green_function( void){
         G_y = sin( k_y/2 );
         G_z = sin( k_z/2 );
         G = -1 / ( G_x*G_x + G_y*G_y + G_z*G_z ) * dx * dx /4 ;
+        if ( k_0==0 && k_1==0 && k_2 == 0 ){
+          index_0 = m ;
+          G = 1;
+          std::cout << " ###########  K=0   index: " << index_0 << std::endl;
+        }
         F.G[m] = G;
         m += 1;
       }
@@ -142,27 +151,29 @@ void Potential_PFFT_3D::Get_K_for_Green_function( void){
 
 
 void Potential_PFFT_3D::Apply_K2_Funtion( void ){
-  // Real kx, ky, kz, k2;
-  // int id;
-  // for (int k=0; k<nz_local; k++){
-  //   for (int j=0; j<ny_local; j++){
-  //     for ( int i=0; i<nx_local; i++){
-  //       id = i + j*nx_local + k*nx_local*ny_local;
-  //       kz = k;
-  //       ky = j;
-  //       kx = i;
-  //       if ( kz > nz_local/2) kz -= nz_local;
-  //       if ( ky > ny_local/2) ky -= ny_local;
-  //       if ( kx > nx_local/2) kx -= nx_local;
-  //       k2  = 4 * M_PI * M_PI * ( kx*kx + ky*ky + kz*kz );
-  //       if ( id == 0 ) k2 = 1;
-  //       F.transform[id][0] *= -1/k2;
-  //       F.transform[id][1] *= -1/k2;
-  //     }
-  //   }
-  // }
-  // F.transform[0][0] = 0;
-  // F.transform[0][1] = 0;
+  Real kx, ky, kz, k2;
+  int id;
+  for (int k=0; k<nz_local; k++){
+    for (int j=0; j<ny_local; j++){
+      for ( int i=0; i<nx_local; i++){
+        id = i + j*nx_local + k*nx_local*ny_local;
+        kz = k;
+        ky = j;
+        kx = i;
+        if ( kz > nz_local/2) kz -= nz_local;
+        if ( ky > ny_local/2) ky -= ny_local;
+        if ( kx > nx_local/2) kx -= nx_local;
+        k2  = 4 * M_PI * M_PI * ( kx*kx + ky*ky + kz*kz );
+        if ( id == 0 ) k2 = 1;
+        F.transform[id][0] *= -1/k2;
+        F.transform[id][1] *= -1/k2;
+      }
+    }
+  }
+  if (index_0 > -1){
+    F.transform[index_0][0] = 0;
+    F.transform[index_0][1] = 0;
+  }
 }
 
 void Potential_PFFT_3D::Apply_G_Funtion( void ){
@@ -172,8 +183,10 @@ void Potential_PFFT_3D::Apply_G_Funtion( void ){
     F.transform[i][0] *= G_val;
     F.transform[i][1] *= G_val;
   }
-  F.transform[0][0] = 0;
-  F.transform[0][1] = 0;
+  if (index_0 > -1){
+    F.transform[index_0][0] = 0;
+    F.transform[index_0][1] = 0;
+  }
 }
 
 

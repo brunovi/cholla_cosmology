@@ -69,6 +69,86 @@ void Get_Gravity_Field( Grid3D &G, int g_start, int g_end ){
 
 }
 
+
+
+void Get_Gravity_Field_order4( Grid3D &G, int g_start, int g_end ){
+  // int nGHST_pot = N_GHOST_POTENTIAL;
+  int nx_grav, ny_grav, nz_grav, nGHST_grav;
+  nGHST_grav = G.Particles.G.n_ghost_particles_grid;
+  nx_grav = G.Particles.G.nx_local + 2*nGHST_grav;
+  ny_grav = G.Particles.G.ny_local + 2*nGHST_grav;
+  nz_grav = G.Particles.G.nz_local + 2*nGHST_grav;
+
+  int nx_grid, ny_grid, nz_grid, nGHST_grid;
+  nGHST_grid = G.H.n_ghost;
+  nx_grid = G.Grav.nx_local + 2*nGHST_grid;
+  ny_grid = G.Grav.ny_local + 2*nGHST_grid;
+  nz_grid = G.Grav.nz_local + 2*nGHST_grid;
+
+  int nGHST = nGHST_grid - nGHST_grav;
+
+  Real dx, dy, dz;
+  dx = G.Particles.G.dx;
+  dy = G.Particles.G.dy;
+  dz = G.Particles.G.dz;
+
+
+  Real phi_l_1, phi_r_1, phi_l_2, phi_r_2,;
+  int k, j, i, id_l_1, id_r_1,  id_l_2, id_r_2,  id;
+  for ( k=g_start; k<g_end; k++ ){
+    for ( j=0; j<ny_grav; j++ ){
+      for ( i=0; i<nx_grav; i++ ){
+        id   = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
+        id_l_1 = (i-1 + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
+        id_l_2 = (i-2 + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
+        id_r_1 = (i+1 + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
+        id_r_2 = (i+2 + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
+        phi_l_1 = G.C.Grav_potential[id_l_1];
+        phi_r_1 = G.C.Grav_potential[id_r_1];
+        phi_l_2 = G.C.Grav_potential[id_l_2];
+        phi_r_2 = G.C.Grav_potential[id_r_2];
+        G.Particles.G.gravity_x[id] = -2/3 * ( phi_r_1 - phi_l_1 ) / dx + 1/12 * ( phi_r_2 - phi_l_2 ) / dx  ;
+      }
+    }
+  }
+
+  for ( k=g_start; k<g_end; k++ ){
+    for ( j=0; j<ny_grav; j++ ){
+      for ( i=0; i<nx_grav; i++ ){
+        id   = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
+        id_l_1 = (i + nGHST) + (j-1 + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
+        id_l_2 = (i + nGHST) + (j-2 + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
+        id_r_1 = (i + nGHST) + (j+1 + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
+        id_r_2 = (i + nGHST) + (j+2 + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
+        phi_l_1 = G.C.Grav_potential[id_l_1];
+        phi_r_1 = G.C.Grav_potential[id_r_1];
+        phi_l_2 = G.C.Grav_potential[id_l_2];
+        phi_r_2 = G.C.Grav_potential[id_r_2];
+        G.Particles.G.gravity_y[id] = -2/3 * ( phi_r_1 - phi_l_1 ) / dy + 1/12 * ( phi_r_2 - phi_l_2 ) / dy  ;
+      }
+    }
+  }
+
+  for ( k=g_start; k<g_end; k++ ){
+    for ( j=0; j<ny_grav; j++ ){
+      for ( i=0; i<nx_grav; i++ ){
+        id   = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
+        id_l_1 = (i + nGHST) + (j + nGHST)*nx_grid + (k-1 + nGHST)*ny_grid*nz_grid;
+        id_l_2 = (i + nGHST) + (j + nGHST)*nx_grid + (k-2 + nGHST)*ny_grid*nz_grid;
+        id_r_1 = (i + nGHST) + (j + nGHST)*nx_grid + (k+1 + nGHST)*ny_grid*nz_grid;
+        id_r_2 = (i + nGHST) + (j + nGHST)*nx_grid + (k+2 + nGHST)*ny_grid*nz_grid;
+        phi_l_1 = G.C.Grav_potential[id_l_1];
+        phi_r_1 = G.C.Grav_potential[id_r_1];
+        phi_l_2 = G.C.Grav_potential[id_l_2];
+        phi_r_2 = G.C.Grav_potential[id_r_2];
+        G.Particles.G.gravity_z[id] = -2/3 * ( phi_r_1 - phi_l_1 ) / dz + 1/12 * ( phi_r_2 - phi_l_2 ) / dz  ;
+      }
+    }
+  }
+
+}
+
+
 void Get_Gravity_CIC( Particles_3D &Particles, part_int_t p_start, part_int_t p_end ){
 
   int nx_g, ny_g, nz_g, nGHST;
@@ -169,20 +249,20 @@ void Get_Gravity_CIC( Particles_3D &Particles, part_int_t p_start, part_int_t p_
     g_y_tru = Particles.G.gravity_y[indx];
     g_z_tru = Particles.G.gravity_z[indx];
 
-    g_x = g_x_bl*(delta_x)*(delta_y)*(delta_z)   + g_x_br*(1-delta_x)*(delta_y)*(delta_z) +
-      g_x_bu*(delta_x)*(1-delta_y)*(delta_z) + g_x_bru*(1-delta_x)*(1-delta_y)*(delta_z) +
-      g_x_tl*(delta_x)*(delta_y)*(1-delta_z) + g_x_tr*(1-delta_x)*(delta_y)*(1-delta_z) +
-      g_x_tu*(delta_x)*(1-delta_y)*(1-delta_z) + g_x_tru*(1-delta_x)*(1-delta_y)*(1-delta_z);
+    g_x = g_x_bl*(delta_x)*(delta_y)*(delta_z)     + g_x_br*(1-delta_x)*(delta_y)*(delta_z) +
+          g_x_bu*(delta_x)*(1-delta_y)*(delta_z  ) + g_x_bru*(1-delta_x)*(1-delta_y)*(delta_z) +
+          g_x_tl*(delta_x)*(delta_y)*(1-delta_z)   + g_x_tr*(1-delta_x)*(delta_y)*(1-delta_z) +
+          g_x_tu*(delta_x)*(1-delta_y)*(1-delta_z) + g_x_tru*(1-delta_x)*(1-delta_y)*(1-delta_z);
 
-    g_y = g_y_bl*(delta_x)*(delta_y)*(delta_z)   + g_y_br*(1-delta_x)*(delta_y)*(delta_z) +
-      g_y_bu*(delta_x)*(1-delta_y)*(delta_z) + g_y_bru*(1-delta_x)*(1-delta_y)*(delta_z) +
-      g_y_tl*(delta_x)*(delta_y)*(1-delta_z) + g_y_tr*(1-delta_x)*(delta_y)*(1-delta_z) +
-      g_y_tu*(delta_x)*(1-delta_y)*(1-delta_z) + g_y_tru*(1-delta_x)*(1-delta_y)*(1-delta_z);
+    g_y = g_y_bl*(delta_x)*(delta_y)*(delta_z)     + g_y_br*(1-delta_x)*(delta_y)*(delta_z) +
+          g_y_bu*(delta_x)*(1-delta_y)*(delta_z)   + g_y_bru*(1-delta_x)*(1-delta_y)*(delta_z) +
+          g_y_tl*(delta_x)*(delta_y)*(1-delta_z)   + g_y_tr*(1-delta_x)*(delta_y)*(1-delta_z) +
+          g_y_tu*(delta_x)*(1-delta_y)*(1-delta_z) + g_y_tru*(1-delta_x)*(1-delta_y)*(1-delta_z);
 
-    g_z = g_z_bl*(delta_x)*(delta_y)*(delta_z)   + g_z_br*(1-delta_x)*(delta_y)*(delta_z) +
-      g_z_bu*(delta_x)*(1-delta_y)*(delta_z) + g_z_bru*(1-delta_x)*(1-delta_y)*(delta_z) +
-      g_z_tl*(delta_x)*(delta_y)*(1-delta_z) + g_z_tr*(1-delta_x)*(delta_y)*(1-delta_z) +
-      g_z_tu*(delta_x)*(1-delta_y)*(1-delta_z) + g_z_tru*(1-delta_x)*(1-delta_y)*(1-delta_z);
+    g_z = g_z_bl*(delta_x)*(delta_y)*(delta_z)     + g_z_br*(1-delta_x)*(delta_y)*(delta_z) +
+          g_z_bu*(delta_x)*(1-delta_y)*(delta_z)   + g_z_bru*(1-delta_x)*(1-delta_y)*(delta_z) +
+          g_z_tl*(delta_x)*(delta_y)*(1-delta_z)   + g_z_tr*(1-delta_x)*(delta_y)*(1-delta_z) +
+          g_z_tu*(delta_x)*(1-delta_y)*(1-delta_z) + g_z_tru*(1-delta_x)*(1-delta_y)*(1-delta_z);
 
     Particles.grav_x[pIndx] = g_x;
     Particles.grav_y[pIndx] = g_y;

@@ -187,6 +187,9 @@ void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer
     send_buffer[ offset + 5 ] = Get_and_Remove_Real( pIndx, vel_x );
     send_buffer[ offset + 6 ] = Get_and_Remove_Real( pIndx, vel_y );
     send_buffer[ offset + 7 ] = Get_and_Remove_Real( pIndx, vel_z );
+    Remove_Real( pIndx, grav_x );
+    Remove_Real( pIndx, grav_y );
+    Remove_Real( pIndx, grav_z );
     send_buffer[buffer_start] += 1;
     n_local -= 1;
     out_indxs_vec->pop_back();

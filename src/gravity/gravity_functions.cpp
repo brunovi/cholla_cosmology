@@ -185,7 +185,7 @@ void Set_dt( Grid3D &G, bool &output_now ){
   if ( (G.Cosmo.current_a + G.Cosmo.delta_a) >  G.Cosmo.next_output ){
     G.Cosmo.delta_a = G.Cosmo.next_output - G.Cosmo.current_a;
     output_now = true;
-    chprintf( " ################################## \n");
+    // chprintf( " ################################## \n");
   }
   Real dt_courant, dt_gas;
   dt_courant = G.H.dt;

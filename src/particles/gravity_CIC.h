@@ -17,6 +17,8 @@ void Get_Gravity_Field( Grid3D &G, int g_start, int g_end );
 
 void Get_Gravity_CIC( Particles_3D &Particles, part_int_t p_start, part_int_t p_end );
 
+void Get_Gravity_Field_order4( Grid3D &G, int g_start, int g_end );
+
 
 #endif
 #endif
