@@ -316,12 +316,12 @@ void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int bu
     if (direction  != 1 ){
       if ( pPos_y < G.yMin ){
         // std::cout << "  Adding to Y0 " << std::endl;
-        Add_Particle_To_Buffer( send_buffer_y0, buffer_start_y, max_particles, send_buffer_y0_second, 0, pId, pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pPos_z, secondary);
+        Add_Particle_To_Buffer( send_buffer_y0, buffer_start_y, max_particles, send_buffer_y0_second, 0, pId, pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pVel_z, secondary);
         continue;
       }
       if ( pPos_y >= G.yMax ){
         // std::cout << "  Adding to Y1 " << std::endl;
-        Add_Particle_To_Buffer( send_buffer_y1, buffer_start_y, max_particles, send_buffer_y1_second, 0, pId, pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pPos_z, secondary);
+        Add_Particle_To_Buffer( send_buffer_y1, buffer_start_y, max_particles, send_buffer_y1_second, 0, pId, pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pVel_z, secondary);
         continue;
       }
     }
@@ -341,12 +341,12 @@ void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int bu
     if (direction  !=2 ){
       if ( pPos_z < G.zMin ){
         // std::cout << "  Adding to Z0 " << std::endl;
-        Add_Particle_To_Buffer( send_buffer_z0, buffer_start_z, max_particles, send_buffer_z0_second, 0, pId, pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pPos_z, secondary);
+        Add_Particle_To_Buffer( send_buffer_z0, buffer_start_z, max_particles, send_buffer_z0_second, 0, pId, pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pVel_z, secondary);
         continue;
       }
       if ( pPos_z >= G.zMax ){
         // std::cout << "  Adding to Z1 " << std::endl;
-        Add_Particle_To_Buffer( send_buffer_z1, buffer_start_z, max_particles, send_buffer_z1_second, 0, pId, pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pPos_z, secondary);
+        Add_Particle_To_Buffer( send_buffer_z1, buffer_start_z, max_particles, send_buffer_z1_second, 0, pId, pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pVel_z, secondary);
         continue;
       }
     }

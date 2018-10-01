@@ -34,38 +34,38 @@ void Transfer_Particles_Density_Boundaries( Particles_3D &Parts ){
       }
     }
   }
-  for ( k=0; k<nz; k++ ){
+  for ( k=0; k<nz_g; k++ ){
     for ( j=0; j<nGHST; j++ ){
       for ( i=0; i<nx_g; i++ ){
-        id_src = (i) + (j)*nx_g + (k+nGHST)*nx_g*ny_g;
-        id_dst = (i) + (ny_g - 2*nGHST + j)*nx_g + (k+nGHST)* nx_g*ny_g;
+        id_src = (i) + (j)*nx_g + (k)*nx_g*ny_g;
+        id_dst = (i) + (ny_g - 2*nGHST + j)*nx_g + (k)* nx_g*ny_g;
         Parts.G.density[id_dst] += Parts.G.density[id_src];
       }
     }
   }
-  for ( k=0; k<nz; k++ ){
+  for ( k=0; k<nz_g; k++ ){
     for ( j=0; j<nGHST; j++ ){
       for ( i=0; i<nx_g; i++ ){
-        id_src = (i) + (ny_g - nGHST + j)*nx_g + (k+nGHST)*nx_g*ny_g;
-        id_dst = (i) + (j+nGHST)*nx_g + (k+nGHST)*nx_g*ny_g;
+        id_src = (i) + (ny_g - nGHST + j)*nx_g + (k)*nx_g*ny_g;
+        id_dst = (i) + (j+nGHST)*nx_g + (k)*nx_g*ny_g;
         Parts.G.density[id_dst] += Parts.G.density[id_src];
       }
     }
   }
-  for ( k=0; k<nz; k++ ){
-    for ( j=0; j<ny; j++ ){
+  for ( k=0; k<nz_g; k++ ){
+    for ( j=0; j<ny_g; j++ ){
       for ( i=0; i<nGHST; i++ ){
-        id_src = (i) + (j+nGHST)*nx_g + (k+nGHST)*nx_g*ny_g;
-        id_dst = (nx_g - 2*nGHST + i) + (j+nGHST)*nx_g + (k+nGHST)* nx_g*ny_g;
+        id_src = (i) + (j)*nx_g + (k)*nx_g*ny_g;
+        id_dst = (nx_g - 2*nGHST + i) + (j)*nx_g + (k)* nx_g*ny_g;
         Parts.G.density[id_dst] += Parts.G.density[id_src];
       }
     }
   }
-  for ( k=0; k<nz; k++ ){
-    for ( j=0; j<ny; j++ ){
+  for ( k=0; k<nz_g; k++ ){
+    for ( j=0; j<ny_g; j++ ){
       for ( i=0; i<nGHST; i++ ){
-        id_src = (nx_g - nGHST + i) + (j+nGHST)*nx_g + (k+nGHST)*nx_g*ny_g;
-        id_dst = (i+nGHST) + (j+nGHST)*nx_g + (k+nGHST)*nx_g*ny_g;
+        id_src = (nx_g - nGHST + i) + (j)*nx_g + (k)*nx_g*ny_g;
+        id_dst = (i+nGHST) + (j)*nx_g + (k)*nx_g*ny_g;
         Parts.G.density[id_dst] += Parts.G.density[id_src];
       }
     }

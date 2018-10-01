@@ -21,7 +21,8 @@ void Initialize_Cosmology( Cosmology &Cosmo, struct parameters P, Particles_3D &
   Cosmo.current_z = Particles.current_z;
   Cosmo.current_a = Particles.current_a;
 
-  Cosmo.cosmo_G = 4.29448e-06 ;     //kpc km^2 s^-2 Msun^-1
+  // Cosmo.cosmo_G = 4.29448e-06 ;     //kpc km^2 s^-2 Msun^-1
+  Cosmo.cosmo_G = 4.30087630e-06;
 
   Cosmo.max_delta_a = 2e-4;
   Cosmo.delta_a = Cosmo.max_delta_a;
@@ -30,6 +31,7 @@ void Initialize_Cosmology( Cosmology &Cosmo, struct parameters P, Particles_3D &
   Cosmo.t_0_dm   = 1. / Cosmo.H0;
   Cosmo.v_0_dm   = Cosmo.r_0_dm / Cosmo.t_0_dm / Cosmo.cosmo_h;
   Cosmo.rho_0_dm = 3*Cosmo.H0*Cosmo.H0 / ( 8*M_PI*Cosmo.cosmo_G ) * Cosmo.Omega_M /Cosmo.cosmo_h/Cosmo.cosmo_h;
+  Cosmo.dens_avrg = 0;
 
   Cosmo.r_0_gas = 1.0;
   Cosmo.rho_0_gas = 3*Cosmo.H0*Cosmo.H0 / ( 8*M_PI*Cosmo.cosmo_G ) * Cosmo.Omega_M /Cosmo.cosmo_h/Cosmo.cosmo_h;

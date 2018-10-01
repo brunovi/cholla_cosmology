@@ -29,6 +29,8 @@ public:
   Real rho_0_dm;
   Real phi_0_dm;
 
+  Real dens_avrg;
+
   Real r_0_gas;
   Real v_0_gas;
   Real t_0_gas;

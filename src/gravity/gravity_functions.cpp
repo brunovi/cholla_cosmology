@@ -35,7 +35,7 @@ void Compute_Gravitational_Potential( Grid3D &G, Potential_CUFFT_3D &p_solver, R
 
   start = get_time();
   #ifdef PARTICLES
-  Get_Particles_Density_CIC( G, P );
+  Get_Particles_Density_CIC( G, P, time_pDens, time_pDens_trans );
   Copy_Particles_Density_to_Gravity( G );
   #endif
   stop = get_time();

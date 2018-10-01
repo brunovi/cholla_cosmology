@@ -30,6 +30,8 @@ void Get_Particles_Density_CIC( Grid3D &G, struct parameters P, Real *time_pDens
 
 void Copy_Particles_Density_to_Gravity( Grid3D &G );
 
+Real Get_Density_Average( Particles_3D &Parts );
+
 // #ifdef PARTICLES_CUDA
 // void Get_Density_CIC_CUDA( Particles_3D &Parts );
 // #endif

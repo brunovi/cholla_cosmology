@@ -3,6 +3,10 @@
 #include"density_CIC.h"
 #include"../io.h"
 
+#ifdef MPI_CHOLLA
+#include "../mpi_routines.h"
+#endif
+
 void Clear_Density( Particles_3D &Parts ){
   for( int i=0; i<Parts.G.n_cells; i++ ) Parts.G.density[i] = 0;
 }
@@ -11,6 +15,28 @@ void Get_Indexes_CIC( Real xMin, Real yMin, Real zMin, Real dx, Real dy, Real dz
   indx_x = (int) floor( ( pos_x - xMin - 0.5*dx ) / dx );
   indx_y = (int) floor( ( pos_y - yMin - 0.5*dy ) / dy );
   indx_z = (int) floor( ( pos_z - zMin - 0.5*dz ) / dz );
+}
+
+Real Get_Density_Average( Particles_3D &Parts ){
+  int nGHST = Parts.G.n_ghost_particles_grid;
+  int nx_g = Parts.G.nx_local + 2*nGHST;
+  int ny_g = Parts.G.ny_local + 2*nGHST;
+  int nz_g = Parts.G.nz_local + 2*nGHST;
+  int nx = Parts.G.nx_local;
+  int ny = Parts.G.ny_local;
+  int nz = Parts.G.nz_local;
+  int k, j, i, id;
+  Real dens_avrg=0;
+  for( k=0; k<nz; k++){
+    for( j=0; j<ny; j++){
+      for( i=0; i<nx; i++){
+        id = (i+nGHST) + (j+nGHST)*nx_g + (k+nGHST)*nx_g*ny_g;
+        dens_avrg += Parts.G.density[id];
+      }
+    }
+  }
+  dens_avrg /= (nx*ny*nz);
+  return dens_avrg;
 }
 
 void Get_Density_CIC( Particles_3D &Parts ){
@@ -36,19 +62,23 @@ void Get_Density_CIC( Particles_3D &Parts ){
   Real delta_x, delta_y, delta_z;
   Real dV_inv = 1./(Parts.G.dx*Parts.G.dy*Parts.G.dz);
   bool ignore;
+  // Real  max_pos_x =0;
+  // Real dens_avrg = 0;
   for ( pIndx=0; pIndx < Parts.n_local; pIndx++ ){
     ignore = false;
     pMass = Parts.mass[pIndx] * dV_inv;
     x_pos = Parts.pos_x[pIndx];
     y_pos = Parts.pos_y[pIndx];
     z_pos = Parts.pos_z[pIndx];
+    // if (x_pos > max_pos_x) max_pos_x = x_pos;
+    // dens_avrg += pMass;
     Get_Indexes_CIC( xMin, yMin, zMin, dx, dy, dz, x_pos, y_pos, z_pos, indx_x, indx_y, indx_z );
     if ( indx_x < -1 ) ignore = true;
     if ( indx_y < -1 ) ignore = true;
     if ( indx_z < -1 ) ignore = true;
-    if ( indx_x > nx_g-2  ) ignore = true;
-    if ( indx_y > ny_g-2  ) ignore = true;
-    if ( indx_y > nz_g-2  ) ignore = true;
+    if ( indx_x > nx_g-3  ) ignore = true;
+    if ( indx_y > ny_g-3  ) ignore = true;
+    if ( indx_y > nz_g-3  ) ignore = true;
     if ( ignore ){
       std::cout << "ERROR CIC Index    pID: " << Parts.partIDs[pIndx] << std::endl;
       std::cout << "Negative xIndx: " << x_pos << "  " << indx_x << std::endl;
@@ -94,6 +124,8 @@ void Get_Density_CIC( Particles_3D &Parts ){
     indx = (indx_x+1) + (indx_y+1)*nx_g + (indx_z+1)*nx_g*ny_g;
     Parts.G.density[indx] += pMass * (1-delta_x) * (1-delta_y) * (1-delta_z);
   }
+  // dens_avrg /= (Parts.G.nx_local * Parts.G.ny_local * Parts.G.nz_local );
+  // std::cout << "           Dens Avg: " << dens_avrg << std::endl;
 }
 
 #ifdef PARTICLES_OMP
@@ -248,7 +280,8 @@ void Copy_Particles_Density_to_Gravity( Grid3D &G ){
       #ifndef COSMOLOGY
       G.Grav.F.density_h[id_grid] += 4 * M_PI * G.Particles.G.density[id_CIC];
       #else
-      G.Grav.F.density_h[id_grid] += 4 * M_PI * G.Cosmo.cosmo_G * ( G.Particles.G.density[id_CIC] - G.Cosmo.rho_0_dm ) / G.Cosmo.current_a ;
+      // G.Grav.F.density_h[id_grid] += 4 * M_PI * G.Cosmo.cosmo_G * ( G.Particles.G.density[id_CIC] - G.Cosmo.rho_0_dm ) / G.Cosmo.current_a ;
+      G.Grav.F.density_h[id_grid] += 4 * M_PI * G.Cosmo.cosmo_G * ( G.Particles.G.density[id_CIC] - G.Cosmo.dens_avrg ) / G.Cosmo.current_a ;
       #endif
       }
     }
@@ -284,6 +317,15 @@ void Get_Particles_Density_CIC( Grid3D &G, struct parameters P, Real *time_pDens
   #endif
   stop = get_time();
   time_dens_trans = (stop - start) * 1000.0;
+
+  Real dens_avrg;
+  dens_avrg = Get_Density_Average( G.Particles );
+  #ifdef MPI_CHOLLA
+  dens_avrg = ReduceRealAvg( dens_avrg );
+  #endif
+  G.Cosmo.dens_avrg = dens_avrg;
+  // std::cout << "Density Averge: " << dens_avrg << std::endl;
+  chprintf( "Densitty Average:  %f\n", dens_avrg);
 
   *time_pDens = time_dens;
   *time_pDens_trans = time_dens_trans;
