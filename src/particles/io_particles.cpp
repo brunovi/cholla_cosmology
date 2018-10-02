@@ -276,8 +276,14 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
   status = H5Aclose(attribute_id);
   #endif
 
-  #ifndef MPI_CHOLL
+  #ifndef MPI_CHOLLA
   chprintf(" Loading %ld particles\n", n_local);
+  #else
+  for ( int i=0; i<nproc; i++ ){
+    if ( procID == i ) std::cout << "  [pId:"  << procID << "]  Loading Particles: " << n_local <<  std::endl;
+    MPI_Barrier(world);
+  }
+  MPI_Barrier(world);
   #endif
 
   dataset_buffer_px = (Real *) malloc(n_local*sizeof(Real));
@@ -336,10 +342,19 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
     if ( pPos_z < Particles.G.domainMin_z || pPos_z > Particles.G.domainMax_z ){
       std::cout << " Particle outside global domain " << std::endl;
     }
-    if ( pPos_x < Particles.G.xMin || pPos_x >= Particles.G.xMax ) in_local = false;
-    if ( pPos_y < Particles.G.yMin || pPos_y >= Particles.G.yMax ) in_local = false;
-    if ( pPos_z < Particles.G.zMin || pPos_z >= Particles.G.zMax ) in_local = false;
-    if ( ! in_local ) continue;
+    if ( pPos_x < Particles.G.xMin || pPos_x > Particles.G.xMax ) in_local = false;
+    if ( pPos_y < Particles.G.yMin || pPos_y > Particles.G.yMax ) in_local = false;
+    if ( pPos_z < Particles.G.zMin || pPos_z > Particles.G.zMax ) in_local = false;
+    if ( ! in_local ) {
+      // std::cout << " Particle outside Loacal  domain " << std::endl;
+      // std::cout << "  Domain X: " << Particles.G.xMin <<  "  " << Particles.G.xMax << std::endl;
+      // std::cout << "  Domain Y: " << Particles.G.yMin <<  "  " << Particles.G.yMax << std::endl;
+      // std::cout << "  Domain Z: " << Particles.G.zMin <<  "  " << Particles.G.zMax << std::endl;
+      // std::cout << "  Particle X: " << pPos_x << std::endl;
+      // std::cout << "  Particle Y: " << pPos_y << std::endl;
+      // std::cout << "  Particle Z: " << pPos_z << std::endl;
+      // continue;
+    }
     Particles.partIDs.push_back(pIndx);
     Particles.mass.push_back( pMass );
     Particles.pos_x.push_back( pPos_x );

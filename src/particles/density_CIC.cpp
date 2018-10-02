@@ -88,6 +88,7 @@ void Get_Density_CIC( Particles_3D &Parts ){
       std::cout << "Excess yIndx: " << y_pos << "  " << indx_y << std::endl;
       std::cout << "Excess zIndx: " << z_pos << "  " << indx_z << std::endl;
       std::cout << std::endl;
+      exit(-1);
       continue;
     }
     cell_center_x = xMin + indx_x*dx + 0.5*dx;
@@ -143,12 +144,14 @@ void Get_Density_CIC_OMP( Particles_3D &Parts ){
 
     omp_id = omp_get_thread_num();
     n_omp_procs = omp_get_num_threads();
-    Get_OMP_Grid_Indxs( n_omp_procs, omp_id, Parts.G.nz_local+2*nGHST,  &g_start, &g_end );
+    Get_OMP_Grid_Indxs( n_omp_procs, omp_id, Parts.G.nz_local,  &g_start, &g_end );
+
+    chprintf( "omp_id: %d  g_start: %d     g_end: %d\n", omp_id, g_start, g_end );
 
     // g_start -= nGHST;
     // g_end   -= nGHST;
 
-    Real xMin, yMin, zMin, dx, dy, dz, zMin_local, zMax_local;
+    Real xMin, yMin, zMin, dx, dy, dz, zMin_local_p, zMax_local_p, zMin_local_g, zMax_local_g;
     dx = Parts.G.dx;
     dy = Parts.G.dy;
     dz = Parts.G.dz;
@@ -156,11 +159,11 @@ void Get_Density_CIC_OMP( Particles_3D &Parts ){
     yMin = Parts.G.yMin;
     zMin = Parts.G.zMin;
 
-    // zMin_local = Parts.G.zMin + g_start*dz;
-    // zMax_local = Parts.G.zMin + g_end * dz;
+    zMin_local_g = Parts.G.zMin + g_start*dz;
+    zMax_local_g = Parts.G.zMin + g_end * dz;
 
-    zMin_local = Parts.G.zMin + g_start*dz - 0.5*dz;
-    zMax_local = Parts.G.zMin + g_end * dz + 0.5*dz;
+    zMin_local_p = Parts.G.zMin + g_start*dz - 0.5*dz ;
+    zMax_local_p = Parts.G.zMin + g_end * dz + 0.5*dz ;
 
     int indx_x, indx_y, indx_z, indx;
     Real pMass, x_pos, y_pos, z_pos;
@@ -170,11 +173,11 @@ void Get_Density_CIC_OMP( Particles_3D &Parts ){
     Real dV_inv = 1./(Parts.G.dx*Parts.G.dy*Parts.G.dz);
 
 
-
+    bool add_1, add_2;
     part_int_t pIndx;
     for ( pIndx=0; pIndx<Parts.n_local; pIndx++ ){
       z_pos = Parts.pos_z[pIndx];
-      if ( ( z_pos < zMin_local ) || ( z_pos >= zMax_local ) ) continue;
+      if ( ( z_pos < zMin_local_g) || ( z_pos >= zMax_local_g ) ) continue;
       pMass = Parts.mass[pIndx] * dV_inv;
       x_pos = Parts.pos_x[pIndx];
       y_pos = Parts.pos_y[pIndx];
@@ -191,8 +194,32 @@ void Get_Density_CIC_OMP( Particles_3D &Parts ){
       indx_y += nGHST;
       indx_z += nGHST;
 
-      if ( indx_z >= g_start){
+      add_1 = true;
+      add_2 = true;
 
+      // if (z_pos < zMin_local_g  ) add_1 = false;
+      // // // if (indx_z > g_end-1 ) add_1 = false;
+      // if ( z_pos > zMax_local_g ) add_2 = false;
+      //
+      // if ( add_1 ){
+      if( z_pos < zMin_local_g + 0.5*dz ){
+        indx = indx_x + indx_y*nx_g + indx_z*nx_g*ny_g;
+        #pragma omp atomic update
+        Parts.G.density[indx] += pMass  * delta_x * delta_y * delta_z;
+
+        indx = (indx_x+1) + indx_y*nx_g + indx_z*nx_g*ny_g;
+        #pragma omp atomic update
+        Parts.G.density[indx] += pMass  * (1-delta_x) * delta_y * delta_z;
+
+        indx = indx_x + (indx_y+1)*nx_g + indx_z*nx_g*ny_g;
+        #pragma omp atomic update
+        Parts.G.density[indx] += pMass  * delta_x * (1-delta_y) * delta_z;
+
+        indx = (indx_x+1) + (indx_y+1)*nx_g + indx_z*nx_g*ny_g;
+        #pragma omp atomic update
+        Parts.G.density[indx] += pMass  * (1-delta_x) * (1-delta_y) * delta_z;
+      }
+      else{
         indx = indx_x + indx_y*nx_g + indx_z*nx_g*ny_g;
         Parts.G.density[indx] += pMass  * delta_x * delta_y * delta_z;
 
@@ -202,12 +229,28 @@ void Get_Density_CIC_OMP( Particles_3D &Parts ){
         indx = indx_x + (indx_y+1)*nx_g + indx_z*nx_g*ny_g;
         Parts.G.density[indx] += pMass  * delta_x * (1-delta_y) * delta_z;
 
-
         indx = (indx_x+1) + (indx_y+1)*nx_g + indx_z*nx_g*ny_g;
         Parts.G.density[indx] += pMass  * (1-delta_x) * (1-delta_y) * delta_z;
       }
-      if ( indx_z+1 < g_end){
+      // if ( add_2 ){
+      if ( z_pos > zMax_local_g - 0.5*dz ){
+        indx = indx_x + indx_y*nx_g + (indx_z+1)*nx_g*ny_g;
+        #pragma omp atomic update
+        Parts.G.density[indx] += pMass  * delta_x * delta_y * (1-delta_z);
 
+        indx = (indx_x+1) + indx_y*nx_g + (indx_z+1)*nx_g*ny_g;
+        #pragma omp atomic update
+        Parts.G.density[indx] += pMass  * (1-delta_x) * delta_y * (1-delta_z);
+
+        indx = indx_x + (indx_y+1)*nx_g + (indx_z+1)*nx_g*ny_g;
+        #pragma omp atomic update
+        Parts.G.density[indx] += pMass  * delta_x * (1-delta_y) * (1-delta_z);
+
+        indx = (indx_x+1) + (indx_y+1)*nx_g + (indx_z+1)*nx_g*ny_g;
+        #pragma omp atomic update
+        Parts.G.density[indx] += pMass * (1-delta_x) * (1-delta_y) * (1-delta_z);
+      }
+      else{
         indx = indx_x + indx_y*nx_g + (indx_z+1)*nx_g*ny_g;
         Parts.G.density[indx] += pMass  * delta_x * delta_y * (1-delta_z);
 
@@ -397,7 +440,8 @@ void Get_Particles_Density_CIC( Grid3D &G, struct parameters P, Real *time_pDens
 
   start = get_time();
   #ifdef PARTICLES_OMP
-  Get_Density_CIC_OMP( G.Particles );
+  // Get_Density_CIC_OMP( G.Particles );
+  Get_Density_CIC( G.Particles );
   #elif PARTICLES_CUDA
   Get_Density_CIC_CUDA( G.Particles );
   #else

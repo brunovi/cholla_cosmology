@@ -24,7 +24,7 @@ void Initialize_Cosmology( Cosmology &Cosmo, struct parameters P, Particles_3D &
   // Cosmo.cosmo_G = 4.29448e-06 ;     //kpc km^2 s^-2 Msun^-1
   Cosmo.cosmo_G = 4.30087630e-06;
 
-  Cosmo.max_delta_a = 2e-4;
+  Cosmo.max_delta_a = 5e-3;
   Cosmo.delta_a = Cosmo.max_delta_a;
 
   Cosmo.r_0_dm   = P.xlen/P.nx;

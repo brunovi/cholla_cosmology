@@ -163,6 +163,9 @@ void Potential_PFFT_3D::Apply_K2_Funtion( void ){
         if ( kz > nz_local/2) kz -= nz_local;
         if ( ky > ny_local/2) ky -= ny_local;
         if ( kx > nx_local/2) kx -= nx_local;
+        kx /= nx_total;
+        ky /= ny_total;
+        kz /= nz_total;
         k2  = 4 * M_PI * M_PI * ( kx*kx + ky*ky + kz*kz );
         if ( id == 0 ) k2 = 1;
         F.transform[id][0] *= -1/k2;

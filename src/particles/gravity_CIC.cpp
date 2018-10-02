@@ -93,7 +93,7 @@ void Get_Gravity_Field_order4( Grid3D &G, int g_start, int g_end ){
   dz = G.Particles.G.dz;
 
 
-  Real phi_l_1, phi_r_1, phi_l_2, phi_r_2,;
+  Real phi_l_1, phi_r_1, phi_l_2, phi_r_2;
   int k, j, i, id_l_1, id_r_1,  id_l_2, id_r_2,  id;
   for ( k=g_start; k<g_end; k++ ){
     for ( j=0; j<ny_grav; j++ ){
@@ -107,7 +107,8 @@ void Get_Gravity_Field_order4( Grid3D &G, int g_start, int g_end ){
         phi_r_1 = G.C.Grav_potential[id_r_1];
         phi_l_2 = G.C.Grav_potential[id_l_2];
         phi_r_2 = G.C.Grav_potential[id_r_2];
-        G.Particles.G.gravity_x[id] = -2/3 * ( phi_r_1 - phi_l_1 ) / dx + 1/12 * ( phi_r_2 - phi_l_2 ) / dx  ;
+        // G.Particles.G.gravity_x[id] = -2/3 * ( phi_r_1 - phi_l_1 ) / dx + 1/12 * ( phi_r_2 - phi_l_2 ) / dx  ;
+        G.Particles.G.gravity_x[id] = -(  8*phi_r_1  - 8*phi_l_1 - phi_r_2 + phi_l_2 ) / dx / 12  ;
       }
     }
   }
@@ -124,7 +125,8 @@ void Get_Gravity_Field_order4( Grid3D &G, int g_start, int g_end ){
         phi_r_1 = G.C.Grav_potential[id_r_1];
         phi_l_2 = G.C.Grav_potential[id_l_2];
         phi_r_2 = G.C.Grav_potential[id_r_2];
-        G.Particles.G.gravity_y[id] = -2/3 * ( phi_r_1 - phi_l_1 ) / dy + 1/12 * ( phi_r_2 - phi_l_2 ) / dy  ;
+        // G.Particles.G.gravity_y[id] = -2/3 * ( phi_r_1 - phi_l_1 ) / dy + 1/12 * ( phi_r_2 - phi_l_2 ) / dy  ;
+        G.Particles.G.gravity_y[id] = -(  8*phi_r_1  - 8*phi_l_1 - phi_r_2 + phi_l_2 ) / dy / 12 ;
       }
     }
   }
@@ -141,7 +143,8 @@ void Get_Gravity_Field_order4( Grid3D &G, int g_start, int g_end ){
         phi_r_1 = G.C.Grav_potential[id_r_1];
         phi_l_2 = G.C.Grav_potential[id_l_2];
         phi_r_2 = G.C.Grav_potential[id_r_2];
-        G.Particles.G.gravity_z[id] = -2/3 * ( phi_r_1 - phi_l_1 ) / dz + 1/12 * ( phi_r_2 - phi_l_2 ) / dz  ;
+        // G.Particles.G.gravity_z[id] = -2/3 * ( phi_r_1 - phi_l_1 ) / dz + 1/12 * ( phi_r_2 - phi_l_2 ) / dz  ;
+        G.Particles.G.gravity_z[id] = -(  8*phi_r_1  - 8*phi_l_1 - phi_r_2 + phi_l_2 ) / dz / 12 ;
       }
     }
   }
