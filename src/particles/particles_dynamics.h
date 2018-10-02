@@ -35,6 +35,10 @@ void Advance_Particles_step2_cosmo( Particles_3D &Particles, Cosmology &Cosmo, p
 
 Real Get_Particles_dt( Particles_3D &Particles );
 
+#ifdef COSMOLOGY
+Real Get_Particles_da_cosmo( Grid3D &G );
+#endif
+
 Real Update_Particles( Grid3D &G, int step );
 
 

@@ -2,6 +2,10 @@
 
 #include "gravity_functions.h"
 
+#ifdef COSMOLOGY
+#include"../particles/particles_dynamics.h"
+#endif
+
 
 
 void Copy_Hydro_Density_to_Gravity( Grid3D &G ){
@@ -16,14 +20,37 @@ void Copy_Hydro_Density_to_Gravity( Grid3D &G ){
         G.Grav.F.density_h[id_grav] = 0;
         #else
         #ifdef COSMOLOGY
-        G.Grav.F.density_h[id_grav] = 4 * M_PI * G.Cosmo.cosmo_G * ( G.C.density[id]*G.Cosmo.rho_0_gas - G.Cosmo.rho_0_gas ) / G.Cosmo.current_a ;
+        G.Grav.F.density_h[id_grav] = G.C.density[id]*G.Cosmo.rho_0_gas;
         #else
-        G.Grav.F.density_h[id_grav] = 4 * M_PI * G.C.density[id] ;
+        G.Grav.F.density_h[id_grav] = G.C.density[id] ;
         #endif //COSMOLOGY
         #endif //ONLY_PM
       }
     }
   }
+}
+
+Real Get_Density_Average( Grid3D &G ){
+  // int nGHST = G.Parts.G.n_ghost_particles_grid;
+  // int nx_g = Parts.G.nx_local + 2*nGHST;
+  // int ny_g = Parts.G.ny_local + 2*nGHST;
+  // int nz_g = Parts.G.nz_local + 2*nGHST;
+  int nx = G.Grav.nx_local;
+  int ny = G.Grav.ny_local;
+  int nz = G.Grav.nz_local;
+  int k, j, i, id;
+  Real dens_avrg=0;
+  for( k=0; k<nz; k++){
+    for( j=0; j<ny; j++){
+      for( i=0; i<nx; i++){
+        // id = (i+nGHST) + (j+nGHST)*nx_g + (k+nGHST)*nx_g*ny_g;
+        id = (i) + (j)*nx + (k)*nx*ny;
+        dens_avrg += G.Grav.F.density_h[id];
+      }
+    }
+  }
+  dens_avrg /= (nx*ny*nz);
+  return dens_avrg;
 }
 
 
@@ -81,6 +108,18 @@ void Compute_Gravitational_Potential( Grid3D &G, Potential_PFFT_3D &p_solver, Re
   #ifdef PARTICLES
   Get_Particles_Density_CIC( G, P, time_pDens, time_pDens_trans );
   Copy_Particles_Density_to_Gravity( G );
+  #endif
+
+  #ifdef COSMOLOGY
+  Real dens_avrg;
+  dens_avrg = Get_Density_Average( G );
+  #ifdef MPI_CHOLLA
+  dens_avrg = ReduceRealAvg( dens_avrg );
+  #endif
+  // G.Cosmo.dens_avrg = dens_avrg;
+  G.Grav.dens_avrg = dens_avrg;
+  // std::cout << "Density Averge: " << dens_avrg << std::endl;
+  chprintf( "Densitty Average:  %f\n", dens_avrg);
   #endif
 
   time_potential = p_solver.Get_Potential( G.Grav );
@@ -181,7 +220,13 @@ void Copy_Potential_From_Hydro_Grid( Grid3D &G ){
 void Set_dt( Grid3D &G, bool &output_now ){
 
   #ifdef COSMOLOGY
-  G.Cosmo.delta_a = G.Cosmo.max_delta_a;
+  Real delta_a_part = Get_Particles_da_cosmo( G );
+  // std::cout << "Delta_a: " << delta_a_local << std::endl;
+  chprintf( "Delta a: %f\n", delta_a_part);
+
+  if( delta_a_part > G.Cosmo.max_delta_a) delta_a_part = G.Cosmo.max_delta_a;
+
+  G.Cosmo.delta_a = delta_a_part;
   if ( (G.Cosmo.current_a + G.Cosmo.delta_a) >  G.Cosmo.next_output ){
     G.Cosmo.delta_a = G.Cosmo.next_output - G.Cosmo.current_a;
     output_now = true;

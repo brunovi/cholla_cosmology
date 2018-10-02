@@ -21,6 +21,8 @@ void Particles_3D::Initialize( struct parameters P, Grav3D &Grav, Real xblocal, 
   t = 0.0;
   dt_max = 0.01;
 
+  C_cfl = 0.1;
+
   int_vector_t partIDs;
   real_vector_t mass;
   real_vector_t pos_x;

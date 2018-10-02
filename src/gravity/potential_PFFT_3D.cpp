@@ -96,7 +96,12 @@ void Potential_PFFT_3D::Copy_Input( Grav3D &Grav ){
     for (j=0; j<ny_local; j++) {
       for (i=0; i<nx_local; i++) {
         id = i + j*nx_local + k*nx_local*ny_local;
-        F.input[id] = Grav.F.density_h[id] ;
+        // F.input[id] = Grav.F.density_h[id] ;
+        #ifdef COSMOLOGY
+        F.input[id] = 4 * M_PI * Grav.Gconst * (Grav.F.density_h[id] - Grav.dens_avrg ) / Grav.current_a ;
+        #else
+        F.input[id] = 4 * M_PI * Grav.Gconst * Grav.F.density_h[id] ;
+        #endif //COSMOLOGY
       }
     }
   }

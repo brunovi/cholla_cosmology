@@ -50,6 +50,12 @@ class Grav3D
   *  \brief z-width of cells */
   Real dz;
 
+  #ifdef COSMOLOGY
+  Real current_a;
+  #endif
+
+  Real dens_avrg ;
+
 
   int n_cells;
   int n_cells_potential;

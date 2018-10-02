@@ -7,6 +7,7 @@
 #include <cmath>
 #include"../global.h"
 #include"../particles/particles_3D.h"
+#include"../gravity/grav3D.h"
 
 class Cosmology
 {
@@ -29,7 +30,7 @@ public:
   Real rho_0_dm;
   Real phi_0_dm;
 
-  Real dens_avrg;
+  // Real dens_avrg;
 
   Real r_0_gas;
   Real v_0_gas;
@@ -55,7 +56,7 @@ public:
 
 };
 
-void Initialize_Cosmology( Cosmology &Cosmo, struct parameters P, Particles_3D &Particles );
+void Initialize_Cosmology( Cosmology &Cosmo, struct parameters P, Particles_3D &Particles, Grav3D &Grav );
 
 Real Scale_Function( Real a, Real Omega_M, Real Omega_L, Real Omega_K );
 

@@ -32,6 +32,8 @@ class Particles_3D
   Real dt_max;
   Real t;
 
+  Real C_cfl;
+
   int_vector_t partIDs;
   real_vector_t mass;
   real_vector_t pos_x;

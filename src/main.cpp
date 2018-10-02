@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
   #endif
 
   #ifdef COSMOLOGY
-  Initialize_Cosmology( G.Cosmo, P, G.Particles );
+  Initialize_Cosmology( G.Cosmo, P, G.Particles, G.Grav );
   Change_Cosmological_Frame_Sytem( G, true );
   #endif
 
@@ -264,6 +264,7 @@ int main(int argc, char *argv[])
     G.Cosmo.current_z = 1./G.Cosmo.current_a - 1;
     G.Particles.current_a = G.Cosmo.current_a;
     G.Particles.current_z = G.Cosmo.current_z;
+    G.Grav.current_a = G.Cosmo.current_a;
     #endif
     #endif
 

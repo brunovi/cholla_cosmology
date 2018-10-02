@@ -17,27 +17,7 @@ void Get_Indexes_CIC( Real xMin, Real yMin, Real zMin, Real dx, Real dy, Real dz
   indx_z = (int) floor( ( pos_z - zMin - 0.5*dz ) / dz );
 }
 
-Real Get_Density_Average( Particles_3D &Parts ){
-  int nGHST = Parts.G.n_ghost_particles_grid;
-  int nx_g = Parts.G.nx_local + 2*nGHST;
-  int ny_g = Parts.G.ny_local + 2*nGHST;
-  int nz_g = Parts.G.nz_local + 2*nGHST;
-  int nx = Parts.G.nx_local;
-  int ny = Parts.G.ny_local;
-  int nz = Parts.G.nz_local;
-  int k, j, i, id;
-  Real dens_avrg=0;
-  for( k=0; k<nz; k++){
-    for( j=0; j<ny; j++){
-      for( i=0; i<nx; i++){
-        id = (i+nGHST) + (j+nGHST)*nx_g + (k+nGHST)*nx_g*ny_g;
-        dens_avrg += Parts.G.density[id];
-      }
-    }
-  }
-  dens_avrg /= (nx*ny*nz);
-  return dens_avrg;
-}
+
 
 void Get_Density_CIC( Particles_3D &Parts ){
   int nGHST = Parts.G.n_ghost_particles_grid;
@@ -417,12 +397,14 @@ void Copy_Particles_Density_to_Gravity( Grid3D &G ){
       for ( i=0; i<nx; i++ ){
       id_CIC = (i+nGHST) + (j+nGHST)*(nx+2*nGHST) + (k+nGHST)*(nx+2*nGHST)*(ny+2*nGHST);
       id_grid = i + j*nx + k*nx*ny;
-      #ifndef COSMOLOGY
-      G.Grav.F.density_h[id_grid] += 4 * M_PI * G.Particles.G.density[id_CIC];
-      #else
+      // #ifndef COSMOLOGY
+      // // G.Grav.F.density_h[id_grid] += 4 * M_PI * G.Particles.G.density[id_CIC];
+      // G.Grav.F.density_h[id_grid] += G.Particles.G.density[id_CIC];
+      // #else
+      G.Grav.F.density_h[id_grid] += G.Particles.G.density[id_CIC];
       // G.Grav.F.density_h[id_grid] += 4 * M_PI * G.Cosmo.cosmo_G * ( G.Particles.G.density[id_CIC] - G.Cosmo.rho_0_dm ) / G.Cosmo.current_a ;
-      G.Grav.F.density_h[id_grid] += 4 * M_PI * G.Cosmo.cosmo_G * ( G.Particles.G.density[id_CIC] - G.Cosmo.dens_avrg ) / G.Cosmo.current_a ;
-      #endif
+      // G.Grav.F.density_h[id_grid] += 4 * M_PI * G.Cosmo.cosmo_G * ( G.Particles.G.density[id_CIC] - G.Cosmo.dens_avrg ) / G.Cosmo.current_a ;
+      // #endif
       }
     }
   }
@@ -459,14 +441,7 @@ void Get_Particles_Density_CIC( Grid3D &G, struct parameters P, Real *time_pDens
   stop = get_time();
   time_dens_trans = (stop - start) * 1000.0;
 
-  Real dens_avrg;
-  dens_avrg = Get_Density_Average( G.Particles );
-  #ifdef MPI_CHOLLA
-  dens_avrg = ReduceRealAvg( dens_avrg );
-  #endif
-  G.Cosmo.dens_avrg = dens_avrg;
-  // std::cout << "Density Averge: " << dens_avrg << std::endl;
-  chprintf( "Densitty Average:  %f\n", dens_avrg);
+
 
   *time_pDens = time_dens;
   *time_pDens_trans = time_dens_trans;

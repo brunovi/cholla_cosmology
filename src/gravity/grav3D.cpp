@@ -43,6 +43,12 @@ void Grav3D::Initialize( Real Lx, Real Ly, Real Lz, int nx, int ny, int nz, int 
   dt_prev = 0;
   dt_now = 0;
 
+  #ifdef COSMOLOGY
+  current_a = 0;
+  #endif
+
+  dens_avrg = 0;
+
   Gconst = 1;
 
   // Allocate memory
