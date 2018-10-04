@@ -92,6 +92,85 @@ void Advance_Particles_step1_cosmo_LeapFrog( Particles_3D &Particles, Cosmology 
   }
 }
 
+// Real a_solution( Real a, Real Omega_M, Real Omega_L){
+//   Real a3 = a * a * a;
+//   return 2*log( sqrt(Omega_L * ( Omega_L*a3 + Omega_M )) + Omega_L*sqrt(a3) ) / ( 3*sqrt( Omega_L) );
+// }
+// Real da_dt( Real a, Real Omega_M, Real Omega_L){
+//   Real a3 = a * a * a;
+//   return sqrt( Omega_M/a3 + Omega_L)
+// }
+//
+// void Advance_Particles_step1_cosmo_DKD(  Particles_3D &Particles, Cosmology &Cosmo, part_int_t p_start, part_int_t p_end ){
+//
+//   part_int_t pIndx;
+//   Real da = Cosmo.delta_a;
+//   Real current_a = Cosmo.current_a;
+//   Real a_dot = da_dt( current_a, Omega_M, Omega_L)
+//   // Real scale_factor = Scale_Function( current_a, Cosmo.Omega_M, Cosmo.Omega_L, Cosmo.Omega_K ) / Cosmo.H0 * Cosmo.cosmo_h;
+//   Real scale_factor = 1 / a_dot / current_a / Cosmo.H0 * Cosmo.cosmo_h;
+//
+//   Real pos_x, vel_x;
+//   Real pos_y, vel_y;
+//   Real pos_z, vel_z;
+//   for ( pIndx=p_start; pIndx<p_end; pIndx++ ){
+//     pos_x = Particles.pos_x[pIndx];
+//     pos_y = Particles.pos_y[pIndx];
+//     pos_z = Particles.pos_z[pIndx];
+//     vel_x = Particles.vel_x[pIndx];
+//     vel_y = Particles.vel_y[pIndx];
+//     vel_z = Particles.vel_z[pIndx];
+//
+//     pos_x += scale_factor * 0.5 * da * vel_x;
+//     pos_y += scale_factor * 0.5 * da * vel_y;
+//     pos_z += scale_factor * 0.5 * da * vel_z;
+//
+//     Particles.pos_x[pIndx] = pos_x;
+//     Particles.pos_y[pIndx] = pos_y;
+//     Particles.pos_z[pIndx] = pos_z;
+//   }
+// }
+//
+// void Advance_Particles_step2_cosmo_DKD(  Particles_3D &Particles, Cosmology &Cosmo, part_int_t p_start, part_int_t p_end ){
+//
+//   part_int_t pIndx;
+//   Real da = Cosmo.delta_a;
+//   Real current_a = Cosmo.current_a;
+//   Real a_dot_1 = da_dt( current_a + 0.5*da, Omega_M, Omega_L)
+//   // Real scale_factor = Scale_Function( current_a, Cosmo.Omega_M, Cosmo.Omega_L, Cosmo.Omega_K ) / Cosmo.H0 * Cosmo.cosmo_h;
+//   Real scale_factor_v = 1 / a_dot_1 / (current_a+0.5*da) / Cosmo.H0 * Cosmo.cosmo_h;
+//   Real scale_factor_z = 1 / a_dot_2 / (current_a+da) / Cosmo.H0 * Cosmo.cosmo_h;
+//
+//
+//   Real pos_x, vel_x, grav_x;
+//   Real pos_y, vel_y, grav_y;
+//   Real pos_z, vel_z, grav_z;
+//   for ( pIndx=p_start; pIndx<p_end; pIndx++ ){
+//     pos_x = Particles.pos_x[pIndx];
+//     pos_y = Particles.pos_y[pIndx];
+//     pos_z = Particles.pos_z[pIndx];
+//     vel_x = Particles.vel_x[pIndx];
+//     vel_y = Particles.vel_y[pIndx];
+//     vel_z = Particles.vel_z[pIndx];
+//     grav_x = Particles.grav_x[pIndx];
+//     grav_y = Particles.grav_y[pIndx];
+//     grav_z = Particles.grav_z[pIndx];
+//
+//     vel_x = vel_x*(1-da/(current_a+0.5*da) + scale_factor * grav_x;
+//     vel_y = vel_y*(1-da/(current_a+0.5*da) + scale_factor * grav_y;
+//     vel_z = vel_z*(1-da/(current_a+0.5*da) + scale_factor * grav_z;
+//
+//
+//     pos_x += scale_factor * 0.5 * da * vel_x;
+//     pos_y += scale_factor * 0.5 * da * vel_y;
+//     pos_z += scale_factor * 0.5 * da * vel_z;
+//
+//     Particles.pos_x[pIndx] = pos_x;
+//     Particles.pos_y[pIndx] = pos_y;
+//     Particles.pos_z[pIndx] = pos_z;
+//
+// }
+
 void Advance_Particles_step1_cosmo( Particles_3D &Particles, Cosmology &Cosmo, part_int_t p_start, part_int_t p_end ){
 
   part_int_t pIndx;
@@ -99,6 +178,7 @@ void Advance_Particles_step1_cosmo( Particles_3D &Particles, Cosmology &Cosmo, p
   Real current_a = Cosmo.current_a;
 
   Real scale_factor = Scale_Function( current_a, Cosmo.Omega_M, Cosmo.Omega_L, Cosmo.Omega_K ) / Cosmo.H0 * Cosmo.cosmo_h;
+  // Real scale_factor = ( a_solution( current_a + 0.5*da, Cosmo.Omega_M, Cosmo.Omega_L ) - a_solution( current_a , Cosmo.Omega_M, Cosmo.Omega_L ))/ Cosmo.H0 * Cosmo.cosmo_h;
   Real scale_factor_1 = Scale_Function( current_a + 0.5*da, Cosmo.Omega_M, Cosmo.Omega_L, Cosmo.Omega_K  ) / Cosmo.H0 * Cosmo.cosmo_h;
   Real a2_inv = 1./( ( current_a + 0.5*da )*( current_a + 0.5*da ));
   // Advance velocities by half a step
@@ -119,6 +199,10 @@ void Advance_Particles_step1_cosmo( Particles_3D &Particles, Cosmology &Cosmo, p
     vel_x += scale_factor * 0.5 * da * grav_x;
     vel_y += scale_factor * 0.5 * da * grav_y;
     vel_z += scale_factor * 0.5 * da * grav_z;
+
+    // vel_x += scale_factor   * grav_x;
+    // vel_y += scale_factor   * grav_y;
+    // vel_z += scale_factor   * grav_z;
 
     pos_x += a2_inv * scale_factor_1 * da * vel_x;
     pos_y += a2_inv * scale_factor_1 * da * vel_y;
@@ -141,6 +225,7 @@ void Advance_Particles_step2_cosmo( Particles_3D &Particles, Cosmology &Cosmo, p
   Real current_a = Cosmo.current_a;
 
   Real scale_factor = Scale_Function( current_a , Cosmo.Omega_M, Cosmo.Omega_L, Cosmo.Omega_K ) / Cosmo.H0 * Cosmo.cosmo_h;
+  // Real scale_factor = (a_solution( current_a + 0.5*da, Cosmo.Omega_M, Cosmo.Omega_L ) - a_solution( current_a , Cosmo.Omega_M, Cosmo.Omega_L ))/ Cosmo.H0 * Cosmo.cosmo_h;
   // Real scale_factor_1 = Scale_Function( current_a + 0.5*da, Cosmo.Omega_M, Cosmo.Omega_L, Cosmo.Omega_K  ) / Cosmo.H0 * Cosmo.cosmo_h;
   // Real a2_inv = 1./( ( current_a  )*( current_a  ));
   // Advance velocities by half a step
@@ -154,6 +239,12 @@ void Advance_Particles_step2_cosmo( Particles_3D &Particles, Cosmology &Cosmo, p
     Particles.vel_x[pIndx] += scale_factor * 0.5 * da * grav_x;
     Particles.vel_y[pIndx] += scale_factor * 0.5 * da * grav_y;
     Particles.vel_z[pIndx] += scale_factor * 0.5 * da * grav_z;
+
+    // Particles.vel_x[pIndx] += scale_factor  * grav_x;
+    // Particles.vel_y[pIndx] += scale_factor  * grav_y;
+    // Particles.vel_z[pIndx] += scale_factor  * grav_z;
+
+
   }
 
 }
