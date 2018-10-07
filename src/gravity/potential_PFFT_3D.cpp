@@ -12,6 +12,10 @@ void Potential_PFFT_3D::Initialize( Grav3D Grav){
   Lbox_y = Grav.Lbox_y;
   Lbox_z = Grav.Lbox_z;
 
+  xMin = Grav.xMin;
+  yMin = Grav.yMin;
+  zMin = Grav.zMin;
+
   nx_total = Grav.nx_total;
   ny_total = Grav.ny_total;
   nz_total = Grav.nz_total;
@@ -134,6 +138,12 @@ void Potential_PFFT_3D::Get_K_for_Green_function( void){
         k_0 = k0;
         k_1 = k1;
         k_2 = k2;
+        if ( k_2 >= nx_total/2) k_2 -= nx_total;
+        if ( k_0 >= nz_total/2) k_0 -= nz_total;
+        if ( k_1 >= ny_total/2) k_1 -= ny_total;
+        // k_x = 2*M_PI*k_2/nx_total;
+        // k_z = 2*M_PI*k_0/nz_total;
+        // k_y = 2*M_PI*k_1/nx_total;
         k_x = 2*M_PI*k_2/nx_total;
         k_z = 2*M_PI*k_0/nz_total;
         k_y = 2*M_PI*k_1/nx_total;
@@ -154,25 +164,40 @@ void Potential_PFFT_3D::Get_K_for_Green_function( void){
 }
 
 
+void Potential_PFFT_3D::Get_Index_Global(int i, int j, int k, int *i_global, int *j_global, int *k_global){
+
+  int i_g, j_g, k_g;
+  i_g = xMin/dx + i;
+  j_g = yMin/dy + j;
+  k_g = zMin/dz + k;
+
+  *i_global = i_g;
+  *j_global = j_g;
+  *k_global = k_g;
+}
 
 void Potential_PFFT_3D::Apply_K2_Funtion( void ){
   Real kx, ky, kz, k2;
+  int i_g, j_g, k_g;
   int id;
   for (int k=0; k<nz_local; k++){
     for (int j=0; j<ny_local; j++){
       for ( int i=0; i<nx_local; i++){
         id = i + j*nx_local + k*nx_local*ny_local;
-        kz = k;
-        ky = j;
-        kx = i;
-        if ( kz > nz_local/2) kz -= nz_local;
-        if ( ky > ny_local/2) ky -= ny_local;
-        if ( kx > nx_local/2) kx -= nx_local;
-        kx /= nx_total;
-        ky /= ny_total;
-        kz /= nz_total;
-        k2  = 4 * M_PI * M_PI * ( kx*kx + ky*ky + kz*kz );
-        if ( id == 0 ) k2 = 1;
+        Get_Index_Global( i, j, k, &i_g, &j_g, &k_g );
+        if ( i_g >= nx_total/2) i_g -= nz_total;
+        if ( j_g >= ny_total/2) j_g -= ny_total;
+        if ( k_g >= nz_total/2) k_g -= nz_total;
+        kx =  2 * M_PI * i_g / Lbox_x;
+        ky =  2 * M_PI * j_g / Lbox_y;
+        kz =  2 * M_PI * k_g / Lbox_z;
+        if ( i_g==0 && j_g==0 && k_g== 0){
+          k2=1;
+        }
+        else{
+          k2  =  kx*kx + ky*ky + kz*kz ;
+        }
+
         F.transform[id][0] *= -1/k2;
         F.transform[id][1] *= -1/k2;
       }
@@ -206,6 +231,7 @@ Real Potential_PFFT_3D::Get_Potential( Grav3D &Grav ){
 
   pfft_execute( plan_fwd );
   Apply_G_Funtion();
+  // Apply_K2_Funtion();
   pfft_execute( plan_bwd );
   Copy_Output( Grav );
 

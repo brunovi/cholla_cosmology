@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
 
 
   #ifdef GRAVITY
-  G.Grav.Initialize( G.H.xdglobal, G.H.ydglobal, G.H.zdglobal, P.nx, P.ny, P.nz, G.H.nx_real, G.H.ny_real, G.H.nz_real, G.H.dx, G.H.dy, G.H.dz, G.H.n_ghost_pot_offset  );
+  G.Grav.Initialize( G.H.xblocal, G.H.yblocal, G.H.zblocal, G.H.xdglobal, G.H.ydglobal, G.H.zdglobal, P.nx, P.ny, P.nz, G.H.nx_real, G.H.ny_real, G.H.nz_real, G.H.dx, G.H.dy, G.H.dz, G.H.n_ghost_pot_offset  );
 
   #ifdef POTENTIAL_CUFFT
   Potential_CUFFT_3D p_solver;
@@ -260,11 +260,20 @@ int main(int argc, char *argv[])
     #ifdef PARTICLES
     G.Particles.t += G.Particles.dt;
     #ifdef COSMOLOGY
+    // #ifdef PECULIAR_VEL
+    // G.Cosmo.current_a += G.Cosmo.delta_a;
+    // // G.Cosmo.current_a += G.Cosmo.delta_a_2;
+    // G.Cosmo.current_z = 1./G.Cosmo.current_a - 1;
+    // G.Particles.current_a = G.Cosmo.current_a;
+    // G.Particles.current_z = G.Cosmo.current_z;
+    // G.Grav.current_a = G.Cosmo.current_a;
+    // #else
     G.Cosmo.current_a += G.Cosmo.delta_a;
     G.Cosmo.current_z = 1./G.Cosmo.current_a - 1;
     G.Particles.current_a = G.Cosmo.current_a;
     G.Particles.current_z = G.Cosmo.current_z;
     G.Grav.current_a = G.Cosmo.current_a;
+    // #endif
     #endif
     #endif
 
@@ -320,6 +329,16 @@ int main(int argc, char *argv[])
     #endif //MPI_CHOLLA
     #endif //CPU_TIME
 
+    // #ifdef COSMOLOGY
+    // #ifdef PECULIAR_VEL
+    // // G.Cosmo.current_a +=  0.5* G.Cosmo.delta_a;
+    // G.Cosmo.current_a += ( G.Cosmo.delta_a - G.Cosmo.delta_a_2 );
+    // G.Cosmo.current_z = 1./G.Cosmo.current_a - 1;
+    // G.Particles.current_a = G.Cosmo.current_a;
+    // G.Particles.current_z = G.Cosmo.current_z;
+    // G.Grav.current_a = G.Cosmo.current_a;
+    // #endif
+    // #endif
 
     // get the time to compute the total timestep
     stop_step = get_time();

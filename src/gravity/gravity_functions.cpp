@@ -220,11 +220,10 @@ void Copy_Potential_From_Hydro_Grid( Grid3D &G ){
 void Set_dt( Grid3D &G, bool &output_now ){
 
   #ifdef COSMOLOGY
-  Real delta_a_part = Get_Particles_da_cosmo( G );
-  // std::cout << "Delta_a: " << delta_a_local << std::endl;
-  chprintf( "Delta a: %f\n", delta_a_part);
-
+  // Real delta_a_part = Get_Particles_da_cosmo( G );
+  Real delta_a_part = G.Cosmo.max_delta_a;
   if( delta_a_part > G.Cosmo.max_delta_a) delta_a_part = G.Cosmo.max_delta_a;
+  chprintf( "Delta a: %f\n", delta_a_part);
 
   G.Cosmo.delta_a = delta_a_part;
   if ( (G.Cosmo.current_a + G.Cosmo.delta_a) >  G.Cosmo.next_output ){
@@ -232,23 +231,29 @@ void Set_dt( Grid3D &G, bool &output_now ){
     output_now = true;
     // chprintf( " ################################## \n");
   }
-  Real dt_courant, dt_gas;
-  dt_courant = G.H.dt;
-  dt_gas = G.Cosmo.Get_Cosmology_dt( G.Cosmo.delta_a );
-  G.H.dt = dt_gas;
 
-  chprintf( "Current_a: %f    delta_a: %f   dt: %f    dt/dt_courant: %f\n", G.Cosmo.current_a, G.Cosmo.delta_a, dt_gas, dt_gas/dt_courant );
+  Real dt = G.Cosmo.Get_dt_from_da( G.Cosmo.delta_a );
+  Real da_2 = G.Cosmo.Get_da_from_dt( dt/2 );
+  G.Cosmo.delta_a_2 = da_2;
+  G.Particles.dt = dt;
+  // Real dt_courant, dt_gas;
+  // dt_courant = G.H.dt;
+  // dt_gas = G.Cosmo.Get_Cosmology_dt( G.Cosmo.delta_a );
+  // G.H.dt = dt_gas;
+  G.H.dt = dt;
+
+  chprintf( "Current_a: %f    delta_a: %f   dt: %f  \n", G.Cosmo.current_a, G.Cosmo.delta_a, G.Particles.dt );
   #endif
 
 
 
-  if ( G.Grav.INITIAL ){
-    G.Grav.dt_prev = G.H.dt;
-    G.Grav.dt_now = G.H.dt;
-  }else{
-    G.Grav.dt_prev = G.Grav.dt_now;
-    G.Grav.dt_now = G.H.dt;
-  }
+  // if ( G.Grav.INITIAL ){
+  //   G.Grav.dt_prev = G.H.dt;
+  //   G.Grav.dt_now = G.H.dt;
+  // }else{
+  //   G.Grav.dt_prev = G.Grav.dt_now;
+  //   G.Grav.dt_now = G.H.dt;
+  // }
 
   // #ifdef PARTICLES
   // dt_particles = Get_Particles_dt( G.Particles );

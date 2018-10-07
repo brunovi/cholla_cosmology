@@ -48,6 +48,10 @@ class Potential_PFFT_3D : public Poisson_Solver_3D
 
   int index_0;
 
+  Real xMin;
+  Real yMin;
+  Real zMin;
+
   struct Fields
   {
 
@@ -75,6 +79,9 @@ class Potential_PFFT_3D : public Poisson_Solver_3D
   void Apply_G_Funtion( void );
   void Apply_K2_Funtion( void );
   virtual Real Get_Potential( Grav3D &Grav );
+
+  void Get_Index_Global(int i, int j, int k, int *i_global, int *j_global, int *k_global);
+
 
 };
 

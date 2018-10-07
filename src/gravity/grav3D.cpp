@@ -15,7 +15,7 @@ Grav3D::Grav3D( void ){}
 
 /*! \fn void Initialize(int nx_in, int ny_in, int nz_in)
  *  \brief Initialize the grid. */
-void Grav3D::Initialize( Real Lx, Real Ly, Real Lz, int nx, int ny, int nz, int nx_real, int ny_real, int nz_real, Real dx_real, Real dy_real, Real dz_real, int n_ghost_pot_offset )
+void Grav3D::Initialize( Real x_min, Real y_min, Real z_min, Real Lx, Real Ly, Real Lz, int nx, int ny, int nz, int nx_real, int ny_real, int nz_real, Real dx_real, Real dy_real, Real dz_real, int n_ghost_pot_offset )
 {
 
   Lbox_x = Lx;
@@ -34,6 +34,10 @@ void Grav3D::Initialize( Real Lx, Real Ly, Real Lz, int nx, int ny, int nz, int 
   dx = dx_real;
   dy = dy_real;
   dz = dz_real;
+
+  xMin = x_min;
+  yMin = y_min;
+  zMin = z_min;
 
 
   n_cells = nx_local*ny_local*nz_local;
@@ -63,6 +67,7 @@ void Grav3D::Initialize( Real Lx, Real Ly, Real Lz, int nx, int ny, int nz, int 
   chprintf( " dx:%f  dy:%f  dz:%f\n", dx, dy, dz );
   chprintf( " N ghost potential: %d\n", N_GHOST_POTENTIAL);
   chprintf( " N ghost offset: %d\n", n_ghost_pot_offset);
+  // std::cout << xMin << std::endl;
   // chprintf( "\n" );
 
 }
