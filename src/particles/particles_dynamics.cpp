@@ -418,7 +418,42 @@ Real Get_Particles_da_cosmo( Grid3D &G ){
   #endif
   return G.Particles.C_cfl * da_min;
 }
+
+Real Get_Particles_dt_cosmo( Grid3D &G ){
+  part_int_t pID;
+  Real dt, dt_min, vel;
+  dt_min = 1e100;
+  Real current_a = G.Cosmo.current_a;
+  Real cosmo_h = G.Cosmo.cosmo_h;
+
+  Real vel_factor =  current_a/ cosmo_h;
+
+  for ( pID=0; pID<G.Particles.n_local; pID++ ){
+    vel = abs(G.Particles.vel_x[pID]);
+    if ( vel > 0){
+      dt = G.Particles.G.dx * vel_factor / vel;
+      dt_min = std::min( dt_min, dt);
+    }
+    vel = abs(G.Particles.vel_y[pID]);
+    if ( vel > 0){
+      dt = G.Particles.G.dy * vel_factor / vel;
+      dt_min = std::min( dt_min, dt);
+    }
+    vel = abs(G.Particles.vel_z[pID]);
+    if ( vel > 0){
+      dt = G.Particles.G.dz * vel_factor / vel;
+      dt_min = std::min( dt_min, dt);
+    }
+  }
+
+  #ifdef MPI_CHOLLA
+  Real dt_min_global = ReduceRealMin(dt_min);
+  dt_min = dt_min_global;
+  #endif
+  return G.Particles.C_cfl * dt_min;
+}
 #endif
+
 Real Update_Particles( Grid3D &G, int step ){
 
   Real start, stop, milliseconds;
@@ -469,33 +504,31 @@ Real Update_Particles( Grid3D &G, int step ){
     // }
 
     if ( step == 1 ){
-      // #ifndef COSMOLOGY
-      // Advance_Particles_step1( G.Particles, p_start, p_end );
-      // #else
+      #ifndef COSMOLOGY
+      Advance_Particles_step1( G.Particles, p_start, p_end );
+      #else
       // #ifndef PARTICLES_KDK
       // Advance_Particles_step1_cosmo_LeapFrog( G.Particles, G.Cosmo, p_start, p_end );
       // #endif
-      // #ifdef PARTICLES_KDK
-      // Advance_Particles_step1_cosmo( G.Particles, G.Cosmo, p_start, p_end );
-      // #endif
-      #ifdef PECULIAR_VEL
+      #ifndef PECULIAR_VEL
+      Advance_Particles_step1_cosmo( G.Particles, G.Cosmo, p_start, p_end );
+      #else
       Advance_Particles_step1_cosmo_KDK( G.Particles, G.Cosmo, p_start, p_end );
       #endif
-      // #endif
+      #endif
     }
     else if ( step == 2 ){
       Get_Particles_Acceleration( G, p_start, p_end, g_start, g_end );
       #pragma omp barrier
-      // #ifndef COSMOLOGY
-      // Advance_Particles_step2( G.Particles, p_start, p_end );
-      // #else
-      // #ifdef PARTICLES_KDK
-      // Advance_Particles_step2_cosmo( G.Particles, G.Cosmo, p_start, p_end );
-      // #endif
-      #ifdef PECULIAR_VEL
+      #ifndef COSMOLOGY
+      Advance_Particles_step2( G.Particles, p_start, p_end );
+      #else
+      #ifndef PECULIAR_VEL
+      Advance_Particles_step2_cosmo( G.Particles, G.Cosmo, p_start, p_end );
+      #else
       Advance_Particles_step2_cosmo_KDK( G.Particles, G.Cosmo, p_start, p_end );
       #endif
-      // #endif
+      #endif
     }
 
   }
