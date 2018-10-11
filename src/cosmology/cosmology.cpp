@@ -24,7 +24,8 @@ void Initialize_Cosmology( Cosmology &Cosmo, struct parameters P, Particles_3D &
   Grav.current_a = Cosmo.current_a;
 
   // Cosmo.cosmo_G = 4.29448e-06 ;     //kpc km^2 s^-2 Msun^-1
-  Cosmo.cosmo_G = 4.30087630e-06;
+  Cosmo.cosmo_G = 4.3019425e-06;
+  // 4.3019425e-9
 
   Grav.Gconst = Cosmo.cosmo_G;
 
@@ -93,10 +94,26 @@ Real Scale_Function( Real a, Real Omega_M, Real Omega_L, Real Omega_K ){
 }
 
 Real Cosmology::Get_Cosmology_dt( Real da ){
-  Real dt;
-  dt = Get_dt_from_da( da );
+  Real a2, a3, d_a, dt;
+  a2 = current_a * current_a;
+  a3 = a2 * current_a;
+  d_a = current_a * sqrt( Omega_M/a3 + Omega_K/a2 + Omega_L);
+  dt = da / d_a / current_a / current_a;
   return dt;
+    // Real a2, a3, d_a;
+    // a2 = current_a * current_a;
+    // a3 = a2 * current_a;
+    // d_a = current_a * sqrt( Omega_M/a3 + Omega_K/a2 + Omega_L) * H0 ;
+    // return da / d_a / current_a / current_a * cosmo_h;
+}
 
+Real Cosmology::Get_da_courant( Real dt ){
+  Real a2, a3, da_dt, da;
+  a2 = current_a * current_a;
+  a3 = a2 * current_a;
+  da_dt = current_a * sqrt( Omega_M/a3 + Omega_K/a2 + Omega_L);
+  da = dt * da_dt * current_a * current_a;
+  return da;
 }
 
 #endif

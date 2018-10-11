@@ -54,6 +54,8 @@ public:
 
   Real Get_Cosmology_dt( Real da );
 
+  Real Get_da_courant( Real dt );
+
 
 };
 
