@@ -232,12 +232,12 @@ void Set_dt( Grid3D &G, bool &output_now ){
   delta_a_part = Get_Particles_da_cosmo( G );
   dt_courant = G.H.dt;
   da_courant = G.Cosmo.Get_da_courant( dt_courant);
+  chprintf( "Delta_a parts: %f:   Delta_a gas: %f\n", delta_a_part, da_courant);
   da_courant = std::min(delta_a_part, da_courant);
   #endif
   // Real delta_a_part = G.Cosmo.max_delta_a;
   if( da_courant > G.Cosmo.max_delta_a) da_courant = G.Cosmo.max_delta_a;
 
-  chprintf( "Delta a: %f\n", da_courant);
 
   G.Cosmo.delta_a = da_courant;
   if ( (G.Cosmo.current_a + G.Cosmo.delta_a) >  G.Cosmo.next_output ){
