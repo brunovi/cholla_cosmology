@@ -322,7 +322,7 @@ int main(int argc, char *argv[])
     part_int_t n_total;
     n_total = ReducePartIntSum( G.Particles.n_local );
     chprintf( " Total Particles: %ld\n", n_total );
-    if ( n_total != G.Grav.nx_total * G.Grav.ny_total * G.Grav.nz_total) break;
+    // if ( n_total != G.Grav.nx_total * G.Grav.ny_total * G.Grav.nz_total) break;
     #endif
     chprintf("hydro min: %9.4f  max: %9.4f  avg: %9.4f\n", hydro_min, hydro_max, hydro_avg);
     chprintf("bound min: %9.4f  max: %9.4f  avg: %9.4f\n", bound_min, bound_max, bound_avg);
