@@ -1,8 +1,3 @@
-module switch PrgEnv-pgi/5.2.82 PrgEnv-gnu
-module load cray-hdf5
-module load cudatoolkit
-module load fftw
-
 EXEC   = cholla
 
 OPTIMIZE =  -O2
