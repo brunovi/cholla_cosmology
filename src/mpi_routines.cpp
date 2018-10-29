@@ -175,6 +175,8 @@ void InitializeChollaMPI(int *pargc, char **pargv[])
   /*set up node communicator*/
   node = MPI_Comm_node(&procID_node, &nproc_node);
 
+
+  #ifndef ONLY_PM
   //initialize cuda for use with mpi
   #ifdef CUDA
   if(initialize_cuda_mpi(procID_node,nproc_node))
@@ -183,6 +185,11 @@ void InitializeChollaMPI(int *pargc, char **pargv[])
     chexit(-10);
   }
   #endif /*CUDA*/
+  #endif
+
+  #ifdef ONLY_PM
+  chprintf("ONLY_PM: Initializing without CUDA support.\n");
+  #endif
 
   //set decomposition flag
   #ifdef   SLAB
