@@ -1,6 +1,6 @@
 #ifdef PARTICLES
 
-
+#include <unistd.h>
 #include "particles_3D.h"
 #include "../io.h"
 #include "../random_functions.h"
@@ -90,13 +90,14 @@ void Particles_3D::Initialize( struct parameters P, Grav3D &Grav, Real xblocal, 
   chprintf(" xDomain_global: [%.4f %.4f ] [%.4f %.4f ] [%.4f %.4f ]\n", G.domainMin_x, G.domainMax_x, G.domainMin_y, G.domainMax_y, G.domainMin_z, G.domainMax_z);
   chprintf(" dx: %f  %f  %f\n", G.dx, G.dy, G.dz );
 
-  #ifdef MPI_CHOLLA
+  // #ifdef MPI_CHOLLA
   // for ( int i=0; i<nproc; i++ ){
   //   if ( procID == i ) std::cout << "  [pId:"  << procID << "]  x[ "<<G.xMin<<" "<<G.xMax<<" ]" <<" y[ "<<G.yMin<<" "<<G.yMax<<" ]" <<" z[ "<<G.zMin<<" "<<G.zMax<<" ]" << std::endl;
+  //   usleep(500);
   //   MPI_Barrier(world);
   // }
   // MPI_Barrier(world);
-  #endif
+  // #endif
 
 
 

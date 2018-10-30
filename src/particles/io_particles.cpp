@@ -8,9 +8,9 @@
 #ifdef HDF5
 #include<hdf5.h>
 #endif
-// #ifdef MPI_CHOLLA
-// #include"mpi_routines.h"
-// #endif
+#ifdef MPI_CHOLLA
+#include"../mpi_routines.h"
+#endif
 
 #include"io_particles.h"
 
@@ -276,15 +276,22 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
   status = H5Aclose(attribute_id);
   #endif
 
+
   #ifndef MPI_CHOLLA
+  // if ( n_total != G.Grav.nx_total * G.Grav.ny_total * G.Grav.nz_total) break;
   chprintf(" Loading %ld particles\n", n_local);
+  // #endif
   #else
+  part_int_t n_total_load;
+  n_total_load = ReducePartIntSum( n_local );
+  chprintf( " Total Particles To Load: %ld\n", n_total_load );
   for ( int i=0; i<nproc; i++ ){
     if ( procID == i ) std::cout << "  [pId:"  << procID << "]  Loading Particles: " << n_local <<  std::endl;
     MPI_Barrier(world);
   }
   MPI_Barrier(world);
   #endif
+
 
   dataset_buffer_px = (Real *) malloc(n_local*sizeof(Real));
   dataset_id = H5Dopen(file_id, "/pos_x", H5P_DEFAULT);
@@ -376,6 +383,9 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
     MPI_Barrier(world);
   }
   MPI_Barrier(world);
+  part_int_t n_total_loaded;
+  n_total_loaded = ReducePartIntSum( Particles.n_local );
+  chprintf( " Total Particles Loaded: %ld\n", n_total_loaded );
   #endif
 }
 #endif
