@@ -22,20 +22,20 @@ void Change_GAS_Frame_System( Grid3D &G, bool forward ){
   Real dens_factor, momentum_factor, energy_factor;
   if ( forward ){
     dens_factor = 1 / G.Cosmo.rho_0_gas;
-    momentum_factor = 1 / G.Cosmo.rho_0_gas / G.Cosmo.v_0_gas ;
-    energy_factor = 1 / G.Cosmo.rho_0_gas / G.Cosmo.v_0_gas / G.Cosmo.v_0_gas ;
-    // momentum_factor = 1 / G.Cosmo.rho_0_gas / G.Cosmo.v_0_gas * G.Cosmo.current_a;
-    // energy_factor = 1 / G.Cosmo.rho_0_gas / G.Cosmo.v_0_gas / G.Cosmo.v_0_gas * G.Cosmo.current_a * G.Cosmo.current_a;
+    // momentum_factor = 1 / G.Cosmo.rho_0_gas / G.Cosmo.v_0_gas ;
+    // energy_factor = 1 / G.Cosmo.rho_0_gas / G.Cosmo.v_0_gas / G.Cosmo.v_0_gas ;
+    momentum_factor = 1 / G.Cosmo.rho_0_gas / G.Cosmo.v_0_gas * G.Cosmo.current_a;
+    energy_factor = 1 / G.Cosmo.rho_0_gas / G.Cosmo.v_0_gas / G.Cosmo.v_0_gas * G.Cosmo.current_a * G.Cosmo.current_a;
     // dens_factor = 1;
     // momentum_factor =  1 ;
     // energy_factor =  1;
   }
   else{
     dens_factor = G.Cosmo.rho_0_gas;
-    momentum_factor =  G.Cosmo.rho_0_gas * G.Cosmo.v_0_gas ;
-    energy_factor =  G.Cosmo.rho_0_gas * G.Cosmo.v_0_gas * G.Cosmo.v_0_gas ;
-    // momentum_factor =  G.Cosmo.rho_0_gas * G.Cosmo.v_0_gas / G.Cosmo.current_a;
-    // energy_factor =  G.Cosmo.rho_0_gas * G.Cosmo.v_0_gas * G.Cosmo.v_0_gas / G.Cosmo.current_a / G.Cosmo.current_a;
+    // momentum_factor =  G.Cosmo.rho_0_gas * G.Cosmo.v_0_gas ;
+    // energy_factor =  G.Cosmo.rho_0_gas * G.Cosmo.v_0_gas * G.Cosmo.v_0_gas ;
+    momentum_factor =  G.Cosmo.rho_0_gas * G.Cosmo.v_0_gas / G.Cosmo.current_a;
+    energy_factor =  G.Cosmo.rho_0_gas * G.Cosmo.v_0_gas * G.Cosmo.v_0_gas / G.Cosmo.current_a / G.Cosmo.current_a;
     // dens_factor = 1;
     // momentum_factor =  1 ;
     // energy_factor =  1;
