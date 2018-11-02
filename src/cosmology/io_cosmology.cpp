@@ -34,6 +34,25 @@ void Load_Scale_Outputs( struct parameters P, Cosmology &Cosmo ) {
     exit(1);
   }
 
+  chprintf(" Setting next snapshot output\n");
+
+  int scale_indx = Cosmo.next_output_indx;
+  a_value = Cosmo.scale_outputs[scale_indx];
+
+  while ( (Cosmo.current_a - a_value) > 1e-3  ){
+    // chprintf( "%f   %f\n", a_value, Cosmo.current_a);
+    scale_indx += 1;
+    a_value = Cosmo.scale_outputs[scale_indx];
+  }
+
+  Cosmo.next_output_indx = scale_indx;
+  Cosmo.next_output = a_value;
+
+  chprintf("  Next output scale index: %d  \n", Cosmo.next_output_indx );
+  chprintf("  Next output scale value: %f  \n", Cosmo.next_output);
+
+
+
 }
 
 void Set_Next_Scale_Output( Cosmology &Cosmo ){
