@@ -34,5 +34,5 @@ yu_bcnd=1
 zl_bcnd=1
 zu_bcnd=1
 # path to output directory
-indir=/lustre/atlas/scratch/bvilasen/ast125/cosmo_1024_dm/ics/
-outdir=/lustre/atlas/scratch/bvilasen/ast125/cosmo_1024_dm/data/
+indir=/lustre/atlas/scratch/bvilasen/ast125/cosmo_512_dm/ics/
+outdir=/lustre/atlas/scratch/bvilasen/ast125/cosmo_512_dm/data/
