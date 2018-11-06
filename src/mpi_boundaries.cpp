@@ -39,7 +39,7 @@ void Clear_Buffers_For_Particles_Transfers( void ){
 void Grid3D::Finish_Particles_Transfer( void ){
 
   Particles.Remove_Transfered_Particles();
-  Clear_Buffers_For_Particles_Transfers();
+  // Clear_Buffers_For_Particles_Transfers();
 
   part_int_t n_total;
   n_total = ReducePartIntSum( Particles.n_local );
@@ -65,6 +65,9 @@ void Grid3D::Set_Boundaries_MPI(struct parameters P)
       Set_Boundaries_MPI_SLAB(flags,P);
       break;
     case BLOCK_DECOMP:
+      #ifdef PARTICLES
+      Clear_Buffers_For_Particles_Transfers();
+      #endif
       Set_Boundaries_MPI_BLOCK(flags,P);
       break;
   }
@@ -119,6 +122,7 @@ void Grid3D::Set_Boundaries_MPI_BLOCK(int *flags, struct parameters P)
     chprintf( " Total Particles: %ld\n", n_total );
 
     // Particles.Select_Particles_to_Transfer();
+    Clear_Buffers_For_Particles_Transfers(  );
 
     n_total = ReducePartIntSum( Particles.n_local );
     chprintf( " Total Particles: %ld\n", n_total );
@@ -446,7 +450,11 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers(int dir, int *flags)
       //   n_total = ReducePartIntSum( Particles.n_local );
       //   chprintf( " Total Particles: %ld\n", n_total );
       //
-      // Particles.Select_Particles_to_Transfer( dir );
+      #ifdef PARTICLES
+      if ( !Particles.TRANSFER_DENSITY_BOUNDARIES){
+        Particles.Select_Particles_to_Transfer( dir );
+      }
+      #endif
       //
       //   n_total = ReducePartIntSum( Particles.n_local );
       //   chprintf( " Total Particles: %ld\n", n_total );
