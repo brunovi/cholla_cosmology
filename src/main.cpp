@@ -312,6 +312,7 @@ int main(int argc, char *argv[])
     #ifdef MPI_CHOLLA
     #ifdef PARTICLES
     part_int_t n_total;
+    MPI_Barrier(world);
     n_total = ReducePartIntSum( G.Particles.n_local );
     chprintf( " Total Particles: %ld\n", n_total );
     if ( n_total != G.Grav.nx_total * G.Grav.ny_total * G.Grav.nz_total) break;
