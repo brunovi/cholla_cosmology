@@ -102,7 +102,8 @@ class Particles_3D
 
   #ifdef MPI_CHOLLA
   void Clear_Vectors_For_Transfers( void );
-  void Select_Particles_to_Transfer( void );
+  // void Select_Particles_to_Transfer( void );
+    void Select_Particles_to_Transfer( int dir );
   void Load_Particles_to_Buffer( int direction, int side, int buffer_start, Real *send_buffer, int MAX_PARTICLES_IN_BUFFER  );
   void Load_Particles_to_Buffer_X( void );
   void Load_Particles_to_Buffer_Y( void );

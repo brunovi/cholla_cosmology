@@ -94,47 +94,111 @@ void Particles_3D::Clear_Vectors_For_Transfers( void ){
   out_indxs_vec_z1.clear();
 }
 
-void Particles_3D::Select_Particles_to_Transfer( void ){
+// void Particles_3D::Select_Particles_to_Transfer( void ){
+//
+//   Clear_Vectors_For_Transfers();
+//
+//   part_int_t pIndx;
+//   for ( pIndx=0; pIndx<n_local; pIndx++ ){
+//     // if (procID == 0) std::cout << pIndx << std::endl;
+//     if ( pos_x[pIndx] < G.xMin ){
+//       out_indxs_vec_x0.push_back( pIndx );
+//       continue;
+//     }
+//     if ( pos_x[pIndx] >= G.xMax ){
+//       out_indxs_vec_x1.push_back( pIndx );
+//       continue;
+//     }
+//     if ( pos_y[pIndx] < G.yMin ){
+//       out_indxs_vec_y0.push_back( pIndx );
+//       continue;
+//     }
+//     if ( pos_y[pIndx] >= G.yMax ){
+//       out_indxs_vec_y1.push_back( pIndx );
+//       continue;
+//     }
+//     if ( pos_z[pIndx] < G.zMin ){
+//         out_indxs_vec_z0.push_back( pIndx );
+//       continue;
+//     }
+//     if ( pos_z[pIndx] >= G.zMax ){
+//         out_indxs_vec_z1.push_back( pIndx );
+//       continue;
+//     }
+//   }
+//
+//   std::sort(out_indxs_vec_x0.begin(), out_indxs_vec_x0.end());
+//   std::sort(out_indxs_vec_x1.begin(), out_indxs_vec_x1.end());
+//   std::sort(out_indxs_vec_y0.begin(), out_indxs_vec_y0.end());
+//   std::sort(out_indxs_vec_y1.begin(), out_indxs_vec_y1.end());
+//   std::sort(out_indxs_vec_z0.begin(), out_indxs_vec_z0.end());
+//   std::sort(out_indxs_vec_z1.begin(), out_indxs_vec_z1.end());
+//
+// }
 
-  Clear_Vectors_For_Transfers();
+void Particles_3D::Select_Particles_to_Transfer( int dir ){
 
   part_int_t pIndx;
-  for ( pIndx=0; pIndx<n_local; pIndx++ ){
-    // if (procID == 0) std::cout << pIndx << std::endl;
-    if ( pos_x[pIndx] < G.xMin ){
-      out_indxs_vec_x0.push_back( pIndx );
-      continue;
+  if ( dir == 0 ){
+    out_indxs_vec_x0.clear();
+    out_indxs_vec_x1.clear();
+    for ( pIndx=0; pIndx<n_local; pIndx++ ){
+      if ( pos_x[pIndx] < G.xMin ){
+        out_indxs_vec_x0.push_back( pIndx );
+        continue;
+      }
+      if ( pos_x[pIndx] >= G.xMax ){
+        out_indxs_vec_x1.push_back( pIndx );
+        continue;
+      }
     }
-    if ( pos_x[pIndx] >= G.xMax ){
-      out_indxs_vec_x1.push_back( pIndx );
-      continue;
-    }
-    if ( pos_y[pIndx] < G.yMin ){
-      out_indxs_vec_y0.push_back( pIndx );
-      continue;
-    }
-    if ( pos_y[pIndx] >= G.yMax ){
-      out_indxs_vec_y1.push_back( pIndx );
-      continue;
-    }
-    if ( pos_z[pIndx] < G.zMin ){
-        out_indxs_vec_z0.push_back( pIndx );
-      continue;
-    }
-    if ( pos_z[pIndx] >= G.zMax ){
-        out_indxs_vec_z1.push_back( pIndx );
-      continue;
-    }
+    std::sort(out_indxs_vec_x0.begin(), out_indxs_vec_x0.end());
+    std::sort(out_indxs_vec_x1.begin(), out_indxs_vec_x1.end());
   }
-
-  std::sort(out_indxs_vec_x0.begin(), out_indxs_vec_x0.end());
-  std::sort(out_indxs_vec_x1.begin(), out_indxs_vec_x1.end());
-  std::sort(out_indxs_vec_y0.begin(), out_indxs_vec_y0.end());
-  std::sort(out_indxs_vec_y1.begin(), out_indxs_vec_y1.end());
-  std::sort(out_indxs_vec_z0.begin(), out_indxs_vec_z0.end());
-  std::sort(out_indxs_vec_z1.begin(), out_indxs_vec_z1.end());
-
+  if ( dir == 1 ){
+    out_indxs_vec_y0.clear();
+    out_indxs_vec_y1.clear();
+    for ( pIndx=0; pIndx<n_local; pIndx++ ){
+      if ( pos_y[pIndx] < G.yMin ){
+        out_indxs_vec_y0.push_back( pIndx );
+        continue;
+      }
+      if ( pos_y[pIndx] >= G.yMax ){
+        out_indxs_vec_y1.push_back( pIndx );
+        continue;
+      }
+    }
+    std::sort(out_indxs_vec_y0.begin(), out_indxs_vec_y0.end());
+    std::sort(out_indxs_vec_y1.begin(), out_indxs_vec_y1.end());
+  }
+  if ( dir == 2 ){
+    out_indxs_vec_z0.clear();
+    out_indxs_vec_z1.clear();
+    for ( pIndx=0; pIndx<n_local; pIndx++ ){
+      if ( pos_z[pIndx] < G.zMin ){
+        out_indxs_vec_z0.push_back( pIndx );
+        continue;
+      }
+      if ( pos_z[pIndx] >= G.zMax ){
+        out_indxs_vec_z1.push_back( pIndx );
+        continue;
+      }
+    }
+    std::sort(out_indxs_vec_z0.begin(), out_indxs_vec_z0.end());
+    std::sort(out_indxs_vec_z1.begin(), out_indxs_vec_z1.end());
+  }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer_start, Real *send_buffer,int MAX_PARTICLES_IN_BUFFER  ){
 
