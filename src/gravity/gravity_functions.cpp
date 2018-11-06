@@ -236,7 +236,10 @@ void Set_dt( Grid3D &G, bool &output_now ){
   da_courant = std::min(delta_a_part, da_courant);
   #endif
   // Real delta_a_part = G.Cosmo.max_delta_a;
-  if( da_courant > G.Cosmo.max_delta_a) da_courant = G.Cosmo.max_delta_a;
+  if( da_courant > G.Cosmo.max_delta_a){
+    da_courant = G.Cosmo.max_delta_a;
+    chprintf( " Seting max delta_a: %f\n", da_courant );
+  }
 
 
   G.Cosmo.delta_a = da_courant;

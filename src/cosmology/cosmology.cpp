@@ -29,7 +29,7 @@ void Initialize_Cosmology( Cosmology &Cosmo, struct parameters P, Particles_3D &
 
   Grav.Gconst = Cosmo.cosmo_G;
 
-  Cosmo.max_delta_a = 1e-3;
+  Cosmo.max_delta_a = 0.001;
   Cosmo.delta_a = Cosmo.max_delta_a;
   Cosmo.delta_a_2 = Cosmo.max_delta_a;
 
