@@ -465,12 +465,12 @@ Real Update_Particles( Grid3D &G, int step ){
     #ifndef COSMOLOGY
     Advance_Particles_step1( G.Particles, 0, G.Particles.n_local );
     #else
-    #ifndef PARTICLES_KDK
-    Advance_Particles_step1_cosmo_LeapFrog( G.Particles, G.Cosmo, 0, G.Particles.n_local);
-    #endif
-    #ifdef PARTICLES_KDK
+    // #ifndef PARTICLES_KDK
+    // Advance_Particles_step1_cosmo_LeapFrog( G.Particles, G.Cosmo, 0, G.Particles.n_local);
+    // #endif
+    // #ifdef PARTICLES_KDK
     Advance_Particles_step1_cosmo( G.Particles, G.Cosmo, 0, G.Particles.n_local );
-    #endif
+    // #endif
     #endif
   }
   else if ( step == 2 ){
@@ -478,9 +478,9 @@ Real Update_Particles( Grid3D &G, int step ){
     #ifndef COSMOLOGY
     Advance_Particles_step2( G.Particles, 0, G.Particles.n_local);
     #else
-    #ifdef PARTICLES_KDK
+    // #ifdef PARTICLES_KDK
     Advance_Particles_step2_cosmo( G.Particles, G.Cosmo, 0, G.Particles.n_local);
-    #endif
+    // #endif
     #endif
   }
   #endif

@@ -326,7 +326,6 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
     vy_n =  dev_conserved[2*n_cells + id] * d_inv_n;
     vz_n =  dev_conserved[3*n_cells + id] * d_inv_n;
 
-
     // Calculate the -gradient of potential
     // Get X componet of gravity field
     id_l = (xid-1) + (yid)*nx + (zid)*nx*ny;
@@ -349,13 +348,22 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
     pot_r = dev_conserved[field_pot*n_cells + id_r];
     gz = -0.5*( pot_r - pot_l ) / dz;
 
+    Real Ek_0 = 0.5*d_n*( vx_n*vx_n + vy_n*vy_n + vz_n*vz_n );
 
     dev_conserved[  n_cells + id] += 0.5*dt*gx*(d + d_n);
     dev_conserved[2*n_cells + id] += 0.5*dt*gy*(d + d_n);
     dev_conserved[3*n_cells + id] += 0.5*dt*gz*(d + d_n);
-    dev_conserved[4*n_cells + id] += 0.25*dt*gx*(d + d_n)*(vx + vx_n)
-    +  0.25*dt*gy*(d + d_n)*(vy + vy_n)
-    +  0.25*dt*gz*(d + d_n)*(vz + vz_n);
+    // dev_conserved[4*n_cells + id] += 0.25*dt*gx*(d + d_n)*(vx + vx_n)
+    // +  0.25*dt*gy*(d + d_n)*(vy + vy_n)
+    // +  0.25*dt*gz*(d + d_n)*(vz + vz_n);
+
+    vx_n =  dev_conserved[1*n_cells + id] * d_inv_n;
+    vy_n =  dev_conserved[2*n_cells + id] * d_inv_n;
+    vz_n =  dev_conserved[3*n_cells + id] * d_inv_n;
+
+    Real Ek_1 = 0.5*d_n*( vx_n*vx_n + vy_n*vy_n + vz_n*vz_n );
+    Real delta_Ek = Ek_1 - Ek_0;
+    dev_conserved[4*n_cells + id] += delta_Ek;
 
     #endif
 
@@ -373,7 +381,7 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
       dev_conserved[(n_fields-1)*n_cells + id] = u;
       dev_conserved[4*n_cells + id] += delta_u ;
     }
-    E = dev_conserved[4*n_cells + id];
+    E = dev_conserved[4*n_cells + id] - Ek_1;
     if ( E < u_floor ){
       delta_u += u_floor - E;
       dev_conserved[(n_fields-1)*n_cells + id] += delta_u;
@@ -611,41 +619,41 @@ __global__ void Sync_Energies_3D(Real *dev_conserved, int nx, int ny, int nz, in
 #ifdef COSMOLOGY
 __global__ void Apply_Internal_Energy_Floor(Real *dev_conserved, int nx, int ny, int nz, int n_ghost, int n_fields )
 {
-  int id, xid, yid, zid, n_cells;
-  // Real d, d_inv, vx, vy, vz, P, E;
-  // Real ge1, ge2, Emax;
-  // int imo, ipo, jmo, jpo, kmo, kpo;
-  n_cells = nx*ny*nz;
-
-  // get a global thread ID
-  id = threadIdx.x + blockIdx.x * blockDim.x;
-  zid = id / (nx*ny);
-  yid = (id - zid*nx*ny) / nx;
-  xid = id - zid*nx*ny - yid*nx;
-
-
-  // threads corresponding to real cells do the calculation
-  if (xid > n_ghost-1 && xid < nx-n_ghost && yid > n_ghost-1 && yid < ny-n_ghost && zid > n_ghost-1 && zid < nz-n_ghost)
-  {
-    // every thread collects the conserved variables it needs from global memory
-
-    //InternalEnergy Floor at u=0.2
-    Real dens, u, u_floor, delta_u;
-    // Real phi_0_gas = 0.01;                           //Unit Conversion
-    dens  =  dev_conserved[            id];
-    u = dev_conserved[(n_fields-1)*n_cells + id];
-    // u = u / current_a / current_a * phi_0_gas;  //convert to physical km^2/s^2
-    u_floor = 0.00001;
-    if ( u < u_floor ) {
-      delta_u = u_floor - u;
-      u = u_floor;
-      // u = u_floor * current_a * current_a / phi_0_gas;  //convert back to comouving units
-      // E_n = d_n * u_n +  0.5*P2_2/d_n ;
-      // dev_conserved[4*n_cells + id] = E_n;
-      dev_conserved[(n_fields-1)*n_cells + id] = u;
-      dev_conserved[4*n_cells + id] += delta_u ;
-    }
-  }
+  // int id, xid, yid, zid, n_cells;
+  // // Real d, d_inv, vx, vy, vz, P, E;
+  // // Real ge1, ge2, Emax;
+  // // int imo, ipo, jmo, jpo, kmo, kpo;
+  // n_cells = nx*ny*nz;
+  //
+  // // get a global thread ID
+  // id = threadIdx.x + blockIdx.x * blockDim.x;
+  // zid = id / (nx*ny);
+  // yid = (id - zid*nx*ny) / nx;
+  // xid = id - zid*nx*ny - yid*nx;
+  //
+  //
+  // // threads corresponding to real cells do the calculation
+  // if (xid > n_ghost-1 && xid < nx-n_ghost && yid > n_ghost-1 && yid < ny-n_ghost && zid > n_ghost-1 && zid < nz-n_ghost)
+  // {
+  //   // every thread collects the conserved variables it needs from global memory
+  //
+  //   //InternalEnergy Floor at u=0.2
+  //   Real dens, u, u_floor, delta_u;
+  //   // Real phi_0_gas = 0.01;                           //Unit Conversion
+  //   dens  =  dev_conserved[            id];
+  //   u = dev_conserved[(n_fields-1)*n_cells + id];
+  //   // u = u / current_a / current_a * phi_0_gas;  //convert to physical km^2/s^2
+  //   u_floor = 0.00001;
+  //   if ( u < u_floor ) {
+  //     delta_u = u_floor - u;
+  //     u = u_floor;
+  //     // u = u_floor * current_a * current_a / phi_0_gas;  //convert back to comouving units
+  //     // E_n = d_n * u_n +  0.5*P2_2/d_n ;
+  //     // dev_conserved[4*n_cells + id] = E_n;
+  //     dev_conserved[(n_fields-1)*n_cells + id] = u;
+  //     dev_conserved[4*n_cells + id] += delta_u ;
+  //   }
+  // }
 }
 #endif
 
