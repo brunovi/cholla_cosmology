@@ -446,7 +446,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers(int dir, int *flags)
       //   n_total = ReducePartIntSum( Particles.n_local );
       //   chprintf( " Total Particles: %ld\n", n_total );
       //
-      Particles.Select_Particles_to_Transfer( dir );
+      // Particles.Select_Particles_to_Transfer( dir );
       //
       //   n_total = ReducePartIntSum( Particles.n_local );
       //   chprintf( " Total Particles: %ld\n", n_total );
