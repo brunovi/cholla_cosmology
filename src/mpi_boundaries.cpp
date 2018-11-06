@@ -41,9 +41,9 @@ void Grid3D::Finish_Particles_Transfer( void ){
   Particles.Remove_Transfered_Particles();
   Clear_Buffers_For_Particles_Transfers();
 
-  // part_int_t n_total;
-  // n_total = ReducePartIntSum( Particles.n_local );
-  // chprintf( " Total Particles: %ld\n", n_total );
+  part_int_t n_total;
+  n_total = ReducePartIntSum( Particles.n_local );
+  chprintf( " Total Particles: %ld\n", n_total );
   // std::cout << "N_Local: " << Particles.n_local << std::endl;
 }
 #endif
