@@ -63,6 +63,10 @@ class Particles_3D
   Real current_a;
   #endif
 
+  #ifdef SINGLE_PARTICLE_MASS
+  Real particle_mass;
+  #endif
+
 
   struct Grid
   {

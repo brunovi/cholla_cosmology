@@ -46,7 +46,12 @@ void Get_Density_CIC( Particles_3D &Parts ){
   // Real dens_avrg = 0;
   for ( pIndx=0; pIndx < Parts.n_local; pIndx++ ){
     ignore = false;
+
+    #ifdef SINGLE_PARTICLE_MASS
+    pMass = Parts.particle_mass * dV_inv;
+    #else
     pMass = Parts.mass[pIndx] * dV_inv;
+    #endif
     x_pos = Parts.pos_x[pIndx];
     y_pos = Parts.pos_y[pIndx];
     z_pos = Parts.pos_z[pIndx];
@@ -158,7 +163,11 @@ void Get_Density_CIC_OMP( Particles_3D &Parts ){
     for ( pIndx=0; pIndx<Parts.n_local; pIndx++ ){
       z_pos = Parts.pos_z[pIndx];
       if ( ( z_pos < zMin_local_g) || ( z_pos >= zMax_local_g ) ) continue;
+      #ifdef SINGLE_PARTICLE_MASS
+      pMass = Parts.particle_mass * dV_inv;
+      #else
       pMass = Parts.mass[pIndx] * dV_inv;
+      #endif
       x_pos = Parts.pos_x[pIndx];
       y_pos = Parts.pos_y[pIndx];
       Get_Indexes_CIC( xMin, yMin, zMin, dx, dy, dz, x_pos, y_pos, z_pos, indx_x, indx_y, indx_z );

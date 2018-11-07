@@ -63,6 +63,13 @@ void Write_Particles_Header_HDF5(Particles_3D &Particles, hid_t file_id)
   status = H5Awrite(attribute_id, H5T_NATIVE_DOUBLE, &Particles.current_z);
   status = H5Aclose(attribute_id);
   #endif
+
+  #ifdef SINGLE_PARTICLE_MASS
+  attribute_id = H5Acreate(file_id, "particle_mass", H5T_IEEE_F64BE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
+  status = H5Awrite(attribute_id, H5T_NATIVE_DOUBLE, &Particles.particle_mass);
+  status = H5Aclose(attribute_id);
+  #endif
+
   status = H5Sclose(dataspace_id);
 }
 
@@ -120,11 +127,13 @@ void Write_Particles_Data_HDF5( Particles_3D &Particles, hid_t file_id)
   status = H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, dataset_buffer);
   status = H5Dclose(dataset_id);
 
+  #ifndef SINGLE_PARTICLE_MASS
   // Copy the mass vector to the memory buffer
   for ( i=0; i<n_local; i++) dataset_buffer[i] = Particles.mass[i];
   dataset_id = H5Dcreate(file_id, "/mass", H5T_IEEE_F64BE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
   status = H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, dataset_buffer);
   status = H5Dclose(dataset_id);
+  #endif
 
   // 3D case
   int       nx_dset = Particles.G.nx_local;
@@ -276,6 +285,12 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
   status = H5Aclose(attribute_id);
   #endif
 
+  #ifdef SINGLE_PARTICLE_MASS
+  attribute_id = H5Aopen(file_id, "particle_mass", H5P_DEFAULT);
+  status = H5Aread(attribute_id, H5T_NATIVE_DOUBLE, &Particles.particle_mass);
+  status = H5Aclose(attribute_id);
+  chprintf( " Using Single mass for DM particles: %f  Msun/h\n", Particles.particle_mass);
+  #endif
 
   #ifndef MPI_CHOLLA
   // if ( n_total != G.Grav.nx_total * G.Grav.ny_total * G.Grav.nz_total) break;
@@ -323,10 +338,12 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
   status = H5Dread(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, dataset_buffer_vz);
   status = H5Dclose(dataset_id);
 
+  #ifndef SINGLE_PARTICLE_MASS
   dataset_buffer_m = (Real *) malloc(n_local*sizeof(Real));
   dataset_id = H5Dopen(file_id, "/mass", H5P_DEFAULT);
   status = H5Dread(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, dataset_buffer_m);
   status = H5Dclose(dataset_id);
+  #endif
 
   Real pPos_x, pPos_y, pPos_z;
   Real pVel_x, pVel_y, pVel_z, pMass;
@@ -338,7 +355,9 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
     pVel_x = dataset_buffer_vx[pIndx];
     pVel_y = dataset_buffer_vy[pIndx];
     pVel_z = dataset_buffer_vz[pIndx];
+    #ifndef SINGLE_PARTICLE_MASS
     pMass = dataset_buffer_m[pIndx];
+    #endif
     in_local = true;
     if ( pPos_x < Particles.G.domainMin_x || pPos_x > Particles.G.domainMax_x ){
       std::cout << " Particle outside global domain " << std::endl;
@@ -363,7 +382,6 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
       continue;
     }
     Particles.partIDs.push_back(pIndx);
-    Particles.mass.push_back( pMass );
     Particles.pos_x.push_back( pPos_x );
     Particles.pos_y.push_back( pPos_y );
     Particles.pos_z.push_back( pPos_z );
@@ -373,6 +391,9 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
     Particles.grav_x.push_back( 0.0 );
     Particles.grav_y.push_back( 0.0 );
     Particles.grav_z.push_back( 0.0 );
+    #ifndef SINGLE_PARTICLE_MASS
+    Particles.mass.push_back( pMass );
+    #endif
     Particles.n_local += 1;
   }
   #ifndef MPI_CHOLLA
