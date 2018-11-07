@@ -326,9 +326,13 @@ void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int bu
     if ( pPos_x >= G.domainMax_x ) pPos_x -= ( G.domainMax_x - G.domainMin_x );
     if ( ( pPos_x < G.xMin ) || ( pPos_x >= G.xMax )  ){
       std::cout << "ERROR Particle Transfer out of X domain" << std::endl;
-      std::cout << " posX: " << pPos_x << "velX: " << pVel_x << std::endl;
-      std::cout << " posY: " << pPos_y << "velY: " << pVel_y << std::endl;
-      std::cout << " posZ: " << pPos_z << "velZ: " << pVel_z << std::endl;
+      std::cout << " posX: " << pPos_x << " velX: " << pVel_x << std::endl;
+      std::cout << " posY: " << pPos_y << " velY: " << pVel_y << std::endl;
+      std::cout << " posZ: " << pPos_z << " velZ: " << pVel_z << std::endl;
+      std::cout << " Domain X: " << G.xMin << "  " << G.xMax << std::endl;
+      std::cout << " Domain Y: " << G.yMin << "  " << G.yMax << std::endl;
+      std::cout << " Domain Z: " << G.zMin << "  " << G.zMax << std::endl;
+
       continue;
     }
 
@@ -338,9 +342,12 @@ void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int bu
     }
     if ( (direction==1 || direction==2) && (( pPos_y < G.yMin ) || ( pPos_y >= G.yMax ))  ){
       std::cout << "ERROR Particle Transfer out of Y domain" << std::endl;
-      std::cout << " posX: " << pPos_x << "velX: " << pVel_x << std::endl;
-      std::cout << " posY: " << pPos_y << "velY: " << pVel_y << std::endl;
-      std::cout << " posZ: " << pPos_z << "velZ: " << pVel_z << std::endl;
+      std::cout << " posX: " << pPos_x << " velX: " << pVel_x << std::endl;
+      std::cout << " posY: " << pPos_y << " velY: " << pVel_y << std::endl;
+      std::cout << " posZ: " << pPos_z << " velZ: " << pVel_z << std::endl;
+      std::cout << " Domain X: " << G.xMin << "  " << G.xMax << std::endl;
+      std::cout << " Domain Y: " << G.yMin << "  " << G.yMax << std::endl;
+      std::cout << " Domain Z: " << G.zMin << "  " << G.zMax << std::endl;
       continue;
     }
 
@@ -363,9 +370,12 @@ void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int bu
     }
     if ( (direction==2) && (( pPos_z < G.zMin ) || ( pPos_z >= G.zMax ))  ){
       std::cout << "ERROR Particle Transfer out of Z domain" << std::endl;
-      std::cout << " posX: " << pPos_x << "velX: " << pVel_x << std::endl;
-      std::cout << " posY: " << pPos_y << "velY: " << pVel_y << std::endl;
-      std::cout << " posZ: " << pPos_z << "velZ: " << pVel_z << std::endl;
+      std::cout << " posX: " << pPos_x << " velX: " << pVel_x << std::endl;
+      std::cout << " posY: " << pPos_y << " velY: " << pVel_y << std::endl;
+      std::cout << " posZ: " << pPos_z << " velZ: " << pVel_z << std::endl;
+      std::cout << " Domain X: " << G.xMin << "  " << G.xMax << std::endl;
+      std::cout << " Domain Y: " << G.yMin << "  " << G.yMax << std::endl;
+      std::cout << " Domain Z: " << G.zMin << "  " << G.zMax << std::endl;
       continue;
     }
   //
