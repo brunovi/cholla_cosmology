@@ -65,7 +65,11 @@ void Get_Density_CIC( Particles_3D &Parts ){
     if ( indx_y > ny_g-3  ) ignore = true;
     if ( indx_y > nz_g-3  ) ignore = true;
     if ( ignore ){
+      #ifdef PARTICLE_IDS
       std::cout << "ERROR CIC Index    pID: " << Parts.partIDs[pIndx] << std::endl;
+      #else
+      std::cout << "ERROR CIC Index " << std::endl;
+      #endif
       std::cout << "Negative xIndx: " << x_pos << "  " << indx_x << std::endl;
       std::cout << "Negative zIndx: " << z_pos << "  " << indx_z << std::endl;
       std::cout << "Negative yIndx: " << y_pos << "  " << indx_y << std::endl;

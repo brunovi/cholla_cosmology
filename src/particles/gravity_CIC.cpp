@@ -192,7 +192,11 @@ void Get_Gravity_CIC( Particles_3D &Particles, part_int_t p_start, part_int_t p_
     if ( indx_y > ny_g-2  ) ignore = true;
     if ( indx_y > nz_g-2  ) ignore = true;
     if ( ignore ){
+      #ifdef PARTICLE_IDS
       std::cout << "ERROR GRAVITY_CIC Index    pID: " << Particles.partIDs[pIndx] << std::endl;
+      #else
+      std::cout << "ERROR GRAVITY_CIC Index " << std::endl;
+      #endif
       std::cout << "Negative xIndx: " << x_pos << "  " << indx_x << std::endl;
       std::cout << "Negative zIndx: " << z_pos << "  " << indx_z << std::endl;
       std::cout << "Negative yIndx: " << y_pos << "  " << indx_y << std::endl;

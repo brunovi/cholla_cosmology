@@ -958,8 +958,11 @@ void Allocate_MPI_Buffers_BLOCK(struct Header *H)
   int n_max = std::max( H->nx, H->ny );
   n_max = std::max( H->nz, n_max );
   N_PARTICLES_TRANSFER = n_max * n_max  * 1 ;
-  N_DATA_PER_PARTICLE_TRANSFER = 7;
+  N_DATA_PER_PARTICLE_TRANSFER = 6;
   #ifndef SINGLE_PARTICLE_MASS
+  N_DATA_PER_PARTICLE_TRANSFER += 1;
+  #endif
+  #ifdef PARTICLE_IDS
   N_DATA_PER_PARTICLE_TRANSFER += 1;
   #endif
   N_HEADER_PARTICLES_TRANSFER = 2;

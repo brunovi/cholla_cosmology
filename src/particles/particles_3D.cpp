@@ -23,8 +23,6 @@ void Particles_3D::Initialize( struct parameters P, Grav3D &Grav, Real xblocal, 
 
   C_cfl = 0.1;
 
-  int_vector_t partIDs;
-  real_vector_t mass;
   real_vector_t pos_x;
   real_vector_t pos_y;
   real_vector_t pos_z;
@@ -34,6 +32,13 @@ void Particles_3D::Initialize( struct parameters P, Grav3D &Grav, Real xblocal, 
   real_vector_t grav_x;
   real_vector_t grav_y;
   real_vector_t grav_z;
+
+  #ifndef SINGLE_PARTICLE_MASS
+  real_vector_t mass;
+  #endif
+  #ifdef PARTICLE_IDS
+  int_vector_t partIDs;
+  #endif
 
   #ifdef MPI_CHOLLA
   int_vector_t out_indxs_vec_x0;
@@ -157,7 +162,6 @@ void Particles_3D::FreeMemory_CPU(void)
  free(G.gravity_y);
  free(G.gravity_z);
 
- partIDs.clear();
  pos_x.clear();
  pos_y.clear();
  pos_z.clear();
@@ -167,6 +171,14 @@ void Particles_3D::FreeMemory_CPU(void)
  grav_x.clear();
  grav_y.clear();
  grav_z.clear();
+
+ #ifdef PARTICLE_IDS
+ partIDs.clear();
+ #endif
+
+ #ifndef SINGLE_PARTICLE_MASS
+ mass.clear()
+ #endif
 
  // free(send_buffer_x0_particles);
  // free(send_buffer_x1_particles);
@@ -213,8 +225,6 @@ void Particles_3D::Initialize_Uniform_Grid( void ){
         pPos_x = G.xMin + k*G.dx + 0.5*G.dx + offset_x;
         pPos_y = G.yMin + j*G.dy + 0.5*G.dy + offset_y;
         pPos_z = G.zMin + i*G.dz + 0.5*G.dz + offset_z;
-        partIDs.push_back( pID );
-        mass.push_back( Mparticle );
         pos_x.push_back( pPos_x );
         pos_y.push_back( pPos_y );
         pos_z.push_back( pPos_z);
@@ -224,11 +234,17 @@ void Particles_3D::Initialize_Uniform_Grid( void ){
         grav_x.push_back( 0.0 );
         grav_y.push_back( 0.0 );
         grav_z.push_back( 0.0 );
+        #ifdef PARTICLE_IDS
+        partIDs.push_back( pID );
+        #endif
+        #ifndef SINGLE_PARTICLE_MASS
+        mass.push_back( Mparticle );
+        #endif
         pID += 1;
       }
     }
   }
-  n_local = mass.size();
+  n_local = pos_x.size();
   chprintf( " Particles Uniform Grid Initialized, n_local: %lu\n", n_local);
 }
 
@@ -258,8 +274,6 @@ void Particles_3D::Initialize_Sphere( void ){
 
     r = sqrt( (pPos_x-center_x)*(pPos_x-center_x) + (pPos_y-center_y)*(pPos_y-center_y) + (pPos_z-center_z)*(pPos_z-center_z) );
     if ( r > sphereR ) continue;
-    partIDs.push_back( pID );
-    mass.push_back( Mparticle );
     pos_x.push_back( pPos_x );
     pos_y.push_back( pPos_y );
     pos_z.push_back( pPos_z);
@@ -269,10 +283,16 @@ void Particles_3D::Initialize_Sphere( void ){
     grav_x.push_back( 0.0 );
     grav_y.push_back( 0.0 );
     grav_z.push_back( 0.0 );
+    #ifdef PARTICLE_IDS
+    partIDs.push_back( pID );
+    #endif
+    #ifndef SINGLE_PARTICLE_MASS
+    mass.push_back( Mparticle );
+    #endif
     pID += 1;
   }
 
-  n_local = mass.size();
+  n_local = pos_x.size();
 
   chprintf( " Particles Uniform Sphere Initialized, n_local: %lu\n", n_local);
 

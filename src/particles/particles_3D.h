@@ -34,8 +34,12 @@ class Particles_3D
 
   Real C_cfl;
 
+  #ifdef PARTICLE_IDS
   int_vector_t partIDs;
+  #endif
+  #ifndef SINGLE_PARTICLE_MASS
   real_vector_t mass;
+  #endif
   real_vector_t pos_x;
   real_vector_t pos_y;
   real_vector_t pos_z;
