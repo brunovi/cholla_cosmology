@@ -403,11 +403,15 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
     if ( pPos_z < Particles.G.domainMin_z || pPos_z > Particles.G.domainMax_z ){
       std::cout << " Particle outside global domain " << std::endl;
     }
-    if ( pPos_x < Particles.G.xMin || pPos_x > Particles.G.xMax ) in_local = false;
-    if ( pPos_y < Particles.G.yMin || pPos_y > Particles.G.yMax ) in_local = false;
-    if ( pPos_z < Particles.G.zMin || pPos_z > Particles.G.zMax ) in_local = false;
+    if ( pPos_x < Particles.G.xMin || pPos_x >= Particles.G.xMax ) in_local = false;
+    if ( pPos_y < Particles.G.yMin || pPos_y >= Particles.G.yMax ) in_local = false;
+    if ( pPos_z < Particles.G.zMin || pPos_z >= Particles.G.zMax ) in_local = false;
     if ( ! in_local ) {
+      #ifdef PARTICLE_IDS
+      std::cout << " Particle outside Loacal  domain    pID: " << pID << std::endl;
+      #else
       std::cout << " Particle outside Loacal  domain " << std::endl;
+      #endif
       std::cout << "  Domain X: " << Particles.G.xMin <<  "  " << Particles.G.xMax << std::endl;
       std::cout << "  Domain Y: " << Particles.G.yMin <<  "  " << Particles.G.yMax << std::endl;
       std::cout << "  Domain Z: " << Particles.G.zMin <<  "  " << Particles.G.zMax << std::endl;
