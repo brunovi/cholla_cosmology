@@ -308,10 +308,10 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
   part_int_t n_total_load;
   n_total_load = ReducePartIntSum( n_local );
   chprintf( " Total Particles To Load: %ld\n", n_total_load );
-  for ( int i=0; i<nproc; i++ ){
-    if ( procID == i ) std::cout << "  [pId:"  << procID << "]  Loading Particles: " << n_local <<  std::endl;
-    MPI_Barrier(world);
-  }
+  // for ( int i=0; i<nproc; i++ ){
+  //   if ( procID == i ) std::cout << "  [pId:"  << procID << "]  Loading Particles: " << n_local <<  std::endl;
+  //   MPI_Barrier(world);
+  // }
   MPI_Barrier(world);
   #endif
 
@@ -361,6 +361,21 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
   status = H5Dclose(dataset_id);
   #endif
 
+  Real px_min, px_max;
+  Real py_min, py_max;
+  Real pz_min, pz_max;
+  Real vx_min, vx_max;
+  Real vy_min, vy_max;
+  Real vz_min, vz_max;
+  px_min = 1e64;
+  py_min = 1e64;
+  pz_min = 1e64;
+  px_max = -1e64;
+  py_max = -1e64;
+  pz_max = -1e64;
+
+
+
   Real pPos_x, pPos_y, pPos_z;
   Real pVel_x, pVel_y, pVel_z, pMass;
   part_int_t pID;
@@ -401,6 +416,23 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
       std::cout << "  Particle Z: " << pPos_z << std::endl;
       continue;
     }
+
+    if  ( pPos_x > px_max ) px_max = pPos_x;
+    if  ( pPos_y > py_max ) py_max = pPos_y;
+    if  ( pPos_z > pz_max ) pz_max = pPos_z;
+
+    if  ( pPos_x < px_min ) px_min = pPos_x;
+    if  ( pPos_y < py_min ) py_min = pPos_y;
+    if  ( pPos_z < pz_min ) pz_min = pPos_z;
+
+    if  ( pVel_x > vx_max ) vx_max = pVel_x;
+    if  ( pVel_y > vy_max ) vy_max = pVel_y;
+    if  ( pVel_z > vz_max ) vz_max = pVel_z;
+
+    if  ( pVel_x < vx_min ) vx_min = pVel_x;
+    if  ( pVel_y < vy_min ) vy_min = pVel_y;
+    if  ( pVel_z < vz_min ) vz_min = pVel_z;
+
     Particles.pos_x.push_back( pPos_x );
     Particles.pos_y.push_back( pPos_y );
     Particles.pos_z.push_back( pPos_z );
@@ -421,15 +453,40 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
   #ifndef MPI_CHOLLA
   chprintf( " Loaded  %ld  particles\n", Particles.n_local );
   #else
-  for ( int i=0; i<nproc; i++ ){
-    if ( procID == i ) std::cout << "  [pId:"  << procID << "]  N Particles Loaded: " << Particles.n_local <<  std::endl;
-    MPI_Barrier(world);
-  }
+  // for ( int i=0; i<nproc; i++ ){
+  //   if ( procID == i ) std::cout << "  [pId:"  << procID << "]  N Particles Loaded: " << Particles.n_local <<  std::endl;
+  //   MPI_Barrier(world);
+  // }
   MPI_Barrier(world);
   part_int_t n_total_loaded;
   n_total_loaded = ReducePartIntSum( Particles.n_local );
   chprintf( " Total Particles Loaded: %ld\n", n_total_loaded );
   #endif
+
+  #ifdef MPI_CHOLLA
+  Real px_max_g = ReduceRealMax( px_max );
+  Real py_max_g = ReduceRealMax( py_max );
+  Real pz_max_g = ReduceRealMax( pz_max );
+  Real vx_max_g = ReduceRealMax( vx_max );
+  Real vy_max_g = ReduceRealMax( vy_max );
+  Real vz_max_g = ReduceRealMax( vz_max );
+
+  Real px_min_g = ReduceRealMax( px_min );
+  Real py_min_g = ReduceRealMin( py_min );
+  Real pz_min_g = ReduceRealMin( pz_min );
+  Real vx_min_g = ReduceRealMin( vx_min );
+  Real vy_min_g = ReduceRealMin( vy_min );
+  Real vz_min_g = ReduceRealMin( vz_min );
+
+  chprintf( "  Pos X   Min: %f   Max: %f   [ kpc/h]\n", px_min_g, px_max_g);
+  chprintf( "  Pos Y   Min: %f   Max: %f   [ kpc/h]\n", py_min_g, py_max_g);
+  chprintf( "  Pos Z   Min: %f   Max: %f   [ kpc/h]\n", pz_min_g, pz_max_g);
+  chprintf( "  Vel X   Min: %f   Max: %f   [ kpc/h]\n", vx_min_g, vx_max_g);
+  chprintf( "  Vel Y   Min: %f   Max: %f   [ kpc/h]\n", vy_min_g, vy_max_g);
+  chprintf( "  Vel Z   Min: %f   Max: %f   [ kpc/h]\n", vz_min_g, vz_max_g);
+
+  #endif
+
 
   free(dataset_buffer_px);
   free(dataset_buffer_py);
