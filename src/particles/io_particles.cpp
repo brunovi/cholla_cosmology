@@ -84,7 +84,7 @@ void Write_Particles_Data_HDF5( Particles_3D &Particles, hid_t file_id)
   // int       nx_dset = H.nx_real;
   hsize_t   dims[1];
   dataset_buffer = (Real *) malloc(n_local*sizeof(Real));
-  dataset_buffer_IDs = (part_int_t *) malloc(n_local*sizeof(part_int_t));
+
 
   // Create the data space for the datasets
   dims[0] = n_local;
@@ -135,6 +135,15 @@ void Write_Particles_Data_HDF5( Particles_3D &Particles, hid_t file_id)
   status = H5Dclose(dataset_id);
   #endif
 
+  #ifdef PARTICLE_IDS
+  dataset_buffer_IDs = (part_int_t *) malloc(n_local*sizeof(part_int_t));
+  for ( i=0; i<n_local; i++) dataset_buffer_IDs[i] = Particles.partIDs[i];
+  dataset_id = H5Dcreate(file_id, "/particle_IDs", H5T_IEEE_F64BE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  status = H5Dwrite(dataset_id, H5T_NATIVE_LONG, H5S_ALL, H5S_ALL, H5P_DEFAULT, dataset_buffer_IDs);
+  status = H5Dclose(dataset_id);
+  free(dataset_buffer_IDs);
+  #endif
+
   // 3D case
   int       nx_dset = Particles.G.nx_local;
   int       ny_dset = Particles.G.ny_local;
@@ -168,7 +177,6 @@ void Write_Particles_Data_HDF5( Particles_3D &Particles, hid_t file_id)
   status = H5Dclose(dataset_id);
 
   free(dataset_buffer);
-  free(dataset_buffer_IDs);
 }
 
 
@@ -345,8 +353,17 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
   status = H5Dclose(dataset_id);
   #endif
 
+  #ifdef PARTICLE_IDS
+  part_int_t *dataset_buffer_IDs;
+  dataset_buffer_IDs = (part_int_t *) malloc(n_local*sizeof(part_int_t));
+  dataset_id = H5Dopen(file_id, "/particle_IDs", H5P_DEFAULT);
+  status = H5Dread(dataset_id, H5T_NATIVE_LONG, H5S_ALL, H5S_ALL, H5P_DEFAULT, dataset_buffer_IDs);
+  status = H5Dclose(dataset_id);
+  #endif
+
   Real pPos_x, pPos_y, pPos_z;
   Real pVel_x, pVel_y, pVel_z, pMass;
+  part_int_t pID;
   bool in_local;
   for( pIndx=0; pIndx<n_local; pIndx++ ){
     pPos_x = dataset_buffer_px[pIndx];
@@ -357,6 +374,9 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
     pVel_z = dataset_buffer_vz[pIndx];
     #ifndef SINGLE_PARTICLE_MASS
     pMass = dataset_buffer_m[pIndx];
+    #endif
+    #ifdef PARTICLE_IDS
+    pID = dataset_buffer_IDs[pIndx];
     #endif
     in_local = true;
     if ( pPos_x < Particles.G.domainMin_x || pPos_x > Particles.G.domainMax_x ){
@@ -381,7 +401,6 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
       std::cout << "  Particle Z: " << pPos_z << std::endl;
       continue;
     }
-    Particles.partIDs.push_back(pIndx);
     Particles.pos_x.push_back( pPos_x );
     Particles.pos_y.push_back( pPos_y );
     Particles.pos_z.push_back( pPos_z );
@@ -393,6 +412,9 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
     Particles.grav_z.push_back( 0.0 );
     #ifndef SINGLE_PARTICLE_MASS
     Particles.mass.push_back( pMass );
+    #endif
+    #ifdef PARTICLE_IDS
+    Particles.partIDs.push_back(pID);
     #endif
     Particles.n_local += 1;
   }
@@ -407,6 +429,20 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
   part_int_t n_total_loaded;
   n_total_loaded = ReducePartIntSum( Particles.n_local );
   chprintf( " Total Particles Loaded: %ld\n", n_total_loaded );
+  #endif
+
+  free(dataset_buffer_px);
+  free(dataset_buffer_py);
+  free(dataset_buffer_pz);
+  free(dataset_buffer_vx);
+  free(dataset_buffer_vy);
+  free(dataset_buffer_vz);
+
+  #ifndef SINGLE_PARTICLE_MASS
+  free(dataset_buffer_m);
+  #endif
+  #ifdef PARTICLE_IDS
+  free(dataset_buffer_IDs);
   #endif
 }
 #endif

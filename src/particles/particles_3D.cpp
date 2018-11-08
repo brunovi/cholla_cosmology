@@ -99,6 +99,9 @@ void Particles_3D::Initialize( struct parameters P, Grav3D &Grav, Real xblocal, 
   // MPI_Barrier(world);
   // #endif
 
+  #ifdef PARTICLE_IDS
+  chprintf(" Using particle IDs\n");
+  #endif
 
 
   #ifdef PARTICLES_OMP
