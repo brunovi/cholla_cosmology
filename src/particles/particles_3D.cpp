@@ -177,7 +177,7 @@ void Particles_3D::FreeMemory_CPU(void)
  #endif
 
  #ifndef SINGLE_PARTICLE_MASS
- mass.clear()
+ mass.clear();
  #endif
 
  // free(send_buffer_x0_particles);

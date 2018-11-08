@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
   while (G.H.t < P.tout)
   //while (G.H.n_step < 1)
   {
-
+    chprintf("n_step: %d \n", G.H.n_step + 1 );
     // get the start time
     start_step = get_time();
 
@@ -329,7 +329,7 @@ int main(int argc, char *argv[])
     #ifdef MPI_CHOLLA
     G.H.t_wall = ReduceRealMax(G.H.t_wall);
     #endif
-    chprintf("n_step: %d   sim time: %10.7f   sim timestep: %7.4e  timestep time = %9.3f ms   total time = %9.4f s\n",
+    chprintf("n_step: %d   sim time: %10.7f   sim timestep: %7.4e  timestep time = %9.3f ms   total time = %9.4f s\n\n",
       G.H.n_step, G.H.t, G.H.dt, (stop_step-start_step)*1000, G.H.t_wall);
 
     #ifndef COSMOLOGY
