@@ -365,7 +365,11 @@ void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int bu
     if ( pPos_x <  G.domainMin_x ) pPos_x += ( G.domainMax_x - G.domainMin_x );
     if ( pPos_x >= G.domainMax_x ) pPos_x -= ( G.domainMax_x - G.domainMin_x );
     if ( ( pPos_x < G.xMin ) || ( pPos_x >= G.xMax )  ){
+      #ifdef PARTICLE_IDS
+      std::cout << "ERROR Particle Transfer out of X domain    pID: " << pId << std::endl;
+      #else
       std::cout << "ERROR Particle Transfer out of X domain" << std::endl;
+      #endif
       std::cout << " posX: " << pPos_x << " velX: " << pVel_x << std::endl;
       std::cout << " posY: " << pPos_y << " velY: " << pVel_y << std::endl;
       std::cout << " posZ: " << pPos_z << " velZ: " << pVel_z << std::endl;
@@ -381,7 +385,11 @@ void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int bu
       if ( pPos_y >= G.domainMax_y ) pPos_y -= ( G.domainMax_y - G.domainMin_y );
     }
     if ( (direction==1 || direction==2) && (( pPos_y < G.yMin ) || ( pPos_y >= G.yMax ))  ){
+      #ifdef PARTICLE_IDS
+      std::cout << "ERROR Particle Transfer out of Y domain    pID: " << pId << std::endl;
+      #else
       std::cout << "ERROR Particle Transfer out of Y domain" << std::endl;
+      #endif
       std::cout << " posX: " << pPos_x << " velX: " << pVel_x << std::endl;
       std::cout << " posY: " << pPos_y << " velY: " << pVel_y << std::endl;
       std::cout << " posZ: " << pPos_z << " velZ: " << pVel_z << std::endl;
@@ -409,7 +417,11 @@ void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int bu
       if ( pPos_z >= G.domainMax_z ) pPos_z -= ( G.domainMax_z - G.domainMin_z );
     }
     if ( (direction==2) && (( pPos_z < G.zMin ) || ( pPos_z >= G.zMax ))  ){
+      #ifdef PARTICLE_IDS
+      std::cout << "ERROR Particle Transfer out of Z domain    pID: " << pId << std::endl;
+      #else
       std::cout << "ERROR Particle Transfer out of Z domain" << std::endl;
+      #endif
       std::cout << " posX: " << pPos_x << " velX: " << pVel_x << std::endl;
       std::cout << " posY: " << pPos_y << " velY: " << pVel_y << std::endl;
       std::cout << " posZ: " << pPos_z << " velZ: " << pVel_z << std::endl;
