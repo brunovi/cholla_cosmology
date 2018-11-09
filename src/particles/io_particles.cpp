@@ -418,7 +418,7 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
       std::cout << "  Particle X: " << pPos_x << std::endl;
       std::cout << "  Particle Y: " << pPos_y << std::endl;
       std::cout << "  Particle Z: " << pPos_z << std::endl;
-      continue;
+      // continue;
     }
 
     if  ( pPos_x > px_max ) px_max = pPos_x;
