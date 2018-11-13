@@ -475,7 +475,7 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
   Real vy_max_g = ReduceRealMax( vy_max );
   Real vz_max_g = ReduceRealMax( vz_max );
 
-  Real px_min_g = ReduceRealMax( px_min );
+  Real px_min_g = ReduceRealMin( px_min );
   Real py_min_g = ReduceRealMin( py_min );
   Real pz_min_g = ReduceRealMin( pz_min );
   Real vx_min_g = ReduceRealMin( vx_min );

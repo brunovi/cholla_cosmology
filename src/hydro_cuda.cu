@@ -357,6 +357,11 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
     // +  0.25*dt*gy*(d + d_n)*(vy + vy_n)
     // +  0.25*dt*gz*(d + d_n)*(vz + vz_n);
 
+    // dev_conserved[  n_cells + id] = 0;
+    // dev_conserved[2*n_cells + id] = 0;
+    // dev_conserved[3*n_cells + id] = 0;
+    // dev_conserved[4*n_cells + id] = dev_conserved[(n_fields-1)*n_cells + id];
+
     vx_n =  dev_conserved[1*n_cells + id] * d_inv_n;
     vy_n =  dev_conserved[2*n_cells + id] * d_inv_n;
     vz_n =  dev_conserved[3*n_cells + id] * d_inv_n;
@@ -381,7 +386,8 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
       dev_conserved[(n_fields-1)*n_cells + id] = u;
       dev_conserved[4*n_cells + id] += delta_u ;
     }
-    E = dev_conserved[4*n_cells + id] - Ek_1;
+    u_floor = 0;
+    E = dev_conserved[4*n_cells + id];
     if ( E < u_floor ){
       delta_u += u_floor - E;
       dev_conserved[(n_fields-1)*n_cells + id] += delta_u;

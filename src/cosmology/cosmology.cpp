@@ -24,7 +24,8 @@ void Initialize_Cosmology( Cosmology &Cosmo, struct parameters P, Particles_3D &
   Grav.current_a = Cosmo.current_a;
 
   // Cosmo.cosmo_G = 4.29448e-06 ;     //kpc km^2 s^-2 Msun^-1
-  Cosmo.cosmo_G = 4.3019425e-06;
+  // Cosmo.cosmo_G = 4.3019425e-06;
+  Cosmo.cosmo_G = 4.300927161e-06;
   // 4.3019425e-9
 
   Grav.Gconst = Cosmo.cosmo_G;
