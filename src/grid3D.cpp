@@ -476,7 +476,17 @@ Real Grid3D::Update_Grid(void)
     max_dti = CTU_Algorithm_3D_CUDA(g0, g1, H.nx, H.ny, H.nz, x_off, y_off, z_off, H.n_ghost, H.dx, H.dy, H.dz, H.xbound, H.ybound, H.zbound, H.dt, H.n_fields);
     #endif //not_VL
     #ifdef VL
-    max_dti = VL_Algorithm_3D_CUDA(g0, g1, H.nx, H.ny, H.nz, x_off, y_off, z_off, H.n_ghost, H.dx, H.dy, H.dz, H.xbound, H.ybound, H.zbound, H.dt, H.n_fields);
+    Real dens_0, vel_0, current_a;
+    #ifdef COSMOLOGY
+    dens_0 = Cosmo.rho_0_gas;
+    vel_0 = Cosmo.v_0_gas;
+    current_a = Cosmo.current_a;
+    #else
+    dens_0 = 1;
+    vel_0 = 1;
+    current_a =1;
+    #endif
+    max_dti = VL_Algorithm_3D_CUDA(g0, g1, H.nx, H.ny, H.nz, x_off, y_off, z_off, H.n_ghost, H.dx, H.dy, H.dz, H.xbound, H.ybound, H.zbound, H.dt, H.n_fields, dens_0, vel_0, current_a);
     #endif //VL
     #endif
   }
