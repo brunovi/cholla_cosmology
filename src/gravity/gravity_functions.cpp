@@ -224,17 +224,19 @@ void Set_dt( Grid3D &G, bool &output_now ){
   #ifdef COSMOLOGY
   Real delta_a_part;
   Real dt_courant, dt_gas, da_courant;
-  #ifdef PECULIAR_VEL
-  Real delta_t_part = Get_Particles_dt_cosmo( G );
-  // chprintf( " dt: %f  \n", delta_t_part );
-  delta_a_part = G.Cosmo.Get_da_from_dt( delta_t_part );
-  #else
+
   delta_a_part = Get_Particles_da_cosmo( G );
   dt_courant = G.H.dt;
   da_courant = G.Cosmo.Get_da_courant( dt_courant);
-  chprintf( "Delta_a parts: %f:   Delta_a gas: %f\n", delta_a_part, da_courant);
-  da_courant = std::min(delta_a_part, da_courant);
+
+  #ifdef ONLY_PM
+  chprintf( "Delta_a particles: %f\n", delta_a_part );
+  #else
+  chprintf( "Delta_a particles: %f   Delta_a gas: %f\n", delta_a_part, da_courant);
   #endif
+
+  da_courant = std::min(delta_a_part, da_courant);
+
   // Real delta_a_part = G.Cosmo.max_delta_a;
   if( da_courant > G.Cosmo.max_delta_a){
     da_courant = G.Cosmo.max_delta_a;
@@ -281,11 +283,6 @@ void Set_dt( Grid3D &G, bool &output_now ){
   // G.Particles.dt = dt_min;
   // // G.Particles.dt = 0;
   // #endif
-
-
-
-
-
 
 }
 
