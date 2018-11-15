@@ -73,7 +73,7 @@ void Write_Particles_Header_HDF5(Particles_3D &Particles, hid_t file_id)
   status = H5Sclose(dataspace_id);
 }
 
-void Write_Particles_Data_HDF5( Particles_3D &Particles, hid_t file_id)
+void Write_Particles_Data_HDF5( Particles_3D &Particles, Grav3D &Grav, hid_t file_id)
 {
   part_int_t i, j, k, id, buf_id;
   hid_t     dataset_id, dataspace_id;
@@ -176,6 +176,31 @@ void Write_Particles_Data_HDF5( Particles_3D &Particles, hid_t file_id)
   // Free the dataset id
   status = H5Dclose(dataset_id);
 
+  #ifdef OUTPUT_POTENTIAL
+  // Copy the potential array to the memory buffer
+  for (k=0; k<Grav.nz_local; k++) {
+    for (j=0; j<Grav.ny_local; j++) {
+      for (i=0; i<Grav.nx_local; i++) {
+        // id = (i+H.n_ghost) + (j+H.n_ghost)*H.nx + (k+H.n_ghost)*H.nx*H.ny;
+        // buf_id = k + j*H.nz_real + i*H.nz_real*H.ny_real;
+        id = (i+N_GHOST_POTENTIAL) + (j+N_GHOST_POTENTIAL)*(Grav.nx_local+2*N_GHOST_POTENTIAL) + (k+N_GHOST_POTENTIAL)*(Grav.nx_local+2*N_GHOST_POTENTIAL)*(Grav.ny_local+2*N_GHOST_POTENTIAL);
+        buf_id = k + j*Grav.nz_local + i*Grav.nz_local*Grav.ny_local;
+        dataset_buffer[buf_id] = Grav.F.potential_h[id];
+        // dataset_buffer[buf_id] = pfft_potential[id][0];
+
+      }
+    }
+  }
+  // Create a dataset id for density
+  dataset_id = H5Dcreate(file_id, "/grav_potential", H5T_IEEE_F64BE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  // Write the density array to file  // NOTE: NEED TO FIX FOR FLOAT REAL!!!
+  status = H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, dataset_buffer);
+  // Free the dataset id
+  status = H5Dclose(dataset_id);
+
+  #endif //OUTPUT_POTENTIAL
+
+
   free(dataset_buffer);
 }
 
@@ -215,7 +240,7 @@ void OutputData_Particles( Grid3D &G, struct parameters P, int nfile)
   // Write header (file attributes)
   G.Write_Header_HDF5(file_id);
   Write_Particles_Header_HDF5( G.Particles, file_id);
-  Write_Particles_Data_HDF5( G.Particles, file_id);
+  Write_Particles_Data_HDF5( G.Particles, G.Grav, file_id);
 
   // Close the file
   status = H5Fclose(file_id);
