@@ -154,7 +154,6 @@ void Extrapolate_Grav_Potential( Grid3D &G ){
         if ( G.Grav.INITIAL ){
           pot_prev = pot_now;
           pot_extrp = pot_now;
-          G.Grav.INITIAL = false;
         } else{
           pot_prev = G.Grav.F.potential_1_h[id_pot];
           pot_extrp = pot_now + 0.5 * G.Grav.dt_now * ( pot_now - pot_prev ) / G.Grav.dt_prev;
@@ -171,6 +170,7 @@ void Extrapolate_Grav_Potential( Grid3D &G ){
       }
     }
   }
+  G.Grav.INITIAL = false;
 }
 
 
