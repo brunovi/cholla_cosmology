@@ -42,6 +42,10 @@ using namespace std;
 
 #endif
 
+#ifdef COOLING_GRACKLE
+#include "cooling/cool_grackle.h"
+#endif
+
 #define OUTPUT
 #define CPU_TIME
 
@@ -157,6 +161,10 @@ int main(int argc, char *argv[])
 
   #ifdef PARTICLES
   Get_Particles_Acceleration( G, 0, G.Particles.n_local, 0, G.Particles.G.nz_local + 2*G.Particles.G.n_ghost_particles_grid );
+  #endif
+
+  #ifdef COOLING_GRACKLE
+  G.Cool.Initialize();
   #endif
 
   chprintf("Dimensions of each cell: dx = %f dy = %f dz = %f\n", G.H.dx, G.H.dy, G.H.dz);

@@ -27,6 +27,11 @@
 #include "cosmology/cosmology.h"
 #endif
 
+#ifdef COOLING_GRACKLE
+#include "cooling/cool_grackle.h"
+#endif
+
+
 struct Rotation
 {
   /*! \var nx
@@ -252,6 +257,10 @@ class Grid3D
 
     #ifdef COSMOLOGY
     Cosmology Cosmo;
+    #endif
+
+    #ifdef COOLING_GRACKLE
+    Cool_GK Cool;
     #endif
 
     struct Conserved
