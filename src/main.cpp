@@ -44,6 +44,7 @@ using namespace std;
 
 #ifdef COOLING_GRACKLE
 #include "cooling/cool_grackle.h"
+#include "cooling/grackle_functions.h"
 #endif
 
 #define OUTPUT
@@ -163,9 +164,13 @@ int main(int argc, char *argv[])
   Get_Particles_Acceleration( G, 0, G.Particles.n_local, 0, G.Particles.G.nz_local + 2*G.Particles.G.n_ghost_particles_grid );
   #endif
 
-  #ifdef COOLING_GRACKLE
-  G.Cool.Initialize();
-  #endif
+  // #ifdef COOLING_GRACKLE
+  // Initialize_Grackle( G.Cool, P, G.Grav, G.Cosmo );
+  // Initialize_Grackle_Fields( G );
+  // // Copy_Fields_to_Grackle( G );
+  // Do_Cooling_Step( 0, G );
+  //
+  // #endif
 
   chprintf("Dimensions of each cell: dx = %f dy = %f dz = %f\n", G.H.dx, G.H.dy, G.H.dz);
   chprintf("Ratio of specific heats gamma = %f\n",gama);
@@ -208,6 +213,7 @@ int main(int argc, char *argv[])
   bool output_now = false;
   // Evolve the grid, one timestep at a time
   chprintf("Starting calculations.\n");
+  // P.tout = 0;
   while (G.H.t < P.tout)
   //while (G.H.n_step < 1)
   {
@@ -370,7 +376,7 @@ int main(int argc, char *argv[])
     step_counter += 1;
     #endif
 
-    // if (step_counter == 10) break;
+    // if (step_counter == 1) break;
 
     #ifdef COSMOLOGY
     if ( G.Cosmo.current_a >= G.Cosmo.scale_outputs[G.Cosmo.n_outputs-1] ) {
@@ -442,6 +448,10 @@ int main(int argc, char *argv[])
   #ifdef Particles_3D
   G.Particles.Reset();
   #endif
+
+  // #ifdef COOLING_GRACKLE
+  // Clear_Data_Grackle( G );
+  // #endif
 
   #ifdef MPI_CHOLLA
   MPI_Finalize();
