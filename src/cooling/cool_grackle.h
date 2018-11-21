@@ -5,12 +5,42 @@
 #define INIT_GRACKLE_H
 
 #include"../global.h"
-// extern "C" {
+#include"../cosmology/cosmology.h"
+#include"../gravity/grav3D.h"
+
+extern "C" {
 #include <grackle.h>
+}
 
 class Cool_GK
 {
   public:
+
+  Real mass_h;
+  Real k_boltz;
+
+
+  code_units units;
+  chemistry_data *data;
+
+  Real dens_conv;
+  Real momentum_conv;
+  Real energy_conv;
+
+  Real dens_to_CGS;
+  Real vel_to_CGS;
+  Real energy_to_CGS;
+
+  Real temperature_units;
+
+  Real tiny_number;
+
+  // Create struct for storing grackle field data
+  grackle_field_data fields;
+  int field_size;
+
+
+
 
   // int procID_pfft;
   // int nproc_pfft;
@@ -18,9 +48,11 @@ class Cool_GK
 
 
 Cool_GK( void );
-void Initialize( );
+
+// void Do_Cooling_Step( Real dt );
 
 };
+void Initialize_Grackle( Cool_GK &Cool, struct parameters P,  Grav3D &Grav, Cosmology &Cosmo );
 
 #endif
 #endif
