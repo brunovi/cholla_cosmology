@@ -3,6 +3,7 @@
 #include"cosmology.h"
 #include "../io.h"
 #include "io_cosmology.h"
+#include "../universal_constants.h"
 
 Cosmology::Cosmology( void ){}
 
@@ -32,7 +33,10 @@ void Initialize_Cosmology( Cosmology &Cosmo, struct parameters P, Particles_3D &
 
   Cosmo.max_delta_a = 0.001;
   Cosmo.delta_a = Cosmo.max_delta_a;
-  Cosmo.delta_a_2 = Cosmo.max_delta_a;
+
+
+  Cosmo.time_conversion = KPC;
+  Cosmo.t_secs = 0;
 
   Cosmo.r_0_dm   = P.xlen/P.nx;
   Cosmo.t_0_dm   = 1. / Cosmo.H0;

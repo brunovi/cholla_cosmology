@@ -19,6 +19,8 @@ void Copy_Fields_to_Grackle( Grid3D &G );
 
 void Do_Cooling_Step( Real dt, Grid3D &G );
 
+void Set_Initial_Fields_Grackle( Grid3D &G );
+
 #endif
 #endif
 #endif

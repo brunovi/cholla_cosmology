@@ -16,9 +16,6 @@ class Cool_GK
 {
   public:
 
-  Real mass_h;
-  Real k_boltz;
-
 
   code_units units;
   chemistry_data *data;
@@ -31,7 +28,11 @@ class Cool_GK
   Real vel_to_CGS;
   Real energy_to_CGS;
 
+  Real gamma;
+
   Real temperature_units;
+  Real *temperature;
+  Real *cooling_time;
 
   Real tiny_number;
 

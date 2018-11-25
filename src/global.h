@@ -39,7 +39,11 @@ typedef double Real;
 #define SP_ENERGY_UNIT (VELOCITY_UNIT*VELOCITY_UNIT)
 
 #ifdef SCALAR
+#ifdef COOLING_GRACKLE
+#define NSCALARS 7
+#else
 #define NSCALARS 1
+#endif
 #endif
 
 #ifdef GRAVITY

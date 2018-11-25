@@ -24,12 +24,16 @@ public:
   Real current_a;
   Real max_delta_a;
   Real delta_a;
-  Real delta_a_2;
+
   Real r_0_dm;
   Real t_0_dm;
   Real v_0_dm;
   Real rho_0_dm;
   Real phi_0_dm;
+
+  Real time_conversion;
+  Real dt_secs;
+  Real t_secs;
 
   // Real dens_avrg;
 

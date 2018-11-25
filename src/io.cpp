@@ -23,6 +23,8 @@
 #include "cosmology/cosmology_units.h"
 #endif
 
+#include "universal_constants.h"
+
 /* function used to rotate points about an axis in 3D for the rotated projection output routine */
 void rotate_point(Real x, Real y, Real z, Real delta, Real phi, Real theta, Real *xp, Real *yp, Real *zp);
 
@@ -1106,6 +1108,7 @@ void Grid3D::Write_Grid_HDF5(hid_t file_id)
     status = H5Dclose(dataset_id);
 
     #ifdef SCALAR
+    #ifndef COOLING_GRACKLE
     for (int s=0; s<NSCALARS; s++) {
       // create the name of the dataset
       char dataset[100];
@@ -1130,6 +1133,7 @@ void Grid3D::Write_Grid_HDF5(hid_t file_id)
       // Free the dataset id
       status = H5Dclose(dataset_id);
     }
+    #endif
     #endif
 
     #ifdef DE
@@ -2577,6 +2581,13 @@ void Grid3D::Read_Grid_HDF5(hid_t file_id)
     mean_l = 0;
     min_l = 1e65;
     max_l = -1;
+
+    Real temp, temp_max_l, temp_min_l, temp_mean_l;
+    Real temp_min_g, temp_max_g, temp_mean_g;
+
+    temp_mean_l = 0;
+    temp_min_l = 1e65;
+    temp_max_l = -1;
     // Copy the internal Energy array to the grid
     for (k=0; k<H.nz_real; k++) {
       for (j=0; j<H.ny_real; j++) {
@@ -2587,10 +2598,17 @@ void Grid3D::Read_Grid_HDF5(hid_t file_id)
           mean_l += C.GasEnergy[id];
           if ( C.GasEnergy[id] > max_l ) max_l = C.GasEnergy[id];
           if ( C.GasEnergy[id] < min_l ) min_l = C.GasEnergy[id];
+          temp = C.GasEnergy[id] / C.density[id] * ( gama - 1 ) * MASS_HYDROGEN / K_BOLTZ * 1e10 ;
+          temp_mean_l += temp;
+          // chprintf( "%f\n", temp);
+          if ( temp > temp_max_l ) temp_max_l = temp;
+          if ( temp < temp_min_l ) temp_min_l = temp;
+
         }
       }
     }
     mean_l /= ( H.nz_real * H.ny_real * H.nx_real );
+    temp_mean_l /= ( H.nz_real * H.ny_real * H.nx_real );
 
     #if MPI_CHOLLA
     mean_g = ReduceRealAvg( mean_l );
@@ -2599,14 +2617,22 @@ void Grid3D::Read_Grid_HDF5(hid_t file_id)
     mean_l = mean_g;
     max_l = max_g;
     min_l = min_g;
+    temp_mean_g = ReduceRealAvg( temp_mean_l );
+    temp_max_g = ReduceRealMax( temp_max_l );
+    temp_min_g = ReduceRealMin( temp_min_l );
+    temp_mean_l = temp_mean_g;
+    temp_max_l = temp_max_g;
+    temp_min_l = temp_min_g;
     #endif
 
     #ifdef COSMOLOGY
-    chprintf( " GasEnergy  Mean: %f   Min: %f   Max: %f      [ h^2 Msun kpc^-3 km^2 s^-2] \n", mean_l, min_l, max_l );
+    chprintf( " GasEnergy  Mean: %f   Min: %f   Max: %f      [ h^2 Msun kpc^-3 km^2 s^-2 ] \n", mean_l, min_l, max_l );
+    chprintf( " Temperature  Mean: %f   Min: %f   Max: %f      [ K ] \n", temp_mean_l, temp_min_l, temp_max_l );
     #endif
     #endif
 
     #ifdef SCALAR
+    #ifndef COOLING_GRACKLE
     for (int s=0; s<NSCALARS; s++) {
       // create the name of the dataset
       char dataset[100];
@@ -2633,6 +2659,7 @@ void Grid3D::Read_Grid_HDF5(hid_t file_id)
         }
       }
     }
+    #endif
     #endif
   }
   free(dataset_buffer);

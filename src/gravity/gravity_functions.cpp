@@ -1,6 +1,7 @@
 #ifdef GRAVITY
 
 #include "gravity_functions.h"
+#include "../universal_constants.h"
 
 #ifdef COSMOLOGY
 #include"../particles/particles_dynamics.h"
@@ -230,9 +231,9 @@ void Set_dt( Grid3D &G, bool &output_now ){
   da_courant = G.Cosmo.Get_da_courant( dt_courant);
 
   #ifdef ONLY_PM
-  chprintf( "Delta_a particles: %f\n", delta_a_part );
+  chprintf( " Delta_a particles: %f\n", delta_a_part );
   #else
-  chprintf( "Delta_a particles: %f   Delta_a gas: %f\n", delta_a_part, da_courant);
+  chprintf( " Delta_a particles: %f   Delta_a gas: %f\n", delta_a_part, da_courant);
   #endif
 
   da_courant = std::min(delta_a_part, da_courant);
@@ -250,19 +251,20 @@ void Set_dt( Grid3D &G, bool &output_now ){
     output_now = true;
     // chprintf( " ################################## \n");
   }
-
   Real dt = G.Cosmo.Get_dt_from_da( G.Cosmo.delta_a );
-  Real da_2 = G.Cosmo.Get_da_from_dt( dt/2 );
-  G.Cosmo.delta_a_2 = da_2;
+  G.Cosmo.dt_secs = dt * G.Cosmo.time_conversion;
+  G.Cosmo.t_secs += G.Cosmo.dt_secs;
+
+
   G.Particles.dt = dt;
 
   dt_gas = G.Cosmo.Get_Cosmology_dt( G.Cosmo.delta_a );
   G.H.dt = dt_gas;
   // Real dt_courant = dt_gas*G.Cosmo.t_0_gas;
-  // G.H.dt = dt;
 
-  chprintf( "Current_a: %f    delta_a: %f   dt: %f    da_courant: %f \n", G.Cosmo.current_a, G.Cosmo.delta_a, dt_gas, da_courant  );
-  chprintf( " dt: %f  \n", dt );
+  chprintf( " Current_a: %f    delta_a: %f     da_courant: %f  dt:  %f\n", G.Cosmo.current_a, G.Cosmo.delta_a, da_courant, dt  );
+  chprintf( " t_physical: %f Myr   dt_physical: %f Myr\n", G.Cosmo.t_secs/MYR, G.Cosmo.dt_secs/MYR );
+
 
   #endif
 

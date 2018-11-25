@@ -164,13 +164,16 @@ int main(int argc, char *argv[])
   Get_Particles_Acceleration( G, 0, G.Particles.n_local, 0, G.Particles.G.nz_local + 2*G.Particles.G.n_ghost_particles_grid );
   #endif
 
-  // #ifdef COOLING_GRACKLE
-  // Initialize_Grackle( G.Cool, P, G.Grav, G.Cosmo );
-  // Initialize_Grackle_Fields( G );
-  // // Copy_Fields_to_Grackle( G );
-  // Do_Cooling_Step( 0, G );
-  //
-  // #endif
+  #ifdef COOLING_GRACKLE
+  Initialize_Grackle( G.Cool, P, G.Grav, G.Cosmo );
+  Initialize_Grackle_Fields( G );
+  Real start_cool, stop_cool, time_cool;
+  start_cool = get_time();
+  Do_Cooling_Step( 0, G );
+  stop_cool = get_time();
+  time_cool = stop_cool - start_cool;
+  chprintf( " Time Cooling: %f\n", time_cool*1000 );
+  #endif
 
   chprintf("Dimensions of each cell: dx = %f dy = %f dz = %f\n", G.H.dx, G.H.dy, G.H.dz);
   chprintf("Ratio of specific heats gamma = %f\n",gama);
@@ -213,7 +216,7 @@ int main(int argc, char *argv[])
   bool output_now = false;
   // Evolve the grid, one timestep at a time
   chprintf("Starting calculations.\n");
-  // P.tout = 0;
+  P.tout = 0;
   while (G.H.t < P.tout)
   //while (G.H.n_step < 1)
   {
@@ -449,9 +452,9 @@ int main(int argc, char *argv[])
   G.Particles.Reset();
   #endif
 
-  // #ifdef COOLING_GRACKLE
-  // Clear_Data_Grackle( G );
-  // #endif
+  #ifdef COOLING_GRACKLE
+  Clear_Data_Grackle( G );
+  #endif
 
   #ifdef MPI_CHOLLA
   MPI_Finalize();
