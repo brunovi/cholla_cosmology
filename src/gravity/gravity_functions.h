@@ -38,15 +38,22 @@ void Compute_Gravitational_Potential( Grid3D &G,  Potential_FFTW_3D &p_solver, R
 void Compute_Gravitational_Potential( Grid3D &G,  Potential_PFFT_3D &p_solver, Real *time_pot, Real *time_pDens, Real *time_pDens_trans, struct parameters P);
 #endif
 
- Real Get_Density_Average( Grid3D &G );
+Real Get_Density_Average( Grid3D &G );
 
 void Copy_Potential_To_Hydro_Grid( Grid3D &G );
 
-void Copy_Potential_From_Hydro_Grid( Grid3D &G );
+// void Copy_Potential_From_Hydro_Grid( Grid3D &G );
+
+
+void Get_Gavity_Corrector( Grid3D &G, int g_start, int g_end);
+void Apply_Gavity_Corrector( Grid3D &G );
+
+
+void Sync_Energies_3D_Host(Grid3D &G );
 
 void Extrapolate_Grav_Potential( Grid3D &G  );
 
-void Set_dt( Grid3D &G, bool &output_now );
+void Set_dt( Grid3D &G, bool &output_now, int n_step );
 
 #endif //SELF_GRAV_FUNC_H
 #endif //SELF_GRAVITY

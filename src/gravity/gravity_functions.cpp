@@ -118,10 +118,9 @@ void Compute_Gravitational_Potential( Grid3D &G, Potential_PFFT_3D &p_solver, Re
   #ifdef MPI_CHOLLA
   dens_avrg = ReduceRealAvg( dens_avrg );
   #endif
-  // G.Cosmo.dens_avrg = dens_avrg;
+
   G.Grav.dens_avrg = dens_avrg;
-  // std::cout << "Density Averge: " << dens_avrg << std::endl;
-  chprintf( "Densitty Average:  %f\n", dens_avrg);
+  chprintf( " Density Average:  %f\n", dens_avrg);
   #endif
 
   time_potential = p_solver.Get_Potential( G.Grav );
@@ -151,19 +150,23 @@ void Extrapolate_Grav_Potential( Grid3D &G ){
       for ( i=0; i<nx_pot; i++ ){
         id_pot = i + j*nx_pot + k*nx_pot*ny_pot;
         id_grid = (i+nGHST) + (j+nGHST)*nx_grid + (k+nGHST)*nx_grid*ny_grid;
-        pot_now = G.C.Grav_potential[id_grid];
+        pot_now = G.C.Grav_potential[id_grid]  ;
         if ( G.Grav.INITIAL ){
           pot_prev = pot_now;
-          pot_extrp = pot_now;
+          pot_extrp = pot_now *  G.Cosmo.current_a * G.Cosmo.current_a ;
         } else{
-          pot_prev = G.Grav.F.potential_1_h[id_pot];
-          pot_extrp = pot_now + 0.5 * G.Grav.dt_now * ( pot_now - pot_prev ) / G.Grav.dt_prev;
-          // pot_extrp = pot_now;
+          pot_prev = G.Grav.F.potential_1_h[id_pot] ;
+          #ifdef GRAVITY_CORRECTOR
+          pot_extrp = pot_now * G.Cosmo.current_a * G.Cosmo.current_a;
+          #else
+          // pot_extrp = pot_now * G.Cosmo.current_a * G.Cosmo.current_a + 0.5 * G.Grav.dt_now * ( pot_now * G.Cosmo.current_a * G.Cosmo.current_a - pot_prev * (G.Cosmo.current_a - G.Cosmo.delta_a ) * (G.Cosmo.current_a - G.Cosmo.delta_a ) ) / G.Grav.dt_prev;
+          pot_extrp = pot_now * G.Cosmo.current_a * G.Cosmo.current_a + 0.5 * G.Grav.dt_now * ( pot_now * G.Cosmo.current_a * G.Cosmo.current_a - pot_prev * (G.Cosmo.current_a ) * (G.Cosmo.current_a ) ) / G.Grav.dt_prev;
+          #endif
         }
 
         #ifdef COSMOLOGY
-        pot_extrp *= G.Cosmo.current_a * G.Cosmo.current_a / G.Cosmo.phi_0_gas;
-        // pot_extrp *= G.Cosmo.current_a * G.Cosmo.current_a ;
+        // pot_extrp *= 1 / G.Cosmo.phi_0_gas * G.Cosmo.current_a * G.Cosmo.current_a;
+        pot_extrp *= 1 / G.Cosmo.phi_0_gas ;
         #endif
 
         G.C.Grav_potential[id_grid] = pot_extrp;
@@ -186,41 +189,285 @@ void Copy_Potential_To_Hydro_Grid( Grid3D &G ){
   int nx_grid = G.Grav.nx_local + 2*n_ghost_grid;
   int ny_grid = G.Grav.ny_local + 2*n_ghost_grid;
   int nz_grid = G.Grav.nz_local + 2*n_ghost_grid;
+  Real pot;
   int k, j, i, id_pot, id_grid;
   for ( k=0; k<G.Grav.nz_local; k++ ){
     for ( j=0; j<G.Grav.ny_local; j++ ){
       for ( i=0; i<G.Grav.nx_local; i++ ){
         id_pot = (i+n_ghost_pot) + (j+n_ghost_pot)*nx_pot + (k+n_ghost_pot)*nx_pot*ny_pot;
         id_grid = (i+n_ghost_grid) + (j+n_ghost_grid)*nx_grid + (k+n_ghost_grid)*nx_grid*ny_grid;
-        G.C.Grav_potential[id_grid] = G.Grav.F.potential_h[id_pot];
+        pot = G.Grav.F.potential_h[id_pot];
+
+        // #ifdef COSMOLOGY
+        // pot *= G.Cosmo.current_a * G.Cosmo.current_a / G.Cosmo.phi_0_gas;
+        // #endif
+
+        G.C.Grav_potential[id_grid] = pot;
       }
     }
   }
 }
 
-void Copy_Potential_From_Hydro_Grid( Grid3D &G ){
-  int n_ghost_pot = N_GHOST_POTENTIAL;
-  int nx_pot = G.Grav.nx_local + 2*n_ghost_pot;
-  int ny_pot = G.Grav.ny_local + 2*n_ghost_pot;
-  int nz_pot = G.Grav.nz_local + 2*n_ghost_pot;
-  int n_ghost_grid = G.H.n_ghost;
-  int nx_grid = G.Grav.nx_local + 2*n_ghost_grid;
-  int ny_grid = G.Grav.ny_local + 2*n_ghost_grid;
-  int nz_grid = G.Grav.nz_local + 2*n_ghost_grid;
-  int nGHST = n_ghost_grid - n_ghost_pot;
-  int k, j, i, id_pot, id_grid;
-  for ( k=0; k<nz_pot; k++ ){
-    for ( j=0; j<ny_pot; j++ ){
-      for ( i=0; i<nx_pot; i++ ){
-        id_pot = i + j*nx_pot + k*nx_pot*ny_pot;
-        id_grid = (i+nGHST) + (j+nGHST)*nx_grid + (k+nGHST)*nx_grid*ny_grid;
-        G.Grav.F.potential_h[id_pot] = G.C.Grav_potential[id_grid];
+#ifdef GRAVITY_CORRECTOR
+void Get_Gavity_Corrector( Grid3D &G, int g_start, int g_end ){
+
+  int nx_grav, ny_grav, nz_grav;
+  // nGHST_grav = G.Particles.G.n_ghost_particles_grid;
+  nx_grav = G.Grav.nx_local;
+  ny_grav = G.Grav.ny_local;
+  nz_grav = G.Grav.nz_local;
+
+  int nx_grid, ny_grid, nz_grid, nGHST_grid;
+  nGHST_grid = G.H.n_ghost;
+  nx_grid = G.Grav.nx_local + 2*nGHST_grid;
+  ny_grid = G.Grav.ny_local + 2*nGHST_grid;
+  nz_grid = G.Grav.nz_local + 2*nGHST_grid;
+
+  int nGHST = nGHST_grid ;
+
+  Real dx, dy, dz;
+  dx = G.Grav.dx;
+  dy = G.Grav.dy;
+  dz = G.Grav.dz;
+
+
+  Real phi_l, phi_r;
+  int k, j, i, id_l, id_r, id;
+  for ( k=g_start; k<g_end; k++ ){
+    for ( j=0; j<ny_grav; j++ ){
+      for ( i=0; i<nx_grav; i++ ){
+        id   = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
+        id_l = (i-1 + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
+        id_r = (i+1 + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
+        phi_l = G.C.Grav_potential[id_l];
+        phi_r = G.C.Grav_potential[id_r];
+        G.Grav.F.gravity_x_h[id] = -0.5 * ( phi_r - phi_l ) / dx;
+        phi_l = G.Grav.F.Grav_potential_prev[id_l];
+        phi_r = G.Grav.F.Grav_potential_prev[id_r];
+        G.Grav.F.gravity_x_h_prev[id] = -0.5 * ( phi_r - phi_l ) / dx;
+      }
+    }
+  }
+
+  for ( k=g_start; k<g_end; k++ ){
+    for ( j=0; j<ny_grav; j++ ){
+      for ( i=0; i<nx_grav; i++ ){
+        id   = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
+        id_l = (i + nGHST) + (j-1 + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
+        id_r = (i + nGHST) + (j+1 + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
+        phi_l = G.C.Grav_potential[id_l];
+        phi_r = G.C.Grav_potential[id_r];
+        G.Grav.F.gravity_y_h[id] = -0.5 * ( phi_r - phi_l ) / dy;
+        phi_l = G.Grav.F.Grav_potential_prev[id_l];
+        phi_r = G.Grav.F.Grav_potential_prev[id_r];
+        G.Grav.F.gravity_y_h_prev[id] = -0.5 * ( phi_r - phi_l ) / dy;
+      }
+    }
+  }
+
+  for ( k=g_start; k<g_end; k++ ){
+    for ( j=0; j<ny_grav; j++ ){
+      for ( i=0; i<nx_grav; i++ ){
+        id   = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
+        id_l = (i + nGHST) + (j + nGHST)*nx_grid + (k-1 + nGHST)*ny_grid*nz_grid;
+        id_r = (i + nGHST) + (j + nGHST)*nx_grid + (k+1 + nGHST)*ny_grid*nz_grid;
+        phi_l = G.C.Grav_potential[id_l];
+        phi_r = G.C.Grav_potential[id_r];
+        G.Grav.F.gravity_z_h[id] = -0.5 * ( phi_r - phi_l ) / dz;
+        phi_l = G.Grav.F.Grav_potential_prev[id_l];
+        phi_r = G.Grav.F.Grav_potential_prev[id_r];
+        G.Grav.F.gravity_z_h_prev[id] = -0.5 * ( phi_r - phi_l ) / dz;
       }
     }
   }
 }
 
-void Set_dt( Grid3D &G, bool &output_now ){
+void Add_Gravity_Corrector( Grid3D &G, int g_start, int g_end ){
+
+  int nx_grav, ny_grav, nz_grav;
+  // nGHST_grav = G.Particles.G.n_ghost_particles_grid;
+  nx_grav = G.Grav.nx_local;
+  ny_grav = G.Grav.ny_local;
+  nz_grav = G.Grav.nz_local;
+
+  int nx_grid, ny_grid, nz_grid, nGHST_grid;
+  nGHST_grid = G.H.n_ghost;
+  nx_grid = G.Grav.nx_local + 2*nGHST_grid;
+  ny_grid = G.Grav.ny_local + 2*nGHST_grid;
+  nz_grid = G.Grav.nz_local + 2*nGHST_grid;
+
+  int nGHST = nGHST_grid ;
+
+  Real d, vx, vy, vz, gx, gy, gz;
+  Real d_0, vx_0, vy_0, vz_0, gx_0, gy_0, gz_0;
+  Real current_a_prev;
+  Real E, u_floor, delta_u;
+
+  current_a_prev = G.Cosmo.current_a - G.Cosmo.delta_a;
+  int k, j, i, id_grav, id_grid;
+  for ( k=g_start; k<g_end; k++ ){
+    for ( j=0; j<ny_grav; j++ ){
+      for ( i=0; i<nx_grav; i++ ){
+        id_grav = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
+        id_grid = (i + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
+
+        d_0 = G.Grav.F.density_prev[id_grid];
+        vx_0 = G.Grav.F.momentum_x_prev[id_grid] / d;
+        vy_0 = G.Grav.F.momentum_y_prev[id_grid] / d;
+        vz_0 = G.Grav.F.momentum_z_prev[id_grid] / d;
+        gx_0 = G.Grav.F.gravity_x_h_prev[id_grav];
+        gy_0 = G.Grav.F.gravity_y_h_prev[id_grav];
+        gz_0 = G.Grav.F.gravity_z_h_prev[id_grav];
+
+
+
+        d = G.C.density[id_grid];
+        vx = G.C.momentum_x[id_grid] / d;
+        vy = G.C.momentum_y[id_grid] / d;
+        vz = G.C.momentum_z[id_grid] / d;
+        gx = G.Grav.F.gravity_x_h[id_grav] / G.Cosmo.phi_0_gas * current_a_prev * current_a_prev;
+        gy = G.Grav.F.gravity_y_h[id_grav] / G.Cosmo.phi_0_gas * current_a_prev * current_a_prev;
+        gz = G.Grav.F.gravity_z_h[id_grav] / G.Cosmo.phi_0_gas * current_a_prev * current_a_prev;
+        // gx = G.Grav.F.gravity_x_h[id_grav];
+        // gy = G.Grav.F.gravity_y_h[id_grav];
+        // gz = G.Grav.F.gravity_z_h[id_grav];
+
+        // G.C.momentum_x[id_grid] +=  G.H.dt * d_0 * gx_0;
+        // G.C.momentum_y[id_grid] +=  G.H.dt * d_0 * gy_0;
+        // G.C.momentum_z[id_grid] +=  G.H.dt * d_0 * gz_0;
+        // G.C.Energy[id_grid] +=  G.H.dt * ( d_0*vx_0*gx_0 + d_0*vy_0*gy_0 + d_0*vz_0*gz_0 );
+
+        G.C.momentum_x[id_grid] += 0.5 * G.H.dt * d * gx;
+        G.C.momentum_y[id_grid] += 0.5 * G.H.dt * d * gy;
+        G.C.momentum_z[id_grid] += 0.5 * G.H.dt * d * gz;
+        G.C.Energy[id_grid] += 0.5 * G.H.dt * ( d*vx*gx + d*vy*gy + d*vz*gz );
+
+
+        // u_floor = 0;
+        // E = G.C.Energy[id_grid];
+        // if ( E < u_floor ){
+        //   delta_u += u_floor - E;
+        //   printf("###Thread Energy change  %f -> %f \n", E, u_floor );
+        //   G.C.GasEnergy[id_grid] += delta_u;
+        //   G.C.Energy[id_grid] += delta_u;
+        // }
+      }
+    }
+  }
+
+}
+
+
+void Apply_Gavity_Corrector( Grid3D &G ){
+
+  Get_Gavity_Corrector( G, 0, G.Grav.nz_local );
+
+  Add_Gravity_Corrector( G, 0, G.Grav.nz_local );
+
+
+
+
+}
+#endif
+
+
+
+void Sync_Energies_3D_Host(Grid3D &G ){
+
+  int nx_grid, ny_grid, nz_grid, nGHST_grid;
+  nGHST_grid = G.H.n_ghost;
+  nx_grid = G.H.nx;
+  ny_grid = G.H.ny;
+  nz_grid = G.H.nz;
+
+  int nGHST = nGHST_grid ;
+
+  Real d, d_inv, vx, vy, vz, E, ge1, ge2, Emax;
+  int k, j, i, id;
+  int imo, ipo, jmo, jpo, kmo, kpo;
+  for ( k=0; k<nz_grid; k++ ){
+    for ( j=0; j<ny_grid; j++ ){
+      for ( i=0; i<nx_grid; i++ ){
+        if ( (i < 1) || (i > (nx_grid - 2) ) ) continue;
+        if ( (j < 1) || (j > (ny_grid - 2) ) ) continue;
+        if ( (k < 1) || (k > (nz_grid - 2) ) ) continue;
+
+        id  = (i) + (j)*nx_grid + (k)*ny_grid*nz_grid;
+        imo = (i-1) + (j)*nx_grid + (k)*ny_grid*nz_grid;
+        ipo = (i+1) + (j)*nx_grid + (k)*ny_grid*nz_grid;
+        jmo = (i) + (j-1)*nx_grid + (k)*ny_grid*nz_grid;
+        jpo = (i) + (j+1)*nx_grid + (k)*ny_grid*nz_grid;
+        kmo = (i) + (j)*nx_grid + (k-1)*ny_grid*nz_grid;
+        kpo = (i) + (j)*nx_grid + (k+1)*ny_grid*nz_grid;
+
+        d = G.C.density[id];
+        d_inv = 1/d;
+        vx = G.C.momentum_x[id] * d_inv;
+        vy = G.C.momentum_y[id] * d_inv;
+        vz = G.C.momentum_z[id] * d_inv;
+        E = G.C.Energy[id];
+
+        if (E < 0.0 || E != E) continue;
+
+        ge1 = G.C.GasEnergy[id];
+        ge2 = E - 0.5*d*(vx*vx + vy*vy + vz*vz);
+        // std::cout << ge2/E << std::endl;
+        if (ge2 > 0.0 && E > 0.0 && ge2/E > 0.001) {
+          G.C.GasEnergy[id] = ge2;
+          ge1 = ge2;
+        }
+
+        //find the max nearby total energy
+        Emax = E;
+        Emax = std::max(G.C.Energy[imo], E);
+        Emax = std::max(Emax, G.C.Energy[ipo]);
+        Emax = std::max(Emax, G.C.Energy[jmo]);
+        Emax = std::max(Emax, G.C.Energy[jpo]);
+        Emax = std::max(Emax, G.C.Energy[kmo]);
+        Emax = std::max(Emax, G.C.Energy[kpo]);
+
+        if (ge2/Emax > 0.1 && ge2 > 0.0 && Emax > 0.0) {
+          G.C.GasEnergy[id] = ge2;
+        }
+        // sync the total energy with the internal energy
+        else {
+          if (ge1 > 0.0) G.C.Energy[id] += ge1 - ge2;
+          else G.C.GasEnergy[id] = ge2;
+        }
+
+        //InternalEnergy Floor at u=0.2
+        Real dens, u, u_physical;
+        // Real phi_0_gas = 0.01;                           //Unit Conversion
+        dens  =  d;
+        u = G.C.GasEnergy[id];
+        u_physical = u  * G.Cosmo.v_0_gas * G.Cosmo.v_0_gas / G.Cosmo.current_a / G.Cosmo.current_a;  //convert to physical km^2/s^2
+
+        //Boltazman constant
+        Real K_b = 1.38064852e-23; //m2 kg s-2 K-1
+
+        //Mass of proton
+        Real M_p = 1.6726219e-27; //kg
+
+        Real gamma = 1.6666667;
+
+        Real temp = u_physical / dens * 1e6 * (gamma - 1) * M_p / K_b ;
+
+        Real temp_0 = 1.0;
+        Real u_new, delta_u;
+        if ( temp < temp_0 ){
+          temp = temp_0;
+          u_new = temp * dens * 1e-6 / (gamma - 1) / M_p * K_b ;
+          delta_u = u_new - u_physical;
+          delta_u = delta_u / G.Cosmo.v_0_gas / G.Cosmo.v_0_gas * G.Cosmo.current_a * G.Cosmo.current_a;
+          G.C.GasEnergy[id] += delta_u;
+          G.C.Energy[id] += delta_u;
+        }
+      }
+    }
+  }
+}
+
+void Set_dt( Grid3D &G, bool &output_now, int n_step ){
 
   #ifdef COSMOLOGY
   Real delta_a_part;
@@ -244,13 +491,20 @@ void Set_dt( Grid3D &G, bool &output_now ){
     chprintf( " Seting max delta_a: %f\n", da_courant );
   }
 
+  Real da_min = delta_a_part / 200;
+  if ( da_courant < da_min ){
+    da_courant = da_min;
+    chprintf( " Seting min delta_a: %f\n", da_courant );
+  }
+
 
   G.Cosmo.delta_a = da_courant;
   if ( (G.Cosmo.current_a + G.Cosmo.delta_a) >  G.Cosmo.next_output ){
     G.Cosmo.delta_a = G.Cosmo.next_output - G.Cosmo.current_a;
     output_now = true;
-    // chprintf( " ################################## \n");
   }
+  // if ( n_step%1 == 0)  output_now = true;
+
   Real dt = G.Cosmo.Get_dt_from_da( G.Cosmo.delta_a );
   G.Cosmo.dt_secs = dt * G.Cosmo.time_conversion;
   G.Cosmo.t_secs += G.Cosmo.dt_secs;
@@ -260,7 +514,6 @@ void Set_dt( Grid3D &G, bool &output_now ){
 
   dt_gas = G.Cosmo.Get_Cosmology_dt( G.Cosmo.delta_a );
   G.H.dt = dt_gas;
-  // Real dt_courant = dt_gas*G.Cosmo.t_0_gas;
 
   chprintf( " Current_a: %f    delta_a: %f     da_courant: %f  dt:  %f\n", G.Cosmo.current_a, G.Cosmo.delta_a, da_courant, dt  );
   chprintf( " t_physical: %f Myr   dt_physical: %f Myr\n", G.Cosmo.t_secs/MYR, G.Cosmo.dt_secs/MYR );

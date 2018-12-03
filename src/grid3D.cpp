@@ -305,6 +305,24 @@ void Grid3D::AllocateMemory(void)
 }
 
 
+#ifdef GRAVITY_CORRECTOR
+void Grid3D::set_dt_corrector(){
+ Real max_dti;
+
+ max_dti = calc_dti_CPU();
+
+
+
+ #ifdef MPI_CHOLLA
+ max_dti = ReduceRealMax(max_dti);
+ #endif /*MPI_CHOLLA*/
+
+ H.dt = C_cfl / max_dti;
+
+}
+
+#endif
+
 /*! \fn Real calc_dti_CPU()
  *  \brief Calculate the maximum inverse timestep, according to the CFL condition (Toro 6.17). */
 Real Grid3D::calc_dti_CPU()
@@ -518,6 +536,27 @@ Real Grid3D::Update_Grid(void)
   #ifdef DE
   C.GasEnergy = &g1[(H.n_fields-1)*H.n_cells];
   #endif
+
+  #ifdef GRAVITY_CORRECTOR
+  Grav.F.density_prev = &g0[0];
+  Grav.F.momentum_x_prev = &g0[H.n_cells];
+  Grav.F.momentum_y_prev = &g0[2*H.n_cells];
+  Grav.F.momentum_z_prev = &g0[3*H.n_cells];
+  Grav.F.Energy_prev = &g0[4*H.n_cells];
+
+  #ifndef DE
+  Grav.F.Grav_potential_prev = &g0[(H.n_fields-1)*H.n_cells];
+  #endif
+  #ifdef DE
+  Grav.F.Grav_potential_prev = &g0[(H.n_fields-2)*H.n_cells];
+  #endif
+
+  #ifdef DE
+  Grav.F.GasEnergy_prev = &g0[(H.n_fields-1)*H.n_cells];
+  #endif
+
+  #endif
+
 
   // reset the grid flag to swap buffers
   gflag = (gflag+1)%2;

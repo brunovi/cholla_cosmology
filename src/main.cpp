@@ -216,7 +216,7 @@ int main(int argc, char *argv[])
   bool output_now = false;
   // Evolve the grid, one timestep at a time
   chprintf("Starting calculations.\n");
-  P.tout = 0;
+  // P.tout = 0;
   while (G.H.t < P.tout)
   //while (G.H.n_step < 1)
   {
@@ -225,7 +225,11 @@ int main(int argc, char *argv[])
     start_step = get_time();
 
     // calculate the timestep
+    #ifndef GRAVITY_CORRECTOR
     G.set_dt(dti);
+    #else
+    G.set_dt_corrector();
+    #endif
 
     if (G.H.t + G.H.dt > outtime)
     {
@@ -238,7 +242,7 @@ int main(int argc, char *argv[])
 
 
     #ifdef GRAVITY
-    Set_dt( G, output_now );
+    Set_dt( G, output_now, G.H.n_step + 1 );
     #endif
 
     #ifdef PARTICLES
@@ -313,6 +317,27 @@ int main(int argc, char *argv[])
     bound_avg = ReduceRealAvg(bound);
     #endif //MPI_CHOLLA
     #endif //CPU_TIME
+
+    //Correct gravity in hydro
+    #ifdef GRAVITY_CORRECTOR
+    Apply_Gavity_Corrector( G );
+    Sync_Energies_3D_Host( G );
+    // set boundary conditions for next time step
+    #ifdef CPU_TIME
+    start_bound = get_time();
+    #endif //CPU_TIME
+    G.Set_Boundary_Conditions(P);
+    #ifdef CPU_TIME
+    stop_bound = get_time();
+    bound = stop_bound - start_bound;
+    chprintf( " Time Boundaries: %f\n", bound*1000 );
+    #ifdef MPI_CHOLLA
+    bound_min = ReduceRealMin(bound);
+    bound_max = ReduceRealMax(bound);
+    bound_avg = ReduceRealAvg(bound);
+    #endif //MPI_CHOLLA
+    #endif //CPU_TIME
+    #endif
 
     #ifdef PARTICLES
     //Advance the particles ( second step )

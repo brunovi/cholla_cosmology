@@ -315,9 +315,10 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
 
     #ifdef GRAVITY
     d_n  =  dev_conserved[            id];
-
+    Real d_floor = 1e-5;
     if ( d_n < 0 ){
-      d_n = 1e-5;
+      printf("###Thread density change  %f -> %f \n", d, d_floor );
+      d_n = d_floor;
       dev_conserved[            id] = d_n;
     }
 
@@ -350,25 +351,40 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
 
     Real Ek_0 = 0.5*d_n*( vx_n*vx_n + vy_n*vy_n + vz_n*vz_n );
 
+    // dev_conserved[4*n_cells + id] += 0.25*dt*gx*(d + d_n)*(vx + vx_n)
+    // +  0.25*dt*gy*(d + d_n)*(vy + vy_n)
+    // +  0.25*dt*gz*(d + d_n)*(vz + vz_n);
+    // dev_conserved[4*n_cells + id] += 0.5*dt*gx*(d*vx + d_n*vx_n)
+    // +  0.5*dt*gy*(d*vy + d_n*vy_n)
+    // +  0.5*dt*gz*(d*vz + d_n*vz_n);
+
+    #ifdef GRAVITY_CORRECTOR
+    dev_conserved[  n_cells + id] += 0.5 * dt*gx*(d);
+    dev_conserved[2*n_cells + id] += 0.5 * dt*gy*(d);
+    dev_conserved[3*n_cells + id] += 0.5 * dt*gz*(d);
+    Real delta_E_gravWork = 0.5 * dt * d * ( gx*vx +  gy*vy + gz*vz );
+    #else
     dev_conserved[  n_cells + id] += 0.5*dt*gx*(d + d_n);
     dev_conserved[2*n_cells + id] += 0.5*dt*gy*(d + d_n);
     dev_conserved[3*n_cells + id] += 0.5*dt*gz*(d + d_n);
-    dev_conserved[4*n_cells + id] += 0.25*dt*gx*(d + d_n)*(vx + vx_n)
-    +  0.25*dt*gy*(d + d_n)*(vy + vy_n)
-    +  0.25*dt*gz*(d + d_n)*(vz + vz_n);
+    Real delta_E_gravWork = 0.5*dt*gx*(d*vx + d_n*vx_n) +  0.5*dt*gy*(d*vy + d_n*vy_n) +  0.5*dt*gz*(d*vz + d_n*vz_n);
+    #endif
+
+    dev_conserved[4*n_cells + id] += delta_E_gravWork;
+
+    // vx_n =  dev_conserved[1*n_cells + id] * d_inv_n;
+    // vy_n =  dev_conserved[2*n_cells + id] * d_inv_n;
+    // vz_n =  dev_conserved[3*n_cells + id] * d_inv_n;
+    //
+    // Real Ek_1 = 0.5*d_n*( vx_n*vx_n + vy_n*vy_n + vz_n*vz_n );
+    // Real delta_Ek = Ek_1 - Ek_0;
+    // dev_conserved[4*n_cells + id] += 0.5 *( delta_Ek + delta_E_gravWork );
 
     // dev_conserved[  n_cells + id] = 0;
     // dev_conserved[2*n_cells + id] = 0;
     // dev_conserved[3*n_cells + id] = 0;
     // dev_conserved[4*n_cells + id] = dev_conserved[(n_fields-1)*n_cells + id];
 
-    vx_n =  dev_conserved[1*n_cells + id] * d_inv_n;
-    vy_n =  dev_conserved[2*n_cells + id] * d_inv_n;
-    vz_n =  dev_conserved[3*n_cells + id] * d_inv_n;
-
-    Real Ek_1 = 0.5*d_n*( vx_n*vx_n + vy_n*vy_n + vz_n*vz_n );
-    Real delta_Ek = Ek_1 - Ek_0;
-    // dev_conserved[4*n_cells + id] += delta_Ek;
 
     #endif
 
@@ -376,23 +392,29 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
     Real u, u_floor, delta_u, E;
     u = dev_conserved[(n_fields-1)*n_cells + id];
     // u = u / current_a / current_a * phi_0_gas;  //convert to physical km^2/s^2
-    u_floor = 0.00001;
+    // u_floor = 0.00001;
+    u_floor = 1e-5;
     if ( u < u_floor ) {
       delta_u = u_floor - u;
+      // printf("###Thread GasEnergy change  %f -> %f \n", u, u_floor );
       u = u_floor;
-      // u = u_floor * current_a * current_a / phi_0_gas;  //convert back to comouving units
+      // u = u_floor * current_a * current_a / phi_0_gas;  //convert back to comuving units
       // E_n = d_n * u_n +  0.5*P2_2/d_n ;
       // dev_conserved[4*n_cells + id] = E_n;
       dev_conserved[(n_fields-1)*n_cells + id] = u;
       dev_conserved[4*n_cells + id] += delta_u ;
     }
+
+    // #ifndef GRAVITY_CORRECTOR
     u_floor = 0;
     E = dev_conserved[4*n_cells + id];
     if ( E < u_floor ){
       delta_u += u_floor - E;
+      printf("###Thread Energy change  %f -> %f \n", E, u_floor );
       dev_conserved[(n_fields-1)*n_cells + id] += delta_u;
       dev_conserved[4*n_cells + id] += delta_u;
     }
+    // #endif
 
 
 

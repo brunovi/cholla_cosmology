@@ -78,12 +78,30 @@ void Grav3D::AllocateMemory_CPU(void)
   F.density_h    = (Real *) malloc(n_cells*sizeof(Real));
   F.potential_h  = (Real *) malloc(n_cells_potential*sizeof(Real));
   F.potential_1_h  = (Real *) malloc(n_cells_potential*sizeof(Real));
+
+  #ifdef GRAVITY_CORRECTOR
+  F.gravity_x_h  = (Real *) malloc(n_cells*sizeof(Real));
+  F.gravity_y_h  = (Real *) malloc(n_cells*sizeof(Real));
+  F.gravity_z_h  = (Real *) malloc(n_cells*sizeof(Real));
+  F.gravity_x_h_prev  = (Real *) malloc(n_cells*sizeof(Real));
+  F.gravity_y_h_prev  = (Real *) malloc(n_cells*sizeof(Real));
+  F.gravity_z_h_prev  = (Real *) malloc(n_cells*sizeof(Real));
+  #endif
+
 }
 
 void Grav3D::Initialize_values_CPU(void){
 
   for (int id=0; id<n_cells; id++){
     F.density_h[id] = 0;
+    #ifdef GRAVITY_CORRECTOR
+    F.gravity_x_h[id] = 0;
+    F.gravity_y_h[id] = 0;
+    F.gravity_z_h[id] = 0;
+    F.gravity_x_h_prev[id] = 0;
+    F.gravity_y_h_prev[id] = 0;
+    F.gravity_z_h_prev[id] = 0;
+    #endif
   }
 
   for (int id_pot=0; id_pot<n_cells_potential; id_pot++){
@@ -97,6 +115,15 @@ void Grav3D::FreeMemory_CPU(void)
   free(F.density_h);
   free(F.potential_h);
   free(F.potential_1_h);
+
+  #ifdef GRAVITY_CORRECTOR
+  free(F.gravity_x_h);
+  free(F.gravity_y_h);
+  free(F.gravity_z_h);
+  free(F.gravity_x_h_prev);
+  free(F.gravity_y_h_prev);
+  free(F.gravity_z_h_prev);
+  #endif
 }
 
 #endif
