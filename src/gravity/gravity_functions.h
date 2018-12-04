@@ -49,7 +49,6 @@ void Get_Gavity_Corrector( Grid3D &G, int g_start, int g_end);
 void Apply_Gavity_Corrector( Grid3D &G );
 
 
-void Sync_Energies_3D_Host(Grid3D &G );
 
 void Extrapolate_Grav_Potential( Grid3D &G  );
 

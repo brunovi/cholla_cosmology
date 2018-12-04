@@ -39,13 +39,14 @@ using namespace std;
 #include "cosmology/cosmology_units.h"
 #include "cosmology/io_cosmology.h"
 #endif
-
 #endif
 
 #ifdef COOLING_GRACKLE
 #include "cooling/cool_grackle.h"
 #include "cooling/grackle_functions.h"
 #endif
+
+#include "correction_functions.h"
 
 #define OUTPUT
 #define CPU_TIME
