@@ -78,13 +78,7 @@ Real Cosmology::Get_da_from_dt( Real dt ){
   Real a_dot = sqrt( Omega_M/current_a + a2*Omega_L) * H0 ;
   return a_dot * dt;
 }
-// Real Cosmology::Get_dt_from_da( Real da ){
-//   Real a2, a3, d_a;
-//   a2 = current_a * current_a;
-//   a3 = a2 * current_a;
-//   d_a = current_a * sqrt( Omega_M/a3 + Omega_K/a2 + Omega_L);
-//   return da / d_a / current_a / current_a;
-// }
+
 
 Real Cosmology::Get_dt_from_da( Real da ){
   Real a2 = current_a * current_a;
@@ -105,11 +99,6 @@ Real Cosmology::Get_Cosmology_dt( Real da ){
   d_a = current_a * sqrt( Omega_M/a3 + Omega_K/a2 + Omega_L);
   dt = da / d_a / current_a / current_a;
   return dt;
-    // Real a2, a3, d_a;
-    // a2 = current_a * current_a;
-    // a3 = a2 * current_a;
-    // d_a = current_a * sqrt( Omega_M/a3 + Omega_K/a2 + Omega_L) * H0 ;
-    // return da / d_a / current_a / current_a * cosmo_h;
 }
 
 Real Cosmology::Get_da_courant( Real dt ){

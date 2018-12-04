@@ -336,10 +336,6 @@ class Grid3D
      *  \brief Calculate the timestep. */
     void set_dt(Real dti);
 
-    #ifdef GRAVITY_CORRECTOR
-    void set_dt_corrector();
-    #endif
-
     /*! \fn Real calc_dti_CPU()
      *  \brief Calculate the maximum inverse timestep, according to the CFL condition (Toro 6.17). */
     Real calc_dti_CPU();

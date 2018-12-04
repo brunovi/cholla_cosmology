@@ -223,36 +223,40 @@ Real Get_Particles_da_cosmo( Grid3D &G ){
 
 Real Get_Particles_dt_cosmo( Grid3D &G ){
   part_int_t pID;
-  Real dt, dt_min, vel;
-  dt_min = 1e100;
-  Real current_a = G.Cosmo.current_a;
-  Real cosmo_h = G.Cosmo.cosmo_h;
+  Real da, da_min, vel;
+  da_min = 1e100;
+  Real scale_factor = Scale_Function( G.Cosmo.current_a , G.Cosmo.Omega_M, G.Cosmo.Omega_L, G.Cosmo.Omega_K  ) / G.Cosmo.H0 * G.Cosmo.cosmo_h;
+  Real a2 = ( G.Cosmo.current_a )*( G.Cosmo.current_a  );
+  Real vel_factor = a2 / scale_factor;
 
-  Real vel_factor =  current_a/ cosmo_h;
 
   for ( pID=0; pID<G.Particles.n_local; pID++ ){
     vel = abs(G.Particles.vel_x[pID]);
     if ( vel > 0){
-      dt = G.Particles.G.dx * vel_factor / vel;
-      dt_min = std::min( dt_min, dt);
+      da = G.Particles.G.dx * vel_factor / vel;
+      da_min = std::min( da_min, da);
     }
     vel = abs(G.Particles.vel_y[pID]);
     if ( vel > 0){
-      dt = G.Particles.G.dy * vel_factor / vel;
-      dt_min = std::min( dt_min, dt);
+      da = G.Particles.G.dy * vel_factor / vel;
+      da_min = std::min( da_min, da);
     }
     vel = abs(G.Particles.vel_z[pID]);
     if ( vel > 0){
-      dt = G.Particles.G.dz * vel_factor / vel;
-      dt_min = std::min( dt_min, dt);
+      da = G.Particles.G.dz * vel_factor / vel;
+      da_min = std::min( da_min, da);
     }
   }
 
-  #ifdef MPI_CHOLLA
-  Real dt_min_global = ReduceRealMin(dt_min);
-  dt_min = dt_min_global;
-  #endif
-  return G.Particles.C_cfl * dt_min;
+  Real dt_cosmo = G.Cosmo.Get_Cosmology_dt( da_min );
+
+  //
+  // #ifdef MPI_CHOLLA
+  // Real da_min_global = ReduceRealMin(da_min);
+  // da_min = da_min_global;
+  // #endif
+  // return G.Particles.C_cfl * da_min;
+  return G.Particles.C_cfl * dt_cosmo;
 }
 #endif
 

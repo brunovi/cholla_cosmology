@@ -38,7 +38,9 @@
 // #include "grav3D.h"
 // #endif
 
-
+#ifdef COSMOLOGY
+#include "particles/particles_dynamics.h"
+#endif
 
 
 /*! \fn Grid3D(void)
@@ -276,6 +278,14 @@ void Grid3D::AllocateMemory(void)
 {
   Real max_dti;
 
+  #ifdef COSMOLOGY
+  H.dt = 1e10;
+  return;
+  #else
+
+  #ifdef GRAVITY_CORRECTOR
+  max_dti = calc_dti_CPU();
+  #else
   if (H.n_step == 0) {
     max_dti = calc_dti_CPU();
   }
@@ -287,6 +297,15 @@ void Grid3D::AllocateMemory(void)
     max_dti = dti;
     #endif /*CUDA*/
   }
+  #endif
+
+  // #ifdef COSMOLOGY
+  // Real dt_cosmo, dt_hydro, min_dt;
+  // dt_cosmo = Get_Particles_dt_cosmo( *this );
+  // dt_hydro = 1./max_dti * C_cfl;
+  // min_dt = fmin( dt_hydro, dt_cosmo );
+  // max_dti = 1./min_dt;
+  // #endif
 
   #ifdef MPI_CHOLLA
   max_dti = ReduceRealMax(max_dti);
@@ -300,28 +319,15 @@ void Grid3D::AllocateMemory(void)
     H.dt = C_cfl / max_dti;
   */
   //chprintf("Within set_dt: %f %f %f\n", C_cfl, H.dt, max_dti);
+
+  // #ifdef COSMOLOGY
+  // H.dt = 1. / max_dti; //The hydro C_cfl was already applied when comparing to dt_min_cosmo
+  // #else
   H.dt = C_cfl / max_dti;
+  // #endif
 
+  #endif
 }
-
-
-#ifdef GRAVITY_CORRECTOR
-void Grid3D::set_dt_corrector(){
- Real max_dti;
-
- max_dti = calc_dti_CPU();
-
-
-
- #ifdef MPI_CHOLLA
- max_dti = ReduceRealMax(max_dti);
- #endif /*MPI_CHOLLA*/
-
- H.dt = C_cfl / max_dti;
-
-}
-
-#endif
 
 /*! \fn Real calc_dti_CPU()
  *  \brief Calculate the maximum inverse timestep, according to the CFL condition (Toro 6.17). */

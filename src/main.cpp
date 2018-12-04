@@ -226,12 +226,9 @@ int main(int argc, char *argv[])
     start_step = get_time();
 
     // calculate the timestep
-    #ifndef GRAVITY_CORRECTOR
     G.set_dt(dti);
-    #else
-    G.set_dt_corrector();
-    #endif
 
+    #ifndef COSMOLOGY
     if (G.H.t + G.H.dt > outtime)
     {
       G.H.dt = outtime - G.H.t;
@@ -240,16 +237,13 @@ int main(int argc, char *argv[])
     #ifdef MPI_CHOLLA
     G.H.dt = ReduceRealMin(G.H.dt);
     #endif
+    #endif
 
 
     #ifdef GRAVITY
     Set_dt( G, output_now, G.H.n_step + 1 );
     #endif
 
-    #ifdef PARTICLES
-    //Advance the particles ( first step )
-    time_advance_particles = Update_Particles( G, 1 );
-    #endif
 
     // Extrapolate gravitational potential for hydro step
     #ifdef GRAVITY
@@ -262,8 +256,6 @@ int main(int argc, char *argv[])
     #endif //CPU_TIME
     #ifndef ONLY_PM
     dti = G.Update_Grid();
-    #else
-    dti = 1e-10;
     #endif
     #ifdef CPU_TIME
     stop_hydro = get_time();
@@ -276,6 +268,11 @@ int main(int argc, char *argv[])
     #endif //MPI_CHOLLA
     #endif //CPU_TIME
     //printf("%d After Grid Update: %f %f\n", procID, G.H.dt, dti);
+
+    #ifdef PARTICLES
+    //Advance the particles ( first step )
+    time_advance_particles = Update_Particles( G, 1 );
+    #endif
 
     // update the time
     G.H.t += G.H.dt;
