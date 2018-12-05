@@ -359,11 +359,11 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
     // +  0.5*dt*gz*(d*vz + d_n*vz_n);
 
     #ifdef GRAVITY_CORRECTOR
-    // dev_conserved[  n_cells + id] +=  dt*gx*d;
-    // dev_conserved[2*n_cells + id] +=  dt*gy*d;
-    // dev_conserved[3*n_cells + id] +=  dt*gz*d;
-    // Real delta_E_gravWork =  dt * d * ( gx*vx +  gy*vy + gz*vz );
-    // dev_conserved[4*n_cells + id] += delta_E_gravWork;
+    dev_conserved[  n_cells + id] +=  dt*gx*d;
+    dev_conserved[2*n_cells + id] +=  dt*gy*d;
+    dev_conserved[3*n_cells + id] +=  dt*gz*d;
+    Real delta_E_gravWork =  dt * d * ( gx*vx +  gy*vy + gz*vz );
+    dev_conserved[4*n_cells + id] += delta_E_gravWork;
     #else
     dev_conserved[  n_cells + id] += 0.5*dt*gx*(d + d_n);
     dev_conserved[2*n_cells + id] += 0.5*dt*gy*(d + d_n);

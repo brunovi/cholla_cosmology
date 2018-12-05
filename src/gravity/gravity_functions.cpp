@@ -232,7 +232,7 @@ void Get_Gavity_Corrector( Grid3D &G, int g_start, int g_end ){
 
   Real delta_max, delta;
   delta_max = 100000;
-  Real pot_factor = 1. / G.Cosmo.phi_0_gas * G.Cosmo.current_a * G.Cosmo.current_a ;
+  Real pot_factor = 1. / G.Cosmo.phi_0_gas * (G.Cosmo.current_a - G.Cosmo.delta_a) * (G.Cosmo.current_a - G.Cosmo.delta_a) ;
   Real phi_l, phi_r;
   int k, j, i, id_l, id_r, id;
   for ( k=g_start; k<g_end; k++ ){
@@ -326,34 +326,35 @@ void Add_Gravity_Corrector( Grid3D &G, int g_start, int g_end ){
         gx_0 = G.Grav.F.gravity_x_h_prev[id_grav];
         gy_0 = G.Grav.F.gravity_y_h_prev[id_grav];
         gz_0 = G.Grav.F.gravity_z_h_prev[id_grav];
-        //
-
 
         d = G.C.density[id_grid];
         vx = G.C.momentum_x[id_grid] / d;
         vy = G.C.momentum_y[id_grid] / d;
         vz = G.C.momentum_z[id_grid] / d;
-        // gx = G.Grav.F.gravity_x_h[id_grav] / G.Cosmo.phi_0_gas * current_a_prev * current_a_prev;
-        // gy = G.Grav.F.gravity_y_h[id_grav] / G.Cosmo.phi_0_gas * current_a_prev * current_a_prev;
-        // gz = G.Grav.F.gravity_z_h[id_grav] / G.Cosmo.phi_0_gas * current_a_prev * current_a_prev;
         gx = G.Grav.F.gravity_x_h[id_grav];
         gy = G.Grav.F.gravity_y_h[id_grav];
         gz = G.Grav.F.gravity_z_h[id_grav];
 
-        G.C.momentum_x[id_grid] +=  G.H.dt * d_0 * gx_0;
-        G.C.momentum_y[id_grid] +=  G.H.dt * d_0 * gy_0;
-        G.C.momentum_z[id_grid] +=  G.H.dt * d_0 * gz_0;
-        G.C.Energy[id_grid] +=  G.H.dt * d_0 * ( vx_0*gx_0 + vy_0*gy_0 + vz_0*gz_0 );
+        G.C.momentum_x[id_grid] -= 0.5 * G.H.dt * d_0 * gx_0;
+        G.C.momentum_y[id_grid] -= 0.5 * G.H.dt * d_0 * gy_0;
+        G.C.momentum_z[id_grid] -= 0.5 * G.H.dt * d_0 * gz_0;
+        G.C.Energy[id_grid] -= 0.5 * G.H.dt * d_0 * ( vx_0*gx_0 + vy_0*gy_0 + vz_0*gz_0 );
+
+        G.C.momentum_x[id_grid] += 0.5 * G.H.dt * d * gx;
+        G.C.momentum_y[id_grid] += 0.5 * G.H.dt * d * gy;
+        G.C.momentum_z[id_grid] += 0.5 * G.H.dt * d * gz;
+        G.C.Energy[id_grid] += 0.5 * G.H.dt * ( d*vx*gx + d*vy*gy + d*vz*gz );
+
+        // G.C.momentum_x[id_grid] +=  G.H.dt * d_0 * gx_0;
+        // G.C.momentum_y[id_grid] +=  G.H.dt * d_0 * gy_0;
+        // G.C.momentum_z[id_grid] +=  G.H.dt * d_0 * gz_0;
+        // G.C.Energy[id_grid] +=  G.H.dt * d_0 * ( vx_0*gx_0 + vy_0*gy_0 + vz_0*gz_0 );
 
         // G.C.momentum_x[id_grid] +=  G.H.dt * d * gx;
         // G.C.momentum_y[id_grid] +=  G.H.dt * d * gy;
         // G.C.momentum_z[id_grid] +=  G.H.dt * d * gz;
         // G.C.Energy[id_grid] +=  G.H.dt * d * ( vx*gx + vy*gy + vz*gz );
 
-        // G.C.momentum_x[id_grid] += 0.5 * G.H.dt * d * gx;
-        // G.C.momentum_y[id_grid] += 0.5 * G.H.dt * d * gy;
-        // G.C.momentum_z[id_grid] += 0.5 * G.H.dt * d * gz;
-        // G.C.Energy[id_grid] += 0.5 * G.H.dt * ( d*vx*gx + d*vy*gy + d*vz*gz );
 
 
         // u_floor = 0;
