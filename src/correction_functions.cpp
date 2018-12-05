@@ -97,3 +97,92 @@ void Sync_Energies_3D_Host(Grid3D &G ){
     }
   }
 }
+
+void Get_Delta_Conserved( Grid3D &G ){
+
+  int nx_grid, ny_grid, nz_grid, nGHST_grid;
+  nGHST_grid = G.H.n_ghost;
+  nx_grid = G.H.nx;
+  ny_grid = G.H.ny;
+  nz_grid = G.H.nz;
+
+  int nGHST = nGHST_grid ;
+
+  // Real d, d_inv, vx, vy, vz, E, ge1, ge2, Emax;
+  Real v_1, v_0, delta_v, delta_max;
+  delta_max = 0.3;
+  int k, j, i, id;
+  for ( k=0; k<nz_grid; k++ ){
+    for ( j=0; j<ny_grid; j++ ){
+      for ( i=0; i<nx_grid; i++ ){
+        if ( (i < nGHST) || (i > (nx_grid - nGHST - 1) ) ) continue;
+        if ( (j < nGHST) || (j > (ny_grid - nGHST - 1 ) ) ) continue;
+        if ( (k < nGHST) || (k > (nz_grid - nGHST -1 ) ) ) continue;
+
+        id  = (i) + (j)*nx_grid + (k)*ny_grid*nz_grid;
+        //
+        // //Compare density
+        // v_0 = G.C.density_0[id];
+        // v_1 = G.C.density[id];
+        // delta_v = fabs( (v_1 - v_0 )/ v_0 );
+        // if ( delta_v > delta_max ){
+        //   std::cout << "### Delta density: " << delta_v << " delta_max: " << delta_max << std::endl;
+        // }
+
+        // //Compare momentum_x
+        // v_0 = G.C.momentum_x_0[id];
+        // v_1 = G.C.momentum_x[id];
+        // delta_v = fabs( (v_1 - v_0 )/ v_0 );
+        // if ( delta_v > delta_max ){
+        //   std::cout << "### Delta momentum_x: " << delta_v << " delta_max: " << delta_max << " v0: " << v_0 << " v1: " << v_1 << std::endl;
+        // }
+        //
+        // //Compare momentum_x
+        // v_0 = G.C.momentum_y_0[id];
+        // v_1 = G.C.momentum_y[id];
+        // delta_v = fabs( (v_1 - v_0 )/ v_0 );
+        // if ( delta_v > delta_max ){
+        //   std::cout << "### Delta momentum_y: " << delta_v << " delta_max: " << delta_max << " v0: " << v_0 << " v1: " << v_1 << std::endl;
+        // }
+        //
+        // //Compare momentum_x
+        // v_0 = G.C.momentum_z_0[id];
+        // v_1 = G.C.momentum_z[id];
+        // delta_v = fabs( (v_1 - v_0 )/ v_0 );
+        // if ( delta_v > delta_max ){
+        //   std::cout << "### Delta momentum_z: " << delta_v << " delta_max: " << delta_max << " v0: " << v_0 << " v1: " << v_1 << std::endl;
+        // }
+
+        // //Compare Energy
+        // v_0 = G.C.Energy_0[id];
+        // v_1 = G.C.Energy[id];
+        // delta_v = fabs( (v_1 - v_0 )/ v_0 );
+        // if ( delta_v > delta_max ){
+        //   std::cout << "### Delta Energy: " << delta_v << " delta_max: " << delta_max << std::endl;
+        // }
+        //
+        // #ifdef DE
+        // //Compare GasEnergy
+        // v_0 = G.C.GasEnergy_0[id];
+        // v_1 = G.C.GasEnergy[id];
+        // delta_v = fabs( (v_1 - v_0 )/ v_0 );
+        // if ( delta_v > delta_max ){
+        //   std::cout << "### Delta GasEnergy: " << delta_v << " delta_max: " << delta_max << std::endl;
+        // }
+        // #endif
+
+        // //Compare Grav_potential
+        // v_0 = G.C.Grav_potential_0[id];
+        // v_1 = G.C.Grav_potential[id] /  G.Cosmo.phi_0_gas * G.Cosmo.current_a * G.Cosmo.current_a ;
+        // delta_v = fabs( (v_1 - v_0 )/ v_0 );
+        // if ( delta_v > delta_max ){
+        //   std::cout << "### Grav Potential: " << delta_v << " delta_max: " << delta_max << std::endl;
+        // }
+
+
+      }
+    }
+  }
+
+
+}

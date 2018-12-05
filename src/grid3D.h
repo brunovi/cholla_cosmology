@@ -305,6 +305,21 @@ class Grid3D
       Real *Grav_potential;
       #endif
 
+      //Arrays for conserved variables at the begining of the timesteps
+      Real *density_0;
+      Real *momentum_x_0;
+      Real *momentum_y_0;
+      Real *momentum_z_0;
+      Real *Energy_0;
+
+      #ifdef DE
+      Real *GasEnergy_0;
+      #endif
+
+      #ifdef GRAVITY
+      Real *Grav_potential_0;
+      #endif
+
     } C;
 
 

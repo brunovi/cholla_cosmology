@@ -230,7 +230,9 @@ void Get_Gavity_Corrector( Grid3D &G, int g_start, int g_end ){
   dy = G.Grav.dy;
   dz = G.Grav.dz;
 
-
+  Real delta_max, delta;
+  delta_max = 100000;
+  Real pot_factor = 1. / G.Cosmo.phi_0_gas * G.Cosmo.current_a * G.Cosmo.current_a ;
   Real phi_l, phi_r;
   int k, j, i, id_l, id_r, id;
   for ( k=g_start; k<g_end; k++ ){
@@ -239,12 +241,14 @@ void Get_Gavity_Corrector( Grid3D &G, int g_start, int g_end ){
         id   = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
         id_l = (i-1 + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
         id_r = (i+1 + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
-        phi_l = G.C.Grav_potential[id_l];
-        phi_r = G.C.Grav_potential[id_r];
+        phi_l = G.C.Grav_potential[id_l] * pot_factor;
+        phi_r = G.C.Grav_potential[id_r] * pot_factor;
         G.Grav.F.gravity_x_h[id] = -0.5 * ( phi_r - phi_l ) / dx;
-        phi_l = G.Grav.F.Grav_potential_prev[id_l];
-        phi_r = G.Grav.F.Grav_potential_prev[id_r];
+        phi_l = G.C.Grav_potential_0[id_l] ;
+        phi_r = G.C.Grav_potential_0[id_r] ;
         G.Grav.F.gravity_x_h_prev[id] = -0.5 * ( phi_r - phi_l ) / dx;
+        delta = fabs( (G.Grav.F.gravity_x_h_prev[id] - G.Grav.F.gravity_x_h[id]) / G.Grav.F.gravity_x_h_prev[id] );
+        if ( delta > delta_max ) std::cout << "### Grav X: " << delta<< " delta_max: " << delta_max << std::endl;
       }
     }
   }
@@ -255,12 +259,14 @@ void Get_Gavity_Corrector( Grid3D &G, int g_start, int g_end ){
         id   = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
         id_l = (i + nGHST) + (j-1 + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
         id_r = (i + nGHST) + (j+1 + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
-        phi_l = G.C.Grav_potential[id_l];
-        phi_r = G.C.Grav_potential[id_r];
+        phi_l = G.C.Grav_potential[id_l] * pot_factor;
+        phi_r = G.C.Grav_potential[id_r] * pot_factor;
         G.Grav.F.gravity_y_h[id] = -0.5 * ( phi_r - phi_l ) / dy;
-        phi_l = G.Grav.F.Grav_potential_prev[id_l];
-        phi_r = G.Grav.F.Grav_potential_prev[id_r];
+        phi_l = G.C.Grav_potential_0[id_l] ;
+        phi_r = G.C.Grav_potential_0[id_r] ;
         G.Grav.F.gravity_y_h_prev[id] = -0.5 * ( phi_r - phi_l ) / dy;
+        delta = fabs( (G.Grav.F.gravity_y_h_prev[id] - G.Grav.F.gravity_y_h[id]) / G.Grav.F.gravity_y_h_prev[id] );
+        if ( delta > delta_max ) std::cout << "### Grav Y: " << delta<< " delta_max: " << delta_max << std::endl;
       }
     }
   }
@@ -271,12 +277,14 @@ void Get_Gavity_Corrector( Grid3D &G, int g_start, int g_end ){
         id   = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
         id_l = (i + nGHST) + (j + nGHST)*nx_grid + (k-1 + nGHST)*ny_grid*nz_grid;
         id_r = (i + nGHST) + (j + nGHST)*nx_grid + (k+1 + nGHST)*ny_grid*nz_grid;
-        phi_l = G.C.Grav_potential[id_l];
-        phi_r = G.C.Grav_potential[id_r];
+        phi_l = G.C.Grav_potential[id_l] * pot_factor;
+        phi_r = G.C.Grav_potential[id_r] * pot_factor;
         G.Grav.F.gravity_z_h[id] = -0.5 * ( phi_r - phi_l ) / dz;
-        phi_l = G.Grav.F.Grav_potential_prev[id_l];
-        phi_r = G.Grav.F.Grav_potential_prev[id_r];
+        phi_l = G.C.Grav_potential_0[id_l];
+        phi_r = G.C.Grav_potential_0[id_r];
         G.Grav.F.gravity_z_h_prev[id] = -0.5 * ( phi_r - phi_l ) / dz;
+        delta = fabs( (G.Grav.F.gravity_z_h_prev[id] - G.Grav.F.gravity_z_h[id]) / G.Grav.F.gravity_z_h_prev[id] );
+        if ( delta > delta_max ) std::cout << "### Grav Z: " << delta<< " delta_max: " << delta_max << std::endl;
       }
     }
   }
@@ -311,36 +319,41 @@ void Add_Gravity_Corrector( Grid3D &G, int g_start, int g_end ){
         id_grav = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
         id_grid = (i + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
 
-        d_0 = G.Grav.F.density_prev[id_grid];
-        vx_0 = G.Grav.F.momentum_x_prev[id_grid] / d;
-        vy_0 = G.Grav.F.momentum_y_prev[id_grid] / d;
-        vz_0 = G.Grav.F.momentum_z_prev[id_grid] / d;
+        d_0 = G.C.density_0[id_grid];
+        vx_0 = G.C.momentum_x_0[id_grid] / d_0;
+        vy_0 = G.C.momentum_y_0[id_grid] / d_0;
+        vz_0 = G.C.momentum_z_0[id_grid] / d_0;
         gx_0 = G.Grav.F.gravity_x_h_prev[id_grav];
         gy_0 = G.Grav.F.gravity_y_h_prev[id_grav];
         gz_0 = G.Grav.F.gravity_z_h_prev[id_grav];
-
+        //
 
 
         d = G.C.density[id_grid];
         vx = G.C.momentum_x[id_grid] / d;
         vy = G.C.momentum_y[id_grid] / d;
         vz = G.C.momentum_z[id_grid] / d;
-        gx = G.Grav.F.gravity_x_h[id_grav] / G.Cosmo.phi_0_gas * current_a_prev * current_a_prev;
-        gy = G.Grav.F.gravity_y_h[id_grav] / G.Cosmo.phi_0_gas * current_a_prev * current_a_prev;
-        gz = G.Grav.F.gravity_z_h[id_grav] / G.Cosmo.phi_0_gas * current_a_prev * current_a_prev;
-        // gx = G.Grav.F.gravity_x_h[id_grav];
-        // gy = G.Grav.F.gravity_y_h[id_grav];
-        // gz = G.Grav.F.gravity_z_h[id_grav];
+        // gx = G.Grav.F.gravity_x_h[id_grav] / G.Cosmo.phi_0_gas * current_a_prev * current_a_prev;
+        // gy = G.Grav.F.gravity_y_h[id_grav] / G.Cosmo.phi_0_gas * current_a_prev * current_a_prev;
+        // gz = G.Grav.F.gravity_z_h[id_grav] / G.Cosmo.phi_0_gas * current_a_prev * current_a_prev;
+        gx = G.Grav.F.gravity_x_h[id_grav];
+        gy = G.Grav.F.gravity_y_h[id_grav];
+        gz = G.Grav.F.gravity_z_h[id_grav];
 
-        // G.C.momentum_x[id_grid] +=  G.H.dt * d_0 * gx_0;
-        // G.C.momentum_y[id_grid] +=  G.H.dt * d_0 * gy_0;
-        // G.C.momentum_z[id_grid] +=  G.H.dt * d_0 * gz_0;
-        // G.C.Energy[id_grid] +=  G.H.dt * ( d_0*vx_0*gx_0 + d_0*vy_0*gy_0 + d_0*vz_0*gz_0 );
+        G.C.momentum_x[id_grid] +=  G.H.dt * d_0 * gx_0;
+        G.C.momentum_y[id_grid] +=  G.H.dt * d_0 * gy_0;
+        G.C.momentum_z[id_grid] +=  G.H.dt * d_0 * gz_0;
+        G.C.Energy[id_grid] +=  G.H.dt * d_0 * ( vx_0*gx_0 + vy_0*gy_0 + vz_0*gz_0 );
 
-        G.C.momentum_x[id_grid] += 0.5 * G.H.dt * d * gx;
-        G.C.momentum_y[id_grid] += 0.5 * G.H.dt * d * gy;
-        G.C.momentum_z[id_grid] += 0.5 * G.H.dt * d * gz;
-        G.C.Energy[id_grid] += 0.5 * G.H.dt * ( d*vx*gx + d*vy*gy + d*vz*gz );
+        // G.C.momentum_x[id_grid] +=  G.H.dt * d * gx;
+        // G.C.momentum_y[id_grid] +=  G.H.dt * d * gy;
+        // G.C.momentum_z[id_grid] +=  G.H.dt * d * gz;
+        // G.C.Energy[id_grid] +=  G.H.dt * d * ( vx*gx + vy*gy + vz*gz );
+
+        // G.C.momentum_x[id_grid] += 0.5 * G.H.dt * d * gx;
+        // G.C.momentum_y[id_grid] += 0.5 * G.H.dt * d * gy;
+        // G.C.momentum_z[id_grid] += 0.5 * G.H.dt * d * gz;
+        // G.C.Energy[id_grid] += 0.5 * G.H.dt * ( d*vx*gx + d*vy*gy + d*vz*gz );
 
 
         // u_floor = 0;
@@ -398,11 +411,11 @@ void Set_dt( Grid3D &G, bool &output_now, int n_step ){
     chprintf( " Seting max delta_a: %f\n", da_courant );
   }
 
-  Real da_min = delta_a_part / 5000;
-  if ( da_courant < da_min ){
-    da_courant = da_min;
-    chprintf( " Seting min delta_a: %f\n", da_courant );
-  }
+  // Real da_min = delta_a_part / 5000;
+  // if ( da_courant < da_min ){
+  //   da_courant = da_min;
+  //   chprintf( " Seting min delta_a: %f\n", da_courant );
+  // }
 
 
   G.Cosmo.delta_a = da_courant;

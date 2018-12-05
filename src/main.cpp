@@ -269,6 +269,7 @@ int main(int argc, char *argv[])
     #endif //CPU_TIME
     //printf("%d After Grid Update: %f %f\n", procID, G.H.dt, dti);
 
+
     #ifdef PARTICLES
     //Advance the particles ( first step )
     time_advance_particles = Update_Particles( G, 1 );
@@ -316,6 +317,8 @@ int main(int argc, char *argv[])
     #endif //MPI_CHOLLA
     #endif //CPU_TIME
 
+
+
     //Correct gravity in hydro
     #ifdef GRAVITY_CORRECTOR
     Apply_Gavity_Corrector( G );
@@ -336,6 +339,9 @@ int main(int argc, char *argv[])
     #endif //MPI_CHOLLA
     #endif //CPU_TIME
     #endif
+
+    Get_Delta_Conserved( G );
+
 
     #ifdef PARTICLES
     //Advance the particles ( second step )

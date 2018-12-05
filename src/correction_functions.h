@@ -8,5 +8,7 @@
 
 void Sync_Energies_3D_Host(Grid3D &G );
 
+void Get_Delta_Conserved( Grid3D &G );
+
 
 #endif

@@ -95,13 +95,13 @@ class Grav3D
     Real *gravity_y_h_prev;
     Real *gravity_z_h_prev;
 
-    Real *density_prev;
-    Real *momentum_x_prev;
-    Real *momentum_y_prev;
-    Real *momentum_z_prev;
-    Real *Energy_prev;
-    Real *GasEnergy_prev;
-    Real *Grav_potential_prev;
+    // Real *density_prev;
+    // Real *momentum_x_prev;
+    // Real *momentum_y_prev;
+    // Real *momentum_z_prev;
+    // Real *Energy_prev;
+    // Real *GasEnergy_prev;
+    // Real *Grav_potential_prev;
     #endif
 
 

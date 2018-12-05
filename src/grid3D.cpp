@@ -278,7 +278,7 @@ void Grid3D::AllocateMemory(void)
 {
   Real max_dti;
 
-  #ifdef COSMOLOGY
+  #ifdef ONLY_PM
   H.dt = 1e10;
   return;
   #else
@@ -543,25 +543,44 @@ Real Grid3D::Update_Grid(void)
   C.GasEnergy = &g1[(H.n_fields-1)*H.n_cells];
   #endif
 
-  #ifdef GRAVITY_CORRECTOR
-  Grav.F.density_prev = &g0[0];
-  Grav.F.momentum_x_prev = &g0[H.n_cells];
-  Grav.F.momentum_y_prev = &g0[2*H.n_cells];
-  Grav.F.momentum_z_prev = &g0[3*H.n_cells];
-  Grav.F.Energy_prev = &g0[4*H.n_cells];
 
+  C.density_0  = &g0[0];
+  C.momentum_x_0 = &g0[H.n_cells];
+  C.momentum_y_0 = &g0[2*H.n_cells];
+  C.momentum_z_0 = &g0[3*H.n_cells];
+  C.Energy_0   = &g0[4*H.n_cells];
+
+  #ifdef GRAVITY
   #ifndef DE
-  Grav.F.Grav_potential_prev = &g0[(H.n_fields-1)*H.n_cells];
+  C.Grav_potential_0 = &g0[(H.n_fields-1)*H.n_cells];
   #endif
   #ifdef DE
-  Grav.F.Grav_potential_prev = &g0[(H.n_fields-2)*H.n_cells];
+  C.Grav_potential_0 = &g0[(H.n_fields-2)*H.n_cells];
+  #endif
   #endif
 
   #ifdef DE
-  Grav.F.GasEnergy_prev = &g0[(H.n_fields-1)*H.n_cells];
+  C.GasEnergy_0 = &g0[(H.n_fields-1)*H.n_cells];
   #endif
+  // #ifdef GRAVITY_CORRECTOR
+  // Grav.F.density_prev = &g0[0];
+  // Grav.F.momentum_x_prev = &g0[H.n_cells];
+  // Grav.F.momentum_y_prev = &g0[2*H.n_cells];
+  // Grav.F.momentum_z_prev = &g0[3*H.n_cells];
+  // Grav.F.Energy_prev = &g0[4*H.n_cells];
+  //
+  // #ifndef DE
+  // Grav.F.Grav_potential_prev = &g0[(H.n_fields-1)*H.n_cells];
+  // #endif
+  // #ifdef DE
+  // Grav.F.Grav_potential_prev = &g0[(H.n_fields-2)*H.n_cells];
+  // #endif
+  //
+  // #ifdef DE
+  // Grav.F.GasEnergy_prev = &g0[(H.n_fields-1)*H.n_cells];
+  // #endif
 
-  #endif
+  // #endif
 
 
   // reset the grid flag to swap buffers

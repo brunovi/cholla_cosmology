@@ -256,8 +256,8 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
     #endif
     #ifdef DE
     P  = (dev_conserved[4*n_cells + id] - 0.5*d*(vx*vx + vy*vy + vz*vz)) * (gamma - 1.0);
-    //if (d < 0.0 || d != d) printf("Negative density before final update.\n");
-    //if (P < 0.0) printf("%d Negative pressure before final update.\n", id);
+    if (d < 0.0 || d != d) printf("Negative density before final update.\n");
+    if (P < 0.0) printf("%d Negative pressure before final update.\n", id);
     ipo = xid+1 + yid*nx + zid*nx*ny;
     jpo = xid + (yid+1)*nx + zid*nx*ny;
     kpo = xid + yid*nx + (zid+1)*nx*ny;
@@ -359,18 +359,19 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
     // +  0.5*dt*gz*(d*vz + d_n*vz_n);
 
     #ifdef GRAVITY_CORRECTOR
-    dev_conserved[  n_cells + id] += 0.5 * dt*gx*(d);
-    dev_conserved[2*n_cells + id] += 0.5 * dt*gy*(d);
-    dev_conserved[3*n_cells + id] += 0.5 * dt*gz*(d);
-    Real delta_E_gravWork = 0.5 * dt * d * ( gx*vx +  gy*vy + gz*vz );
+    // dev_conserved[  n_cells + id] +=  dt*gx*d;
+    // dev_conserved[2*n_cells + id] +=  dt*gy*d;
+    // dev_conserved[3*n_cells + id] +=  dt*gz*d;
+    // Real delta_E_gravWork =  dt * d * ( gx*vx +  gy*vy + gz*vz );
+    // dev_conserved[4*n_cells + id] += delta_E_gravWork;
     #else
     dev_conserved[  n_cells + id] += 0.5*dt*gx*(d + d_n);
     dev_conserved[2*n_cells + id] += 0.5*dt*gy*(d + d_n);
     dev_conserved[3*n_cells + id] += 0.5*dt*gz*(d + d_n);
     Real delta_E_gravWork = 0.5*dt*gx*(d*vx + d_n*vx_n) +  0.5*dt*gy*(d*vy + d_n*vy_n) +  0.5*dt*gz*(d*vz + d_n*vz_n);
+    dev_conserved[4*n_cells + id] += delta_E_gravWork;
     #endif
 
-    dev_conserved[4*n_cells + id] += delta_E_gravWork;
 
     // vx_n =  dev_conserved[1*n_cells + id] * d_inv_n;
     // vy_n =  dev_conserved[2*n_cells + id] * d_inv_n;
