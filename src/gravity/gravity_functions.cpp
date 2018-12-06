@@ -7,6 +7,17 @@
 #include"../particles/particles_dynamics.h"
 #endif
 
+#ifdef MPI_CHOLLA
+void Transfer_Potential_Boundaries_MPI( Grid3D &G, struct parameters P){
+
+
+  G.Grav.TRANSFER_POTENTIAL_BOUNDARIES = true;
+  chprintf( " Transfering Gravitational Potential Boundaries\n");
+  G.Set_Boundary_Conditions(P);
+  G.Grav.TRANSFER_POTENTIAL_BOUNDARIES = false;
+
+}
+#endif
 
 
 void Copy_Hydro_Density_to_Gravity( Grid3D &G ){

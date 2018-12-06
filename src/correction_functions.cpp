@@ -110,14 +110,14 @@ void Get_Delta_Conserved( Grid3D &G ){
 
   // Real d, d_inv, vx, vy, vz, E, ge1, ge2, Emax;
   Real v_1, v_0, delta_v, delta_max;
-  delta_max = 0.3;
+  delta_max = 0.00001;
   int k, j, i, id;
   for ( k=0; k<nz_grid; k++ ){
     for ( j=0; j<ny_grid; j++ ){
       for ( i=0; i<nx_grid; i++ ){
-        if ( (i < nGHST) || (i > (nx_grid - nGHST - 1) ) ) continue;
-        if ( (j < nGHST) || (j > (ny_grid - nGHST - 1 ) ) ) continue;
-        if ( (k < nGHST) || (k > (nz_grid - nGHST -1 ) ) ) continue;
+        // if ( (i < nGHST) || (i > (nx_grid - nGHST - 1) ) ) continue;
+        // if ( (j < nGHST) || (j > (ny_grid - nGHST - 1 ) ) ) continue;
+        // if ( (k < nGHST) || (k > (nz_grid - nGHST -1 ) ) ) continue;
 
         id  = (i) + (j)*nx_grid + (k)*ny_grid*nz_grid;
         //
@@ -173,10 +173,10 @@ void Get_Delta_Conserved( Grid3D &G ){
 
         // //Compare Grav_potential
         // v_0 = G.C.Grav_potential_0[id];
-        // v_1 = G.C.Grav_potential[id] /  G.Cosmo.phi_0_gas * G.Cosmo.current_a * G.Cosmo.current_a ;
+        // v_1 = G.C.Grav_potential[id] /  G.Cosmo.phi_0_gas * (G.Cosmo.current_a-G.Cosmo.delta_a) * (G.Cosmo.current_a-G.Cosmo.delta_a) ;
         // delta_v = fabs( (v_1 - v_0 )/ v_0 );
         // if ( delta_v > delta_max ){
-        //   std::cout << "### Grav Potential: " << delta_v << " delta_max: " << delta_max << std::endl;
+        //   std::cout << "### Grav Potential: " << delta_v << " delta_max: " << delta_max << " v0: " << v_0 << " v1: " << v_1 << std::endl;
         // }
 
 

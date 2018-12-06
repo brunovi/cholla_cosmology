@@ -72,6 +72,8 @@ class Grav3D
 
   Real Gconst;
 
+  bool TRANSFER_POTENTIAL_BOUNDARIES;
+
   struct Fields
   {
     /*! \var density

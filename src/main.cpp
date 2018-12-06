@@ -301,28 +301,16 @@ int main(int argc, char *argv[])
     #endif
     #endif
 
-    // set boundary conditions for next time step
-    #ifdef CPU_TIME
-    start_bound = get_time();
-    #endif //CPU_TIME
-    G.Set_Boundary_Conditions(P);
-    #ifdef CPU_TIME
-    stop_bound = get_time();
-    bound = stop_bound - start_bound;
-    chprintf( " Time Boundaries: %f\n", bound*1000 );
-    #ifdef MPI_CHOLLA
-    bound_min = ReduceRealMin(bound);
-    bound_max = ReduceRealMax(bound);
-    bound_avg = ReduceRealAvg(bound);
-    #endif //MPI_CHOLLA
-    #endif //CPU_TIME
-
-
 
     //Correct gravity in hydro
     #ifdef GRAVITY_CORRECTOR
+    Transfer_Potential_Boundaries_MPI( G, P);
     Apply_Gavity_Corrector( G );
     Sync_Energies_3D_Host( G );
+    #endif
+    Get_Delta_Conserved( G );
+
+
     // set boundary conditions for next time step
     #ifdef CPU_TIME
     start_bound = get_time();
@@ -338,9 +326,7 @@ int main(int argc, char *argv[])
     bound_avg = ReduceRealAvg(bound);
     #endif //MPI_CHOLLA
     #endif //CPU_TIME
-    #endif
 
-    Get_Delta_Conserved( G );
 
 
     #ifdef PARTICLES

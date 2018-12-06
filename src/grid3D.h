@@ -560,6 +560,12 @@ class Grid3D
     void Set_Particles_Secondary_Transfer_Recv( int index, int buffer_start );
     void Finish_Particles_Transfer( void );
     #endif
+
+    #ifdef GRAVITY_CORRECTOR
+    int Load_Potential_To_Buffer( int direction, int side, Real *buffer, int buffer_start  );
+    void Unload_Potential_from_Buffer( int direction, int side, Real *buffer, int buffer_start  );
+
+    #endif
 #endif /*MPI_CHOLLA*/
 
 

@@ -55,6 +55,8 @@ void Grav3D::Initialize( Real x_min, Real y_min, Real z_min, Real Lx, Real Ly, R
 
   Gconst = 1;
 
+  TRANSFER_POTENTIAL_BOUNDARIES = false;
+
   // Allocate memory
   AllocateMemory_CPU();
 
