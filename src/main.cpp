@@ -308,7 +308,10 @@ int main(int argc, char *argv[])
     Apply_Gavity_Corrector( G );
     Sync_Energies_3D_Host( G );
     #endif
+
+    #ifdef REVERT_STEP
     Get_Delta_Conserved( G );
+    #endif
 
 
     // set boundary conditions for next time step

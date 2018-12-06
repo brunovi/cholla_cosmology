@@ -265,6 +265,9 @@ Real Update_Particles( Grid3D &G, int step ){
   Real start, stop, milliseconds;
   start = get_time();
 
+  #ifdef REVERT_STEP
+  if ( step == 1) Copy_Particles_Vectors( G );
+  #endif
 
   #ifndef PARTICLES_OMP
   if ( step == 1 ){
@@ -326,5 +329,42 @@ Real Update_Particles( Grid3D &G, int step ){
   milliseconds = (stop - start) * 1000.0;
   return milliseconds;
 }
+
+#ifdef REVERT_STEP
+void Copy_Particles_Vectors( Grid3D &G ){
+
+  #ifdef PARTICLE_IDS
+  G.Particles.partIDs_0.clear();
+  G.Particles.partIDs_0 = G.Particles.partIDs;
+  #endif
+  #ifndef SINGLE_PARTICLE_MASS
+  G.Particles.mass_0.clear();
+  G.Particles.mass_0 = G.Particles.mass;
+  #endif
+  G.Particles.pos_x_0.clear();
+  G.Particles.pos_y_0.clear();
+  G.Particles.pos_z_0.clear();
+  G.Particles.vel_x_0.clear();
+  G.Particles.vel_y_0.clear();
+  G.Particles.vel_z_0.clear();
+  G.Particles.grav_x_0.clear();
+  G.Particles.grav_y_0.clear();
+  G.Particles.grav_z_0.clear();
+
+  G.Particles.pos_x_0 = G.Particles.pos_x;
+  G.Particles.pos_y_0 = G.Particles.pos_y;
+  G.Particles.pos_z_0 = G.Particles.pos_z;
+  G.Particles.vel_x_0 = G.Particles.vel_x;
+  G.Particles.vel_y_0 = G.Particles.vel_y;
+  G.Particles.vel_z_0 = G.Particles.vel_z;
+  G.Particles.grav_x_0 = G.Particles.grav_x;
+  G.Particles.grav_y_0 = G.Particles.grav_y;
+  G.Particles.grav_z_0 = G.Particles.grav_z;
+
+
+
+}
+#endif
+
 
 #endif

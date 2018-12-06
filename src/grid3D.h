@@ -215,6 +215,11 @@ struct Header
   int n_ghost_pot_offset;
   #endif
 
+  #ifdef REVERT_STEP
+  bool revert_step;
+  bool send_revert_signal;
+  Real revert_dt;
+  #endif
 };
 
 /*! \class Grid3D

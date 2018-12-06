@@ -42,7 +42,9 @@ Real Get_Particles_dt_cosmo( Grid3D &G );
 
 Real Update_Particles( Grid3D &G, int step );
 
-
+#ifdef REVERT_STEP
+void Copy_Particles_Vectors( Grid3D &G );
+#endif
 
 
 

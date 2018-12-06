@@ -220,6 +220,13 @@ void Grid3D::Initialize(struct parameters *P)
   R.flag_delta = P->flag_delta;
 #endif /*ROTATED_PROJECTION*/
 
+  #ifdef REVERT_STEP
+  H.revert_step = false;
+  H.send_revert_signal = false;
+  H.revert_dt = 0;
+  chprintf( "Revert Step is ON \n" );
+  #endif
+
 }
 
 

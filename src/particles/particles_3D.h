@@ -50,6 +50,24 @@ class Particles_3D
   real_vector_t grav_y;
   real_vector_t grav_z;
 
+  #ifdef REVERT_STEP
+  #ifdef PARTICLE_IDS
+  int_vector_t partIDs_0;
+  #endif
+  #ifndef SINGLE_PARTICLE_MASS
+  real_vector_t mass_0;
+  #endif
+  real_vector_t pos_x_0;
+  real_vector_t pos_y_0;
+  real_vector_t pos_z_0;
+  real_vector_t vel_x_0;
+  real_vector_t vel_y_0;
+  real_vector_t vel_z_0;
+  real_vector_t grav_x_0;
+  real_vector_t grav_y_0;
+  real_vector_t grav_z_0;
+  #endif
+
   bool INITIAL;
 
   #ifdef MPI_CHOLLA
