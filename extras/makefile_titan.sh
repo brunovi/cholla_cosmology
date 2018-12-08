@@ -23,11 +23,16 @@ CFILES_COSMO = $(wildcard $(DIR_COSMO)/*.c)
 CPPFILES_COSMO = $(wildcard $(DIR_COSMO)/*.cpp)
 CUDAFILES_COSMO = $(wildcard $(DIR_COSMO)/*.cu)
 
+DIR_COOL = ./src/cooling
+CFILES_COOL = $(wildcard $(DIR_COOL)/*.c)
+CPPFILES_COOL = $(wildcard $(DIR_COOL)/*.cpp)
+CUDAFILES_COOL = $(wildcard $(DIR_COOL)/*.cu)
 
-OBJS   = $(subst .c,.o,$(CFILES)) $(subst .cpp,.o,$(CPPFILES)) $(subst .cu,.o,$(CUDAFILES))  $(subst .c,.o,$(CFILES_GRAV)) $(subst .cpp,.o,$(CPPFILES_GRAV)) $(subst .cu,.o,$(CUDAFILES_GRAV)) $(subst .c,.o,$(CFILES_PART)) $(subst .cpp,.o,$(CPPFILES_PART)) $(subst .cu,.o,$(CUDAFILES_PART)) $(subst .c,.o,$(CFILES_COSMO)) $(subst .cpp,.o,$(CPPFILES_COSMO)) $(subst .cu,.o,$(CUDAFILES_COSMO))
-COBJS   = $(subst .c,.o,$(CFILES)) $(subst .c,.o,$(CFILES_GRAV)) $(subst .c,.o,$(CFILES_PART)) $(subst .c,.o,$(CFILES_COSMO))
-CPPOBJS   = $(subst .cpp,.o,$(CPPFILES)) $(subst .cpp,.o,$(CPPFILES_GRAV)) $(subst .cpp,.o,$(CPPFILES_PART)) $(subst .cpp,.o,$(CFILES_COSMO))
-CUOBJS   = $(subst .cu,.o,$(CUDAFILES)) $(subst .cu,.o,$(CUDAFILES_GRAV)) $(subst .cu,.o,$(CUDAFILES_PART)) $(subst .cu,.o,$(CFILES_COSMO))
+
+OBJS   = $(subst .c,.o,$(CFILES)) $(subst .cpp,.o,$(CPPFILES)) $(subst .cu,.o,$(CUDAFILES))  $(subst .c,.o,$(CFILES_GRAV)) $(subst .cpp,.o,$(CPPFILES_GRAV)) $(subst .cu,.o,$(CUDAFILES_GRAV)) $(subst .c,.o,$(CFILES_PART)) $(subst .cpp,.o,$(CPPFILES_PART)) $(subst .cu,.o,$(CUDAFILES_PART)) $(subst .c,.o,$(CFILES_COSMO)) $(subst .cpp,.o,$(CPPFILES_COSMO)) $(subst .cu,.o,$(CUDAFILES_COSMO)) $(subst .c,.o,$(CFILES_COOL)) $(subst .cpp,.o,$(CPPFILES_COOL)) $(subst .cu,.o,$(CUDAFILES_COOL))
+COBJS   = $(subst .c,.o,$(CFILES)) $(subst .c,.o,$(CFILES_GRAV)) $(subst .c,.o,$(CFILES_PART)) $(subst .c,.o,$(CFILES_COSMO)) $(subst .c,.o,$(CFILES_COOL))
+CPPOBJS   = $(subst .cpp,.o,$(CPPFILES)) $(subst .cpp,.o,$(CPPFILES_GRAV)) $(subst .cpp,.o,$(CPPFILES_PART)) $(subst .cpp,.o,$(CPPFILES_COSMO)) $(subst .cpp,.o,$(CPPFILES_COOL))
+CUOBJS   = $(subst .cu,.o,$(CUDAFILES)) $(subst .cu,.o,$(CUDAFILES_GRAV)) $(subst .cu,.o,$(CUDAFILES_PART)) $(subst .cu,.o,$(CUDAFILES_COSMO)) $(subst .cu,.o,$(CUDAFILES_COOL))
 
 #To use GPUs, CUDA must be turned on here
 #Optional error checking can also be enabled
@@ -101,6 +106,12 @@ PARTICLE_IDS = -DPARTICLE_IDS
 #Turn On Cosmological simulation0
 COSMOLOGY = -DCOSMOLOGY
 
+#Turn on scalar fields
+#SCALAR = -DSCALAR
+
+#COOLING = -DCOOLING_GRACKLE
+#GRACKLE_PRECISION = -DCONFIG_BFLOAT_8
+
 
 ifdef CUDA
 CUDA_INCL = -I$(CUDATOOLKIT_HOME)/include/
@@ -124,6 +135,13 @@ PFFT_INCL = -I/ccs/home/bvilasen/apps/PFFT/pfft-git/include
 PFFT_LIBS = -L/ccs/home/bvilasen/apps/PFFT/pfft-git/lib  -lpfft  -lfftw3_mpi -lfftw3
 INCL += $(FFTW_INCL) $(PFFT_INCL)
 LIBS += $(FFTW_LIBS) $(PFFT_LIBS)
+endif
+
+ifeq ($(COOLING),-DCOOLING_GRACKLE)
+GRACKLE_INCL = -I/home/bruno/local/include
+GRACKLE_LIBS = -L/home/bruno/local/lib -lgrackle
+INCL += $(GRACKLE_INCL)
+LIBS += $(GRACKLE_LIBS)
 endif
 
 ifdef PARTICLES_OMP
