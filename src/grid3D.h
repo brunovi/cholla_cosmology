@@ -566,7 +566,7 @@ class Grid3D
     void Finish_Particles_Transfer( void );
     #endif
 
-    #ifdef GRAVITY_CORRECTOR
+    #ifdef GRAVITY
     int Load_Potential_To_Buffer( int direction, int side, Real *buffer, int buffer_start  );
     void Unload_Potential_from_Buffer( int direction, int side, Real *buffer, int buffer_start  );
 

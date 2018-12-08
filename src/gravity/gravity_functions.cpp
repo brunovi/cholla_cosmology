@@ -7,6 +7,10 @@
 #include"../particles/particles_dynamics.h"
 #endif
 
+#ifdef PARTICLES_OMP
+#include"../particles/particles_omp.h"
+#endif
+
 #ifdef MPI_CHOLLA
 void Transfer_Potential_Boundaries_MPI( Grid3D &G, struct parameters P){
 
@@ -258,8 +262,8 @@ void Get_Gavity_Corrector( Grid3D &G, int g_start, int g_end ){
         phi_l = G.C.Grav_potential_0[id_l] ;
         phi_r = G.C.Grav_potential_0[id_r] ;
         G.Grav.F.gravity_x_h_prev[id] = -0.5 * ( phi_r - phi_l ) / dx;
-        delta = fabs( (G.Grav.F.gravity_x_h_prev[id] - G.Grav.F.gravity_x_h[id]) / G.Grav.F.gravity_x_h_prev[id] );
-        if ( delta > delta_max ) std::cout << "### Grav X: " << delta<< " delta_max: " << delta_max << std::endl;
+        // delta = fabs( (G.Grav.F.gravity_x_h_prev[id] - G.Grav.F.gravity_x_h[id]) / G.Grav.F.gravity_x_h_prev[id] );
+        // if ( delta > delta_max ) std::cout << "### Grav X: " << delta<< " delta_max: " << delta_max << std::endl;
       }
     }
   }
@@ -276,8 +280,8 @@ void Get_Gavity_Corrector( Grid3D &G, int g_start, int g_end ){
         phi_l = G.C.Grav_potential_0[id_l] ;
         phi_r = G.C.Grav_potential_0[id_r] ;
         G.Grav.F.gravity_y_h_prev[id] = -0.5 * ( phi_r - phi_l ) / dy;
-        delta = fabs( (G.Grav.F.gravity_y_h_prev[id] - G.Grav.F.gravity_y_h[id]) / G.Grav.F.gravity_y_h_prev[id] );
-        if ( delta > delta_max ) std::cout << "### Grav Y: " << delta<< " delta_max: " << delta_max << std::endl;
+        // delta = fabs( (G.Grav.F.gravity_y_h_prev[id] - G.Grav.F.gravity_y_h[id]) / G.Grav.F.gravity_y_h_prev[id] );
+        // if ( delta > delta_max ) std::cout << "### Grav Y: " << delta<< " delta_max: " << delta_max << std::endl;
       }
     }
   }
@@ -294,8 +298,8 @@ void Get_Gavity_Corrector( Grid3D &G, int g_start, int g_end ){
         phi_l = G.C.Grav_potential_0[id_l];
         phi_r = G.C.Grav_potential_0[id_r];
         G.Grav.F.gravity_z_h_prev[id] = -0.5 * ( phi_r - phi_l ) / dz;
-        delta = fabs( (G.Grav.F.gravity_z_h_prev[id] - G.Grav.F.gravity_z_h[id]) / G.Grav.F.gravity_z_h_prev[id] );
-        if ( delta > delta_max ) std::cout << "### Grav Z: " << delta<< " delta_max: " << delta_max << std::endl;
+        // delta = fabs( (G.Grav.F.gravity_z_h_prev[id] - G.Grav.F.gravity_z_h[id]) / G.Grav.F.gravity_z_h_prev[id] );
+        // if ( delta > delta_max ) std::cout << "### Grav Z: " << delta<< " delta_max: " << delta_max << std::endl;
       }
     }
   }
@@ -338,6 +342,12 @@ void Add_Gravity_Corrector( Grid3D &G, int g_start, int g_end ){
         gy_0 = G.Grav.F.gravity_y_h_prev[id_grav];
         gz_0 = G.Grav.F.gravity_z_h_prev[id_grav];
 
+        // // Gravity first ordef
+        // G.C.momentum_x[id_grid] +=  G.H.dt * d_0 * gx_0;
+        // G.C.momentum_y[id_grid] +=  G.H.dt * d_0 * gy_0;
+        // G.C.momentum_z[id_grid] +=  G.H.dt * d_0 * gz_0;
+        // G.C.Energy[id_grid] +=  G.H.dt * d_0 * ( vx_0*gx_0 + vy_0*gy_0 + vz_0*gz_0 );
+
         d = G.C.density[id_grid];
         vx = G.C.momentum_x[id_grid] / d;
         vy = G.C.momentum_y[id_grid] / d;
@@ -346,25 +356,28 @@ void Add_Gravity_Corrector( Grid3D &G, int g_start, int g_end ){
         gy = G.Grav.F.gravity_y_h[id_grav];
         gz = G.Grav.F.gravity_z_h[id_grav];
 
-        G.C.momentum_x[id_grid] -= 0.5 * G.H.dt * d_0 * gx_0;
-        G.C.momentum_y[id_grid] -= 0.5 * G.H.dt * d_0 * gy_0;
-        G.C.momentum_z[id_grid] -= 0.5 * G.H.dt * d_0 * gz_0;
-        G.C.Energy[id_grid] -= 0.5 * G.H.dt * d_0 * ( vx_0*gx_0 + vy_0*gy_0 + vz_0*gz_0 );
 
-        G.C.momentum_x[id_grid] += 0.5 * G.H.dt * d * gx;
-        G.C.momentum_y[id_grid] += 0.5 * G.H.dt * d * gy;
-        G.C.momentum_z[id_grid] += 0.5 * G.H.dt * d * gz;
-        G.C.Energy[id_grid] += 0.5 * G.H.dt * ( d*vx*gx + d*vy*gy + d*vz*gz );
+        G.C.momentum_x[id_grid] += 0.5 *  G.H.dt * d * gx;
+        G.C.momentum_y[id_grid] += 0.5 *  G.H.dt * d * gy;
+        G.C.momentum_z[id_grid] += 0.5 *  G.H.dt * d * gz;
+        G.C.Energy[id_grid] += 0.5 * G.H.dt * d * ( vx*gx + vy*gy + vz*gz );
 
-        // G.C.momentum_x[id_grid] +=  G.H.dt * d_0 * gx_0;
-        // G.C.momentum_y[id_grid] +=  G.H.dt * d_0 * gy_0;
-        // G.C.momentum_z[id_grid] +=  G.H.dt * d_0 * gz_0;
-        // G.C.Energy[id_grid] +=  G.H.dt * d_0 * ( vx_0*gx_0 + vy_0*gy_0 + vz_0*gz_0 );
+        G.C.momentum_x[id_grid] += 0.5 * G.H.dt * d_0 * gx_0;
+        G.C.momentum_y[id_grid] += 0.5 * G.H.dt * d_0 * gy_0;
+        G.C.momentum_z[id_grid] += 0.5 * G.H.dt * d_0 * gz_0;
+        G.C.Energy[id_grid] += 0.5 *  G.H.dt * d_0 * ( vx_0*gx_0 + vy_0*gy_0 + vz_0*gz_0 );
 
-        // G.C.momentum_x[id_grid] +=  G.H.dt * d * gx;
-        // G.C.momentum_y[id_grid] +=  G.H.dt * d * gy;
-        // G.C.momentum_z[id_grid] +=  G.H.dt * d * gz;
-        // G.C.Energy[id_grid] +=  G.H.dt * d * ( vx*gx + vy*gy + vz*gz );
+        // G.C.momentum_x[id_grid] -= 0.5 * G.H.dt * d_0 * gx_0;
+        // G.C.momentum_y[id_grid] -= 0.5 * G.H.dt * d_0 * gy_0;
+        // G.C.momentum_z[id_grid] -= 0.5 * G.H.dt * d_0 * gz_0;
+        // G.C.Energy[id_grid] -= 0.5 * G.H.dt * d_0 * ( vx_0*gx_0 + vy_0*gy_0 + vz_0*gz_0 );
+
+        // G.C.momentum_x[id_grid] += 0.5 * G.H.dt * d * gx;
+        // G.C.momentum_y[id_grid] += 0.5 * G.H.dt * d * gy;
+        // G.C.momentum_z[id_grid] += 0.5 * G.H.dt * d * gz;
+        // G.C.Energy[id_grid] += 0.5 * G.H.dt * ( d*vx*gx + d*vy*gy + d*vz*gz );
+
+
 
 
 
@@ -385,9 +398,31 @@ void Add_Gravity_Corrector( Grid3D &G, int g_start, int g_end ){
 
 void Apply_Gavity_Corrector( Grid3D &G ){
 
+  #ifndef PARTICLES_OMP
   Get_Gavity_Corrector( G, 0, G.Grav.nz_local );
-
   Add_Gravity_Corrector( G, 0, G.Grav.nz_local );
+  #else
+
+  #pragma omp parallel num_threads( N_OMP_PARTICLE_THREADS )
+  {
+    int omp_id, n_omp_procs;
+    part_int_t p_start, p_end;
+    int g_start, g_end;
+
+    omp_id = omp_get_thread_num();
+    n_omp_procs = omp_get_num_threads();
+    // #pragma omp barrier
+
+    Get_OMP_Grid_Indxs( n_omp_procs, omp_id, G.Grav.nz_local,  &g_start, &g_end  );
+
+    Get_Gavity_Corrector( G, g_start, g_end );
+    #pragma omp barrier
+    Add_Gravity_Corrector( G, g_start, g_end );
+  }
+
+
+
+  #endif
 
 
 
@@ -423,11 +458,11 @@ void Set_dt( Grid3D &G, bool &output_now, int n_step ){
     chprintf( " Seting max delta_a: %f\n", da_courant );
   }
 
-  // Real da_min = delta_a_part / 5000;
-  // if ( da_courant < da_min ){
-  //   da_courant = da_min;
-  //   chprintf( " Seting min delta_a: %f\n", da_courant );
-  // }
+  Real da_min = delta_a_part / 100;
+  if ( da_courant < da_min ){
+    da_courant = da_min;
+    chprintf( " Seting min delta_a: %f\n", da_courant );
+  }
 
 
   G.Cosmo.delta_a = da_courant;

@@ -302,12 +302,16 @@ int main(int argc, char *argv[])
     #endif
 
 
-    //Correct gravity in hydro
     #ifdef GRAVITY_CORRECTOR
+    //Apply second order correction to gravity in hydro
     Transfer_Potential_Boundaries_MPI( G, P);
     Apply_Gavity_Corrector( G );
+    #ifdef DE
     Sync_Energies_3D_Host( G );
     #endif
+    #endif
+
+    // Get_Delta_Conserved( G );
 
     #ifdef REVERT_STEP
     Get_Delta_Conserved( G );
