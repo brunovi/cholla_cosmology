@@ -255,11 +255,18 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
     vy =  dev_conserved[2*n_cells + id] * d_inv;
     vz =  dev_conserved[3*n_cells + id] * d_inv;
     E = dev_conserved[4*n_cells + id];
-    GE = dev_conserved[(n_fields-1)*n_cells + id];
+    #ifdef DE
+    GE = fmin(dev_conserved[(n_fields-1)*n_cells + id], 1e-6);
+    #endif
     #endif
     #ifdef DE
     P  = (dev_conserved[4*n_cells + id] - 0.5*d*(vx*vx + vy*vy + vz*vz)) * (gamma - 1.0);
     if (d < 0.0 || d != d) printf("Negative density before final update.\n");
+    if (P < 0.0){
+      #ifdef DE
+      P  = GE * (gamma - 1.0);
+      #endif
+    }
     if (P < 0.0) printf("%d Negative pressure before final update.\n", id);
     ipo = xid+1 + yid*nx + zid*nx*ny;
     jpo = xid + (yid+1)*nx + zid*nx*ny;
