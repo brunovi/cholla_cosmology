@@ -98,7 +98,7 @@ void Particles_3D::Clear_Vectors_For_Transfers( void ){
 void Particles_3D::Select_Particles_to_Transfer( int dir ){
 
   int i;
-  bool already_transfered;
+  bool already_transfered, pID_in_transfers;
   part_int_t pIndx;
   part_int_t pID;
   if ( dir == 0 ){
@@ -134,12 +134,16 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
     for ( pIndx=0; pIndx<n_local; pIndx++ ){
       pID = partIDs[pIndx];
       already_transfered = false;
-      for ( i=0; i<transfered_x0.size(); i++){
-        if (pID == transfered_x0[i]) already_transfered = true;
-      }
-      for ( i=0; i<transfered_x1.size(); i++){
-        if (pID == transfered_x1[i]) already_transfered = true;
-      }
+      pID_in_transfers = std::binary_search (transfered_x0.begin(), transfered_x0.end(), pID);
+      if ( pID_in_transfers ) already_transfered = true;
+      pID_in_transfers = std::binary_search (transfered_x1.begin(), transfered_x1.end(), pID);
+      if ( pID_in_transfers ) already_transfered = true;
+      // for ( i=0; i<transfered_x0.size(); i++){
+      //   if (pID == transfered_x0[i]) already_transfered = true;
+      // }
+      // for ( i=0; i<transfered_x1.size(); i++){
+      //   if (pID == transfered_x1[i]) already_transfered = true;
+      // }
       if ( already_transfered ){
         // std::cout << " pID: " << pID << " already_transfered "<< std::endl;
         continue;
@@ -165,18 +169,26 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
     for ( pIndx=0; pIndx<n_local; pIndx++ ){
       pID = partIDs[pIndx];
       already_transfered = false;
-      for ( i=0; i<transfered_x0.size(); i++){
-        if (pID == transfered_x0[i]) already_transfered = true;
-      }
-      for ( i=0; i<transfered_x1.size(); i++){
-        if (pID == transfered_x1[i]) already_transfered = true;
-      }
-      for ( i=0; i<transfered_y0.size(); i++){
-        if (pID == transfered_y0[i]) already_transfered = true;
-      }
-      for ( i=0; i<transfered_y1.size(); i++){
-        if (pID == transfered_y1[i]) already_transfered = true;
-      }
+      pID_in_transfers = std::binary_search (transfered_x0.begin(), transfered_x0.end(), pID);
+      if ( pID_in_transfers ) already_transfered = true;
+      pID_in_transfers = std::binary_search (transfered_x1.begin(), transfered_x1.end(), pID);
+      if ( pID_in_transfers ) already_transfered = true;
+      pID_in_transfers = std::binary_search (transfered_y0.begin(), transfered_y0.end(), pID);
+      if ( pID_in_transfers ) already_transfered = true;
+      pID_in_transfers = std::binary_search (transfered_y1.begin(), transfered_y1.end(), pID);
+      if ( pID_in_transfers ) already_transfered = true;
+      // for ( i=0; i<transfered_x0.size(); i++){
+      //   if (pID == transfered_x0[i]) already_transfered = true;
+      // }
+      // for ( i=0; i<transfered_x1.size(); i++){
+      //   if (pID == transfered_x1[i]) already_transfered = true;
+      // }
+      // for ( i=0; i<transfered_y0.size(); i++){
+      //   if (pID == transfered_y0[i]) already_transfered = true;
+      // }
+      // for ( i=0; i<transfered_y1.size(); i++){
+      //   if (pID == transfered_y1[i]) already_transfered = true;
+      // }
       if ( already_transfered ){
         // std::cout << " pID: " << pID << " already_transfered "<< std::endl;
         continue;
@@ -274,6 +286,9 @@ void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer
     out_indxs_vec->pop_back();
     offset += N_DATA_PER_PARTICLE_TRANSFER;
   }
+
+  std::sort( (*transfered_vec).begin(), (*transfered_vec).end());
+
   // out_indxs_vec->clear();
   // if (direction==0 && side==1){
   //   out_indxs_vec_x1.clear();
