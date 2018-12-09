@@ -117,7 +117,7 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
       }
       if ( pos_x[pIndx] >= G.xMax ){
         out_indxs_vec_x1.push_back( pIndx );
-        if ( pID == 65482143 ) std::cout << " pID: " << pID << " Sending Left "<< std::endl;
+        if ( pID == 65482143 ) std::cout << " pID: " << pID << " Sending Right "<< std::endl;
         continue;
       }
       if ( pID == 65482143 ) std::cout << " pID: " << pID << " Not sent "<< std::endl;
