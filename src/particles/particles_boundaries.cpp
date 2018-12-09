@@ -106,23 +106,23 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
     out_indxs_vec_x1.clear();
     for ( pIndx=0; pIndx<n_local; pIndx++ ){
       pID = partIDs[pIndx];
-      if ( pID == 65482143 ){
-        std::cout << " pID: " << pID << " pIndx: " << pIndx << std::endl;
-        std::cout << " pos_x " << pos_x[pIndx] << std::endl;
-        std::cout << " pos_y " << pos_y[pIndx] << std::endl;
-        std::cout << " pos_z " << pos_z[pIndx] << std::endl;
-      }
+      // if ( pID == 65482143 ){
+      //   std::cout << " pID: " << pID << " pIndx: " << pIndx << std::endl;
+      //   std::cout << " pos_x " << pos_x[pIndx] << std::endl;
+      //   std::cout << " pos_y " << pos_y[pIndx] << std::endl;
+      //   std::cout << " pos_z " << pos_z[pIndx] << std::endl;
+      // }
       if ( pos_x[pIndx] < G.xMin ){
         out_indxs_vec_x0.push_back( pIndx );
-        if ( pID == 65482143 ) std::cout << " pID: " << pID << " Sending Left "<< std::endl;
+        // if ( pID == 65482143 ) std::cout << " pID: " << pID << " Sending Left "<< std::endl;
         continue;
       }
       if ( pos_x[pIndx] >= G.xMax ){
         out_indxs_vec_x1.push_back( pIndx );
-        if ( pID == 65482143 ) std::cout << " pID: " << pID << " Sending Right "<< std::endl;
+        // if ( pID == 65482143 ) std::cout << " pID: " << pID << " Sending Right "<< std::endl;
         continue;
       }
-      if ( pID == 65482143 ) std::cout << " pID: " << pID << " Not sent X "<< std::endl;
+      // if ( pID == 65482143 ) std::cout << " pID: " << pID << " Not sent X "<< std::endl;
     }
     std::sort(out_indxs_vec_x0.begin(), out_indxs_vec_x0.end());
     std::sort(out_indxs_vec_x1.begin(), out_indxs_vec_x1.end());
@@ -141,20 +141,20 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
         if (pID == transfered_x1[i]) already_transfered = true;
       }
       if ( already_transfered ){
-        std::cout << " pID: " << pID << " already_transfered "<< std::endl;
+        // std::cout << " pID: " << pID << " already_transfered "<< std::endl;
         continue;
       }
       if ( pos_y[pIndx] < G.yMin ){
         out_indxs_vec_y0.push_back( pIndx );
-        if ( pID == 65482143 ) std::cout << " pID: " << pID << " Sending Down "<< std::endl;
+        // if ( pID == 65482143 ) std::cout << " pID: " << pID << " Sending Down "<< std::endl;
         continue;
       }
       if ( pos_y[pIndx] >= G.yMax ){
         out_indxs_vec_y1.push_back( pIndx );
-        if ( pID == 65482143 ) std::cout << " pID: " << pID << " Sending Up "<< std::endl;
+        // if ( pID == 65482143 ) std::cout << " pID: " << pID << " Sending Up "<< std::endl;
         continue;
       }
-      if ( pID == 65482143 ) std::cout << " pID: " << pID << " Not sent Y "<< std::endl;
+      // if ( pID == 65482143 ) std::cout << " pID: " << pID << " Not sent Y "<< std::endl;
     }
     std::sort(out_indxs_vec_y0.begin(), out_indxs_vec_y0.end());
     std::sort(out_indxs_vec_y1.begin(), out_indxs_vec_y1.end());
@@ -163,6 +163,24 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
     out_indxs_vec_z0.clear();
     out_indxs_vec_z1.clear();
     for ( pIndx=0; pIndx<n_local; pIndx++ ){
+      pID = partIDs[pIndx];
+      already_transfered = false;
+      for ( i=0; i<transfered_x0.size(); i++){
+        if (pID == transfered_x0[i]) already_transfered = true;
+      }
+      for ( i=0; i<transfered_x1.size(); i++){
+        if (pID == transfered_x1[i]) already_transfered = true;
+      }
+      for ( i=0; i<transfered_y0.size(); i++){
+        if (pID == transfered_y0[i]) already_transfered = true;
+      }
+      for ( i=0; i<transfered_y1.size(); i++){
+        if (pID == transfered_y1[i]) already_transfered = true;
+      }
+      if ( already_transfered ){
+        // std::cout << " pID: " << pID << " already_transfered "<< std::endl;
+        continue;
+      }
       if ( pos_z[pIndx] < G.zMin ){
         out_indxs_vec_z0.push_back( pIndx );
         continue;
@@ -242,7 +260,7 @@ void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer
     #endif
     #ifdef PARTICLE_IDS
     offset_extra += 1;
-    if ( partIDs[pIndx] == 65482143 ) std::cout << " pID: " << partIDs[pIndx] << " Loading to buffer  "<< direction << "  " <<  side << std::endl;
+    // if ( partIDs[pIndx] == 65482143 ) std::cout << " pID: " << partIDs[pIndx] << " Loading to buffer  "<< direction << "  " <<  side << std::endl;
     transfered_vec->push_back(partIDs[pIndx]);
     send_buffer[ offset_extra ] = (Real) Get_and_Remove_partID( pIndx, partIDs );
     #endif
@@ -399,15 +417,15 @@ void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int bu
     pId = 0;
     #endif
 
-    if ( pId == 65482143 ){
-      std::cout <<  "pID: " << pId << " Recived particle: " << direction << " " << side << std::endl;
-      std::cout << " posX: " << pPos_x << " velX: " << pVel_x << std::endl;
-      std::cout << " posY: " << pPos_y << " velY: " << pVel_y << std::endl;
-      std::cout << " posZ: " << pPos_z << " velZ: " << pVel_z << std::endl;
-      std::cout << " Domain X: " << G.xMin << "  " << G.xMax << std::endl;
-      std::cout << " Domain Y: " << G.yMin << "  " << G.yMax << std::endl;
-      std::cout << " Domain Z: " << G.zMin << "  " << G.zMax << std::endl;
-    }
+    // if ( pId == 65482143 ){
+    //   std::cout <<  "pID: " << pId << " Recived particle: " << direction << " " << side << std::endl;
+    //   std::cout << " posX: " << pPos_x << " velX: " << pVel_x << std::endl;
+    //   std::cout << " posY: " << pPos_y << " velY: " << pVel_y << std::endl;
+    //   std::cout << " posZ: " << pPos_z << " velZ: " << pVel_z << std::endl;
+    //   std::cout << " Domain X: " << G.xMin << "  " << G.xMax << std::endl;
+    //   std::cout << " Domain Y: " << G.yMin << "  " << G.yMax << std::endl;
+    //   std::cout << " Domain Z: " << G.zMin << "  " << G.zMax << std::endl;
+    // }
 
 
     offset_buff += N_DATA_PER_PARTICLE_TRANSFER;
@@ -455,15 +473,15 @@ void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int bu
         continue;
       }
       if ( pPos_y >= G.yMax ){
-        if ( pId == 65482143 ){
-          std::cout <<  "pID: " << pId << " Seond Transfer sending UP " << direction << " " << side << std::endl;
-          std::cout << " posX: " << pPos_x << " velX: " << pVel_x << std::endl;
-          std::cout << " posY: " << pPos_y << " velY: " << pVel_y << std::endl;
-          std::cout << " posZ: " << pPos_z << " velZ: " << pVel_z << std::endl;
-          std::cout << " Domain X: " << G.xMin << "  " << G.xMax << std::endl;
-          std::cout << " Domain Y: " << G.yMin << "  " << G.yMax << std::endl;
-          std::cout << " Domain Z: " << G.zMin << "  " << G.zMax << std::endl;
-        }
+        // if ( pId == 65482143 ){
+        //   std::cout <<  "pID: " << pId << " Seond Transfer sending UP " << direction << " " << side << std::endl;
+        //   std::cout << " posX: " << pPos_x << " velX: " << pVel_x << std::endl;
+        //   std::cout << " posY: " << pPos_y << " velY: " << pVel_y << std::endl;
+        //   std::cout << " posZ: " << pPos_z << " velZ: " << pVel_z << std::endl;
+        //   std::cout << " Domain X: " << G.xMin << "  " << G.xMax << std::endl;
+        //   std::cout << " Domain Y: " << G.yMin << "  " << G.yMax << std::endl;
+        //   std::cout << " Domain Z: " << G.zMin << "  " << G.zMax << std::endl;
+        // }
         // std::cout << "  Adding to Y1 " << std::endl;
         Add_Particle_To_Buffer( send_buffer_y1, buffer_start_y, max_particles, send_buffer_y1_second, 0, pId, pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pVel_z, secondary);
         continue;
