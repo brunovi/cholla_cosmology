@@ -120,7 +120,7 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
         if ( pID == 65482143 ) std::cout << " pID: " << pID << " Sending Right "<< std::endl;
         continue;
       }
-      if ( pID == 65482143 ) std::cout << " pID: " << pID << " Not sent "<< std::endl;
+      if ( pID == 65482143 ) std::cout << " pID: " << pID << " Not sent X "<< std::endl;
     }
     std::sort(out_indxs_vec_x0.begin(), out_indxs_vec_x0.end());
     std::sort(out_indxs_vec_x1.begin(), out_indxs_vec_x1.end());
@@ -129,14 +129,24 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
     out_indxs_vec_y0.clear();
     out_indxs_vec_y1.clear();
     for ( pIndx=0; pIndx<n_local; pIndx++ ){
+      pID = partIDs[pIndx];
+      if ( pID == 65482143 ){
+        std::cout << " pID: " << pID << " pIndx: " << pIndx << std::endl;
+        std::cout << " pos_x " << pos_x[pIndx] << std::endl;
+        std::cout << " pos_y " << pos_y[pIndx] << std::endl;
+        std::cout << " pos_z " << pos_z[pIndx] << std::endl;
+      }
       if ( pos_y[pIndx] < G.yMin ){
         out_indxs_vec_y0.push_back( pIndx );
+        if ( pID == 65482143 ) std::cout << " pID: " << pID << " Sending Down "<< std::endl;
         continue;
       }
       if ( pos_y[pIndx] >= G.yMax ){
         out_indxs_vec_y1.push_back( pIndx );
+        if ( pID == 65482143 ) std::cout << " pID: " << pID << " Sending Up "<< std::endl;
         continue;
       }
+      if ( pID == 65482143 ) std::cout << " pID: " << pID << " Not sent Y "<< std::endl;
     }
     std::sort(out_indxs_vec_y0.begin(), out_indxs_vec_y0.end());
     std::sort(out_indxs_vec_y1.begin(), out_indxs_vec_y1.end());
