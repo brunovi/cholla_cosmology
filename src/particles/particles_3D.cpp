@@ -47,6 +47,12 @@ void Particles_3D::Initialize( struct parameters P, Grav3D &Grav, Real xblocal, 
   int_vector_t out_indxs_vec_y1;
   int_vector_t out_indxs_vec_z0;
   int_vector_t out_indxs_vec_z1;
+  int_vector_t transfered_x0;
+  int_vector_t transfered_x1;
+  int_vector_t transfered_y0;
+  int_vector_t transfered_y1;
+  int_vector_t transfered_z0;
+  int_vector_t transfered_z1;
   #endif
 
   G.nx_local = Grav.nx_local;
