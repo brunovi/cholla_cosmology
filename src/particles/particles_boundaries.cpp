@@ -138,7 +138,7 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
         if (pID == transfered_x0[i]) already_transfered = true;
       }
       for ( i=0; i<transfered_x1.size(); i++){
-        if (pID == transfered_y1[i]) already_transfered = true;
+        if (pID == transfered_x1[i]) already_transfered = true;
       }
       if ( already_transfered ){
         std::cout << " pID: " << pID << " already_transfered "<< std::endl;
