@@ -106,9 +106,9 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
       pID = partIDs[pIndx];
       if ( pID == 65482143 ){
         std::cout << " pID: " << pID << " pIndx: " << pIndx << std::endl;
-        std::cout << " pos_x " << pos_x[pindx] << std::endl;
-        std::cout << " pos_y " << pos_y[pindx] << std::endl;
-        std::cout << " pos_z " << pos_z[pindx] << std::endl;
+        std::cout << " pos_x " << pos_x[pIndx] << std::endl;
+        std::cout << " pos_y " << pos_y[pIndx] << std::endl;
+        std::cout << " pos_z " << pos_z[pIndx] << std::endl;
       }
       if ( pos_x[pIndx] < G.xMin ){
         out_indxs_vec_x0.push_back( pIndx );
