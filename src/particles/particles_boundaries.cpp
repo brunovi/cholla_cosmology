@@ -98,18 +98,29 @@ void Particles_3D::Clear_Vectors_For_Transfers( void ){
 void Particles_3D::Select_Particles_to_Transfer( int dir ){
 
   part_int_t pIndx;
+  part_int_t pID;
   if ( dir == 0 ){
     out_indxs_vec_x0.clear();
     out_indxs_vec_x1.clear();
     for ( pIndx=0; pIndx<n_local; pIndx++ ){
+      pID = partIDs[pIndx];
+      if ( pID == 65482143 ){
+        std::cout << " pID: " << pID << " pIndx: " << pIndx << std::endl;
+        std::cout << " pos_x " << pos_x[pindx] << std::endl;
+        std::cout << " pos_y " << pos_y[pindx] << std::endl;
+        std::cout << " pos_z " << pos_z[pindx] << std::endl;
+      }
       if ( pos_x[pIndx] < G.xMin ){
         out_indxs_vec_x0.push_back( pIndx );
+        if ( pID == 65482143 ) std::cout << " pID: " << pID << " Sending Left "<< std::endl;
         continue;
       }
       if ( pos_x[pIndx] >= G.xMax ){
         out_indxs_vec_x1.push_back( pIndx );
+        if ( pID == 65482143 ) std::cout << " pID: " << pID << " Sending Left "<< std::endl;
         continue;
       }
+      if ( pID == 65482143 ) std::cout << " pID: " << pID << " Not sent "<< std::endl;
     }
     std::sort(out_indxs_vec_x0.begin(), out_indxs_vec_x0.end());
     std::sort(out_indxs_vec_x1.begin(), out_indxs_vec_x1.end());
