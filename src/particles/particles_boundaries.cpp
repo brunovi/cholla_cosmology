@@ -218,6 +218,7 @@ void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer
     #endif
     #ifdef PARTICLE_IDS
     offset_extra += 1;
+    if ( partIDs[pIndx] == 65482143 ) std::cout << " pID: " << pID << " Loading to buffer  "<< direction << "  " <<  side << std::endl;
     send_buffer[ offset_extra ] = (Real) Get_and_Remove_partID( pIndx, partIDs );
     #endif
 
