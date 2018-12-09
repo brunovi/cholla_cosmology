@@ -77,6 +77,14 @@ class Particles_3D
   int_vector_t out_indxs_vec_y1;
   int_vector_t out_indxs_vec_z0;
   int_vector_t out_indxs_vec_z1;
+  int_vector_t transfered_x0;
+  int_vector_t transfered_x1;
+  int_vector_t transfered_y0;
+  int_vector_t transfered_y1;
+  int_vector_t transfered_z0;
+  int_vector_t transfered_z1;
+
+
   bool TRANSFER_DENSITY_BOUNDARIES;
   #endif
 

@@ -511,6 +511,13 @@ void Particles_3D::Remove_Transfered_Particles( void ){
   n_in_vectors += partIDs.size();
   #endif
 
+  transfered_x0.clear();
+  transfered_x1.clear();
+  transfered_y0.clear();
+  transfered_y1.clear();
+  transfered_z0.clear();
+  transfered_z1.clear();
+
 
 
   if ( n_in_vectors != n_local * N_DATA_PER_PARTICLE_TRANSFER ){
