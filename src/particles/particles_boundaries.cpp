@@ -97,6 +97,8 @@ void Particles_3D::Clear_Vectors_For_Transfers( void ){
 
 void Particles_3D::Select_Particles_to_Transfer( int dir ){
 
+  int i;
+  bool already_transfered;
   part_int_t pIndx;
   part_int_t pID;
   if ( dir == 0 ){
@@ -130,11 +132,15 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
     out_indxs_vec_y1.clear();
     for ( pIndx=0; pIndx<n_local; pIndx++ ){
       pID = partIDs[pIndx];
-      if ( pID == 65482143 ){
-        std::cout << " pID: " << pID << " pIndx: " << pIndx << std::endl;
-        std::cout << " pos_x " << pos_x[pIndx] << std::endl;
-        std::cout << " pos_y " << pos_y[pIndx] << std::endl;
-        std::cout << " pos_z " << pos_z[pIndx] << std::endl;
+      already_transfered = false;
+      for ( i=0; i<out_indxs_vec_x0.size(); i++){
+        if (pID == partIDs[out_indxs_vec_x0[i]]) already_transfered = true;
+      }
+      for ( i=0; i<out_indxs_vec_x1.size(); i++){
+        if (pID == partIDs[out_indxs_vec_x1[i]]) already_transfered = true;
+      }
+      if ( already_transfered ){
+        std::cout << " pID: " << pID << " already_transfered "<< std::endl;
         continue;
       }
       if ( pos_y[pIndx] < G.yMin ){
