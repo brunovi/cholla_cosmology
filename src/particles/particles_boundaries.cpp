@@ -135,6 +135,7 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
         std::cout << " pos_x " << pos_x[pIndx] << std::endl;
         std::cout << " pos_y " << pos_y[pIndx] << std::endl;
         std::cout << " pos_z " << pos_z[pIndx] << std::endl;
+        continue;
       }
       if ( pos_y[pIndx] < G.yMin ){
         out_indxs_vec_y0.push_back( pIndx );
