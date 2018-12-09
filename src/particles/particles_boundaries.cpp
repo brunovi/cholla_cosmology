@@ -126,6 +126,7 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
     }
     std::sort(out_indxs_vec_x0.begin(), out_indxs_vec_x0.end());
     std::sort(out_indxs_vec_x1.begin(), out_indxs_vec_x1.end());
+    return;
   }
   if ( dir == 1 ){
     out_indxs_vec_y0.clear();
