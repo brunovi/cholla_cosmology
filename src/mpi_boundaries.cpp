@@ -128,6 +128,7 @@ void Grid3D::Set_Boundaries_MPI_BLOCK(int *flags, struct parameters P)
     /* Step 3 - Receive MPI x-boundaries */
     if (flags[0]==5 || flags[1]==5) {
       Wait_and_Unload_MPI_Comm_Buffers_BLOCK(0, flags);
+      MPI_Barrier(world);
     }
   }
   MPI_Barrier(world);
@@ -145,6 +146,7 @@ void Grid3D::Set_Boundaries_MPI_BLOCK(int *flags, struct parameters P)
     /* Step 6 - Receive MPI y-boundaries */
     if (flags[2]==5 || flags[3]==5) {
       Wait_and_Unload_MPI_Comm_Buffers_BLOCK(1, flags);
+      MPI_Barrier(world);
     }
   }
   MPI_Barrier(world);
@@ -162,6 +164,7 @@ void Grid3D::Set_Boundaries_MPI_BLOCK(int *flags, struct parameters P)
     /* Step 9 - Receive MPI z-boundaries */
     if (flags[4]==5 || flags[5]==5) {
       Wait_and_Unload_MPI_Comm_Buffers_BLOCK(2, flags);
+      MPI_Barrier(world);
     }
   }
 
