@@ -134,11 +134,11 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
     for ( pIndx=0; pIndx<n_local; pIndx++ ){
       pID = partIDs[pIndx];
       already_transfered = false;
-      for ( i=0; i<out_indxs_vec_x0.size(); i++){
-        if (pID == partIDs[out_indxs_vec_x0[i]]) already_transfered = true;
+      for ( i=0; i<transfered_x0.size(); i++){
+        if (pID == transfered_x0[i]) already_transfered = true;
       }
-      for ( i=0; i<out_indxs_vec_x1.size(); i++){
-        if (pID == partIDs[out_indxs_vec_x1[i]]) already_transfered = true;
+      for ( i=0; i<transfered_x1.size(); i++){
+        if (pID == transfered_y1[i]) already_transfered = true;
       }
       if ( already_transfered ){
         std::cout << " pID: " << pID << " already_transfered "<< std::endl;
@@ -183,29 +183,35 @@ void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer
 
   int n_out;
   int_vector_t *out_indxs_vec;
-
+  int_vector_t *transfered_vec;
   if ( direction == 0 ){
     if ( side == 0 ){
       out_indxs_vec = &out_indxs_vec_x0;
+      transfered_vec = &transfered_x0;
     }
     if ( side == 1 ){
       out_indxs_vec = &out_indxs_vec_x1;
+      transfered_vec = &transfered_x1;
     }
   }
   if ( direction == 1 ){
     if ( side == 0 ){
       out_indxs_vec = &out_indxs_vec_y0;
+      transfered_vec = &transfered_y0;
     }
     if ( side == 1 ){
       out_indxs_vec = &out_indxs_vec_y1;
+      transfered_vec = &transfered_y1;
     }
   }
   if ( direction == 2 ){
     if ( side == 0 ){
       out_indxs_vec = &out_indxs_vec_z0;
+      transfered_vec = &transfered_z0;
     }
     if ( side == 1 ){
       out_indxs_vec = &out_indxs_vec_z1;
+      transfered_vec = &transfered_z1;
     }
   }
 
@@ -237,6 +243,7 @@ void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer
     #ifdef PARTICLE_IDS
     offset_extra += 1;
     if ( partIDs[pIndx] == 65482143 ) std::cout << " pID: " << partIDs[pIndx] << " Loading to buffer  "<< direction << "  " <<  side << std::endl;
+    transfered_vec.push_back(partIDs[pIndx]);
     send_buffer[ offset_extra ] = (Real) Get_and_Remove_partID( pIndx, partIDs );
     #endif
 
