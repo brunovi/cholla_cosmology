@@ -3,65 +3,32 @@ from os import listdir
 from os.path import isfile, join
 import h5py
 import numpy as np
-# import matplotlib.pyplot as plt
-# import matplotlib.cm as cm
 
-dataDir = '/raid/bruno/data/'
-# dataDir = '/home/bruno/Desktop/data/'
+inDir = '/lustre/atlas/scratch/bvilasen/ast125/cosmo_1024_hydro/data/'
+outDir = inDir + 'perticles/'
 
-# dataDir = '/home/bruno/Desktop/hard_drive_1/data/'
+
+name_base = 'h5'
+out_base_name = 'particles_'
+
+dataFiles = [f for f in listdir(inDir) if (isfile(join(inDir, f)) and (f.find('_particles.h5.') > 0 ) ) ]
+dataFiles = np.sort( dataFiles )
+nFiles = len( dataFiles )
+
+def split_name( file_name):
+  nSnap, name, nBox = file_name.split('.')
+  nSnap = nSnap[:nSnap.find('_particles')]
+  return [int(nSnap), int(nBox)]
 #
-# type = 'dm'
-# type = 'hydro'
-# inDir = dataDir + 'cosmo_sims/cholla_pm/cosmo_256_{0}/enzo/'.format( type )
-# # inDir = dataDir + 'cosmo_sims/cholla_pm/cosmo_256_{0}/nyx/'.format( type )
-# outDir = inDir + 'data/'
-#
-# # dataDir = '/home/bruno/Desktop/hard_drive_1/data/'
-# # inDir = dataDir + 'cosmo_sims/cholla_pm/cosmo_512_hydro/'
-# #
-# # dataDir = '/home/bruno/Desktop/hdd_extrn_1/data/'
-# # outDir = dataDir + 'cosmo_sims/cholla_pm/cosmo_512_hydro/data/'
-# # outDir = dataDir + 'cosmo_sims/cholla_pm/cosmo_256_hydro/'
-#
-# # inDir = dataDir + 'cholla_hydro/collapse_3D/'
-# # outDir = dataDir + 'cholla_hydro/collapse_3D/'
-#
-# name_base = 'h5'
-# # outFileName = 'data_particles.h5'
-# out_base_name = 'particles_'
-#
-# dataFiles = [f for f in listdir(inDir) if (isfile(join(inDir, f)) and (f.find('_particles.h5.') > 0 ) ) ]
-# dataFiles = np.sort( dataFiles )
-# nFiles = len( dataFiles )
-#
-#
-# def split_name( file_name):
-#   nSnap, name, nBox = file_name.split('.')
-#   nSnap = nSnap[:nSnap.find('_particles')]
-#   return [int(nSnap), int(nBox)]
-# #
-# files_names = np.array([ split_name( file_name ) for file_name in dataFiles ])
-# snaps, boxes = files_names.T
-# snaps = np.unique( snaps )
-# boxes = np.unique( boxes )
-# nSnapshots = len( snaps )
-# nBoxes = len( boxes )
-#
-# #
-# # # Get all boxes from first snap
-# # snapNum = 0
-# # boxNum = 0
-# # boxesNames = []
-# # for fileName in dataFiles:
-# #   nSnap, nBox = split_name( dataFiles[boxNum], name_base )
-# #   boxesNames.append( str(nSnap) + '.' + name_base + '.' + str(boxNum) )
-# #   if nSnap != snapNum: break
-# #   boxNum += 1
-# # nBoxes = len( boxesNames )
-# # nSnapshots = nFiles / nBoxes
-# print "Number of boxes: {0}".format(nBoxes)
-# print "Number of snapshots: {0}".format(nSnapshots)
+files_names = np.array([ split_name( file_name ) for file_name in dataFiles ])
+snaps, boxes = files_names.T
+snaps = np.unique( snaps )
+boxes = np.unique( boxes )
+nSnapshots = len( snaps )
+nBoxes = len( boxes )
+
+print "Number of boxes: {0}".format(nBoxes)
+print "Number of snapshots: {0}".format(nSnapshots)
 #
 # snap_id = 0
 # box_id = 0
