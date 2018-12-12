@@ -5,7 +5,7 @@ import h5py
 import numpy as np
 
 inDir = '/lustre/atlas/scratch/bvilasen/ast125/cosmo_1024_hydro/data/'
-outDir = inDir + 'perticles/'
+outDir = inDir + 'particles/'
 
 
 name_base = 'h5'
