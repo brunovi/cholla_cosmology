@@ -53,7 +53,7 @@ for nSnap in range(nSnapshots):
   added_time = False
   print ' snap: {0}  {1}'.format( nSnap, keys_all )
   for key in keys_all:
-    data_all = np.zeros( dims_all )
+    data_all = np.zeros( dims_all, dtype=np.float32 )
     data_all_parts = []
     for nBox in range(nBoxes):
       inFileName = '{0}_particles.{1}.{2}'.format(nSnap, name_base, nBox)
@@ -65,21 +65,21 @@ for nSnap in range(nSnapshots):
       procStart_z, procStart_y, procStart_x = head['offset']
       procEnd_z, procEnd_y, procEnd_x = head['offset'] + head['dims_local']
       if key in keys:
-        data_local = inFile[key][...]
+        data_local = inFile[key][...].astype(np.float32)
         data_all[ procStart_z:procEnd_z, procStart_y:procEnd_y, procStart_x:procEnd_x] = data_local
       if key in keys_parts:
-        data_local_parts = inFile[key][...]
+        data_local_parts = inFile[key][...].astype(np.float32)
         data_all_parts.append(data_local_parts)
       inFile.close()
     if key in keys:
-      fileSnap.create_dataset( key, data=data_all.astype(np.float32) )
+      fileSnap.create_dataset( key, data=data_all)
       fileSnap.attrs['max_'+ key ] = data_all.max()
       fileSnap.attrs['min_'+ key ] = data_all.min()
       fileSnap.attrs['mean_'+ key ] = data_all.mean()
     if key in keys_parts:
       array_parts = np.concatenate(data_all_parts)
       print 'nParticles: ', len(array_parts)
-      fileSnap.create_dataset( key, data=array_parts.astype(np.float32) )
+      fileSnap.create_dataset( key, data=array_parts )
     if added_time == False:
       fileSnap.attrs['current_z'] = current_z[0]
       fileSnap.attrs['current_a'] = current_a[0]
