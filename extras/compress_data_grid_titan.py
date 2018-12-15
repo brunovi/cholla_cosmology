@@ -54,7 +54,7 @@ for nSnap in range(nSnapshots):
   print ' snap: {0}  {1}'.format( nSnap, keys )
   for key in keys:
     print '  {0}'.format(key)
-    data_all = np.zeros( dims_all, dtype=np.float64 )
+    data_all = np.zeros( dims_all, dtype=np.float32 )
     for nBox in range(nBoxes):
       inFileName = '{0}.{1}.{2}'.format(nSnap, name_base, nBox)
       inFile = h5py.File( inDir + inFileName, 'r')
@@ -62,7 +62,7 @@ for nSnap in range(nSnapshots):
       time = head['t']
       procStart_z, procStart_y, procStart_x = head['offset']
       procEnd_z, procEnd_y, procEnd_x = head['offset'] + head['dims_local']
-      data_local = inFile[key][...]
+      data_local = inFile[key][...].astype(np.float32)
       data_all[ procStart_z:procEnd_z, procStart_y:procEnd_y, procStart_x:procEnd_x] = data_local
       inFile.close()
     if key=='grav_density': print '  {0}   {1}   {2}'.format(data_all.mean(), data_all.min(), data_all.max())
