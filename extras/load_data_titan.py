@@ -5,6 +5,7 @@ import h5py as h5
 import numpy as np
 import matplotlib.pyplot as plt
 import gc
+import sys
 
 def load_snapshot_data_particles( nSnap, inputDir ):
   inFileName = 'particles_{0}.h5'.format(nSnap)
@@ -47,8 +48,9 @@ inDir = '/lustre/atlas/proj-shared/ast125/data_cosmo/grid/'
 outDir = inDir + 'projections/'
 out_base_name = 'proj_ge'
 
-nSnap = 0
-for nSnap in range(18,20):
+nSnap_start = sys.argv[1]
+nSnaps = sys.argv[2]
+for nSnap in range(nSnap_start, nSnap_start+nSnaps):
   data = load_snapshot_data_grid( nSnap, inDir )
   dens = data['density'][...]
   ge = data['GasEnergy'][...]
