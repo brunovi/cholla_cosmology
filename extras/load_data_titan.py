@@ -1,7 +1,7 @@
 import os, sys
 from os import listdir
 from os.path import isfile, join
-import h5py
+import h5py as h5
 import numpy as np
 
 
