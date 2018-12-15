@@ -31,12 +31,10 @@ def load_snapshot_data_particles( nSnap, inputDir ):
 def load_snapshot_data_grid( nSnap, inDir):
   inFileName = 'grid_{0}.h5'.format(nSnap)
   snapFile = h5.File( inDir + inFileName, 'r')
-  t = snapFile.attrs['t'][0]
   inputKeys = snapFile.keys()
   grid_keys = [ 'density', 'momentum_x', 'momentum_y', 'momentum_z', 'GasEnergy']
   optional_keys = [ ]
   data_grid = {}
-  data_grid['t'] = t
   for key in optional_keys:
     if key in inputKeys: grid_keys.append( key )
   for key in grid_keys:
