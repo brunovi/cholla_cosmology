@@ -56,7 +56,7 @@ for nSnap in range(100):
   dens2_proj = (dens*dens*dens).sum( axis=0 ) / (dens*dens).sum(axis=0)
 
   fileName = out_base_name + '_{0}.h5'.format( nSnap )
-  fileSnap = h5py.File( outDir + fileName, 'w' )
+  fileSnap = h5.File( outDir + fileName, 'w' )
 
   fileSnap.attrs['current_z'] = current_z
   fileSnap.create_dataset( 'density', data=dens2_proj )
