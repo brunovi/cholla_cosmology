@@ -48,7 +48,7 @@ outDir = inDir + 'projections/'
 out_base_name = 'proj_ge'
 
 nSnap = 0
-for nSnap in range(7,10):
+for nSnap in range(27,30):
   data = load_snapshot_data_grid( nSnap, inDir )
   dens = data['density'][...]
   ge = data['GasEnergy'][...]
