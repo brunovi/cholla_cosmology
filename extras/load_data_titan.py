@@ -48,8 +48,8 @@ inDir = '/lustre/atlas/proj-shared/ast125/data_cosmo/grid/'
 outDir = inDir + 'projections/'
 out_base_name = 'proj_ge'
 
-nSnap_start = sys.argv[1]
-nSnaps = sys.argv[2]
+nSnap_start = int(sys.argv[1])
+nSnaps = int(sys.argv[2])
 for nSnap in range(nSnap_start, nSnap_start+nSnaps):
   data = load_snapshot_data_grid( nSnap, inDir )
   dens = data['density'][...]
