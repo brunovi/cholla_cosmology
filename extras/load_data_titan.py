@@ -4,7 +4,7 @@ from os.path import isfile, join
 import h5py as h5
 import numpy as np
 import matplotlib.pyplot as plt
-
+import gc
 
 def load_snapshot_data_particles( nSnap, inputDir ):
   inFileName = 'particles_{0}.h5'.format(nSnap)
@@ -45,22 +45,33 @@ def load_snapshot_data_grid( nSnap, inFileName ):
 
 
 inDir = '/lustre/atlas/proj-shared/ast125/data_cosmo/particles/'
+inDir = '/lustre/atlas/proj-shared/ast125/data_cosmo/grid/'
 outDir = inDir + 'projections/'
 out_base_name = 'proj'
 
 nSnap = 0
-for nSnap in range(90,100):
-  data_particles = load_snapshot_data_particles( nSnap, inDir )
-  current_z = data_particles['current_z']
-  dens = data_particles['density'][...]
+for nSnap in range(0,100):
+  data = load_snapshot_data_grid( nSnap, inDir )
+  dens = data['density'][...]
   dens2_proj = (dens*dens*dens).sum( axis=0 ) / (dens*dens).sum(axis=0)
 
   fileName = out_base_name + '_{0}.h5'.format( nSnap )
   fileSnap = h5.File( outDir + fileName, 'w' )
 
-  fileSnap.attrs['current_z'] = current_z
   fileSnap.create_dataset( 'density', data=dens2_proj )
   fileSnap.close()
+  gc.collect()
+  # data_particles = load_snapshot_data_particles( nSnap, inDir )
+  # current_z = data_particles['current_z']
+  # dens = data_particles['density'][...]
+  # dens2_proj = (dens*dens*dens).sum( axis=0 ) / (dens*dens).sum(axis=0)
+  #
+  # fileName = out_base_name + '_{0}.h5'.format( nSnap )
+  # fileSnap = h5.File( outDir + fileName, 'w' )
+  #
+  # fileSnap.attrs['current_z'] = current_z
+  # fileSnap.create_dataset( 'density', data=dens2_proj )
+  # fileSnap.close()
 
 # box_size = 50
 # d_min = dens2_proj.min()
