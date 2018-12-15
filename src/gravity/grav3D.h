@@ -106,6 +106,10 @@ class Grav3D
     // Real *Grav_potential_prev;
     #endif
 
+    #ifdef EXTRA_FIELD
+    Real *extra_field;
+    #endif
+
 
 
 

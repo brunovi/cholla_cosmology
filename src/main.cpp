@@ -311,8 +311,6 @@ int main(int argc, char *argv[])
     #endif
     #endif
 
-    // Get_Delta_Conserved( G );
-
     #ifdef REVERT_STEP
     Get_Delta_Conserved( G );
     #endif

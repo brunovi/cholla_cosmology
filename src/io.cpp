@@ -1158,6 +1158,29 @@ void Grid3D::Write_Grid_HDF5(hid_t file_id)
 
 
     #ifdef GRAVITY
+    #ifdef EXTRA_FIELD
+    for (int k=0; k<Grav.nz_local; k++) {
+      for (int j=0; j<Grav.ny_local; j++) {
+        for (int i=0; i<Grav.nx_local; i++) {
+          // id = (i+H.n_ghost) + (j+H.n_ghost)*H.nx + (k+H.n_ghost)*H.nx*H.ny;
+          // buf_id = k + j*H.nz_real + i*H.nz_real*H.ny_real;
+          id = (i) + (j)*Grav.nx_local + (k)*Grav.nx_local*Grav.ny_local;
+          buf_id = k + j*Grav.nz_local + i*Grav.nz_local*Grav.ny_local;
+          dataset_buffer[buf_id] = Grav.F.extra_field[id];
+          // dataset_buffer[buf_id] = pfft_density[id][0];
+        }
+      }
+    }
+    // Create a dataset id for density
+    dataset_id = H5Dcreate(file_id, "/extra_field", H5T_IEEE_F64BE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    // Write the density array to file  // NOTE: NEED TO FIX FOR FLOAT REAL!!!
+    status = H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, dataset_buffer);
+    // Free the dataset id
+    status = H5Dclose(dataset_id);
+    #endif
+
+
+
     #ifdef OUTPUT_GRAVITY_DENSITY
     // Copy the Gravity density array to the memory buffer
     for (int k=0; k<Grav.nz_local; k++) {

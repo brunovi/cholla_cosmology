@@ -12,6 +12,11 @@ void Sync_Energies_3D_Host(Grid3D &G ){
   ny_grid = G.H.ny;
   nz_grid = G.H.nz;
 
+  int nx_grav, ny_grav, nz_grav, id_grav;
+  nx_grav = G.Grav.nx_local;
+  ny_grav = G.Grav.ny_local;
+  nz_grav = G.Grav.nz_local;
+
   int nGHST = nGHST_grid ;
   Real d, d_inv, vx, vy, vz, E, Ek, ge1, ge2, Emax;
   int k, j, i, id;
@@ -21,9 +26,9 @@ void Sync_Energies_3D_Host(Grid3D &G ){
   for ( k=0; k<nz_grid; k++ ){
     for ( j=0; j<ny_grid; j++ ){
       for ( i=0; i<nx_grid; i++ ){
-        if ( (i < 1) || (i > (nx_grid - 2) ) ) continue;
-        if ( (j < 1) || (j > (ny_grid - 2) ) ) continue;
-        if ( (k < 1) || (k > (nz_grid - 2) ) ) continue;
+        if ( (i < nGHST) || (i > (nx_grid - nGHST - 1) ) ) continue;
+        if ( (j < nGHST) || (j > (ny_grid - nGHST - 1) ) ) continue;
+        if ( (k < nGHST) || (k > (nz_grid - nGHST - 1) ) ) continue;
 
         id  = (i) + (j)*nx_grid + (k)*ny_grid*nz_grid;
         d = G.C.density[id];
@@ -44,10 +49,11 @@ void Sync_Energies_3D_Host(Grid3D &G ){
   for ( k=0; k<nz_grid; k++ ){
     for ( j=0; j<ny_grid; j++ ){
       for ( i=0; i<nx_grid; i++ ){
-        if ( (i < 1) || (i > (nx_grid - 2) ) ) continue;
-        if ( (j < 1) || (j > (ny_grid - 2) ) ) continue;
-        if ( (k < 1) || (k > (nz_grid - 2) ) ) continue;
+        if ( (i < nGHST) || (i > (nx_grid - nGHST - 1) ) ) continue;
+        if ( (j < nGHST) || (j > (ny_grid - nGHST - 1) ) ) continue;
+        if ( (k < nGHST) || (k > (nz_grid - nGHST - 1) ) ) continue;
 
+        id_grav = (i-nGHST) + (j-nGHST)*nx_grav + (k-nGHST)*ny_grav*nz_grav;
         id  = (i) + (j)*nx_grid + (k)*ny_grid*nz_grid;
         imo = (i-1) + (j)*nx_grid + (k)*ny_grid*nz_grid;
         ipo = (i+1) + (j)*nx_grid + (k)*ny_grid*nz_grid;
@@ -68,9 +74,12 @@ void Sync_Energies_3D_Host(Grid3D &G ){
         ge1 = G.C.GasEnergy[id];
         ge2 = E - 0.5*d*(vx*vx + vy*vy + vz*vz);
 
-        if (ge2 > 0.0 && E > 0.0 && ge2/E > 0.005 && Ek/Ek_mean > 0.4 ) {
+        G.Grav.F.extra_field[id_grav] = 0;
+        if (ge2 > 0.0 && E > 0.0 && ge2/E > 0.001 ) {
+        // if (ge2 > 0.0 && E > 0.0 && ge2/E > 0.001 && Ek/Ek_mean > 0.4 ) {
           G.C.GasEnergy[id] = ge2;
           ge1 = ge2;
+          G.Grav.F.extra_field[id_grav] = 1;
           // std::cout << ge2/E << std::endl;
         }
 
@@ -85,6 +94,7 @@ void Sync_Energies_3D_Host(Grid3D &G ){
 
         if (ge2/Emax > 0.1 && ge2 > 0.0 && Emax > 0.0) {
           G.C.GasEnergy[id] = ge2;
+          G.Grav.F.extra_field[id_grav] = 2;
         }
         // sync the total energy with the internal energy
         else {

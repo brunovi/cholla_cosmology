@@ -90,6 +90,10 @@ void Grav3D::AllocateMemory_CPU(void)
   F.gravity_z_h_prev  = (Real *) malloc(n_cells*sizeof(Real));
   #endif
 
+  #ifdef EXTRA_FIELD
+  F.extra_field  = (Real *) malloc(n_cells*sizeof(Real));
+  #endif
+
 }
 
 void Grav3D::Initialize_values_CPU(void){
@@ -103,6 +107,9 @@ void Grav3D::Initialize_values_CPU(void){
     F.gravity_x_h_prev[id] = 0;
     F.gravity_y_h_prev[id] = 0;
     F.gravity_z_h_prev[id] = 0;
+    #endif
+    #ifdef EXTRA_FIELD
+    F.extra_field[id] = 0;
     #endif
   }
 
@@ -125,6 +132,10 @@ void Grav3D::FreeMemory_CPU(void)
   free(F.gravity_x_h_prev);
   free(F.gravity_y_h_prev);
   free(F.gravity_z_h_prev);
+  #endif
+
+  #ifdef EXTRA_FIELD
+  free(F.extra_field);
   #endif
 }
 
