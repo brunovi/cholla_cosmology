@@ -51,28 +51,28 @@ out_base_name = 'proj'
 nSnap_start = int(sys.argv[1])
 nSnaps = int(sys.argv[2])
 for nSnap in range(nSnap_start, nSnap_start+nSnaps):
-  data = load_snapshot_data_grid( nSnap, inDir )
-  dens = data['density'][...]
-  # ge = data['GasEnergy'][...]
+  # data = load_snapshot_data_grid( nSnap, inDir )
+  # dens = data['density'][...]
+  # # ge = data['GasEnergy'][...]
+  # dens2_proj = (dens*dens).sum( axis=0 ) / (dens).sum(axis=0)
+  #
+  # fileName = out_base_name + '_{0}.h5'.format( nSnap )
+  # fileSnap = h5.File( outDir + fileName, 'w' )
+  #
+  # fileSnap.create_dataset( 'density', data=dens2_proj )
+  # fileSnap.close()
+  data_particles = load_snapshot_data_particles( nSnap, inDir )
+  current_z = data_particles['current_z']
+  dens = data_particles['density'][...]
   dens2_proj = (dens*dens).sum( axis=0 ) / (dens).sum(axis=0)
 
   fileName = out_base_name + '_{0}.h5'.format( nSnap )
   fileSnap = h5.File( outDir + fileName, 'w' )
 
+  fileSnap.attrs['current_z'] = current_z
   fileSnap.create_dataset( 'density', data=dens2_proj )
   fileSnap.close()
   gc.collect()
-  # data_particles = load_snapshot_data_particles( nSnap, inDir )
-  # current_z = data_particles['current_z']
-  # dens = data_particles['density'][...]
-  # dens2_proj = (dens*dens*dens).sum( axis=0 ) / (dens*dens).sum(axis=0)
-  #
-  # fileName = out_base_name + '_{0}.h5'.format( nSnap )
-  # fileSnap = h5.File( outDir + fileName, 'w' )
-  #
-  # fileSnap.attrs['current_z'] = current_z
-  # fileSnap.create_dataset( 'density', data=dens2_proj )
-  # fileSnap.close()
 
 # box_size = 50
 # d_min = dens2_proj.min()
