@@ -47,6 +47,33 @@ inDir = '/lustre/atlas/proj-shared/ast125/data_cosmo/particles/'
 outDir = inDir + 'projections/'
 
 nSnap = 0
-
+box_size = 50
 
 data_particles = load_snapshot_data_particles( nSnap, inDir )
+current_z = data_particles['current_z']
+dens = data_particles['density'][...]
+dens2_proj = (dens*dens*dens).sum( axis=0 ) / (dens*dens).sum(axis=0)
+dens2_proj = np.log10( dens2_proj )
+# dens2_proj = np.log10( dens_proj )
+
+# d_min = dens2_proj.min()
+# d_min = 0
+# d_max = dens2_proj.max()
+
+plt.figure(0, figsize=(15,15))
+plt.clf()
+fig = plt.gcf()
+ax = plt.gca()
+img = np.log10( dens2_proj  )
+ax.imshow(img, extent=[0,box_size,0,box_size], interpolation='bilinear', cmap='inferno'  )
+ax.set_axis_off()
+text = r'z = {0:.1f}'.format(current_z)
+ax.text(box_size*0.05, box_size*0.90, text, fontsize=20, color='white',
+        bbox={'facecolor':'black', 'edgecolor':'white', 'alpha':0.5, })
+
+fig.axes[0].get_yaxis().set_visible(False)
+fig.axes[0].get_xaxis().set_visible(False)
+# # plt.axis('off')
+outFileName = outDir + 'densProj_{0}.png'.format(snap)
+fig.savefig( outFileName, pad_inches=0,  bbox_inches='tight', dpi=200 )
+# # fig.show()
