@@ -48,7 +48,7 @@ outDir = inDir + 'projections/'
 out_base_name = 'proj'
 
 nSnap = 0
-for nSnap in range(15,100):
+for nSnap in range(29,100):
   data = load_snapshot_data_grid( nSnap, inDir )
   dens = data['density'][...]
   dens2_proj = (dens*dens*dens).sum( axis=0 ) / (dens*dens).sum(axis=0)
