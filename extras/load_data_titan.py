@@ -3,6 +3,7 @@ from os import listdir
 from os.path import isfile, join
 import h5py as h5
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def load_snapshot_data_particles( nSnap, inputDir ):
