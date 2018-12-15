@@ -46,6 +46,7 @@ def load_snapshot_data_grid( nSnap, inFileName ):
 
 inDir = '/lustre/atlas/proj-shared/ast125/data_cosmo/particles/'
 outDir = inDir + 'projections/'
+out_base_name = 'proj'
 
 nSnap = 0
 for nSnap in range(100):
@@ -54,7 +55,7 @@ for nSnap in range(100):
   dens = data_particles['density'][...]
   dens2_proj = (dens*dens*dens).sum( axis=0 ) / (dens*dens).sum(axis=0)
 
-  fileName = out_base_name + 'proj_{0}.h5'.format( nSnap )
+  fileName = out_base_name + '_{0}.h5'.format( nSnap )
   fileSnap = h5py.File( outDir + fileName, 'w' )
 
   fileSnap.attrs['current_z'] = current_z
