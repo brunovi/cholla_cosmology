@@ -28,9 +28,9 @@ def load_snapshot_data_particles( nSnap, inputDir ):
     data_part[key] = partsFile[key]
   return data_part
 
-def load_snapshot_data_grid( nSnap, inFileName ):
-  # inFileName = '{0}.h5'.format(nSnap)
-  snapFile = h5.File( inFileName, 'r')
+def load_snapshot_data_grid( nSnap, inDir):
+  inFileName = 'grid_{0}.h5'.format(nSnap)
+  snapFile = h5.File( inDir + inFileName, 'r')
   t = snapFile.attrs['t'][0]
   inputKeys = snapFile.keys()
   grid_keys = [ 'density', 'momentum_x', 'momentum_y', 'momentum_z', 'GasEnergy']
