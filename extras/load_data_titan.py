@@ -49,7 +49,7 @@ outDir = inDir + 'projections/'
 out_base_name = 'proj'
 
 nSnap = 0
-for nSnap in range(17,100):
+for nSnap in range(33,100):
   data_particles = load_snapshot_data_particles( nSnap, inDir )
   current_z = data_particles['current_z']
   dens = data_particles['density'][...]
