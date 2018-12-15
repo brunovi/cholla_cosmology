@@ -44,7 +44,7 @@ def load_snapshot_data_grid( nSnap, inDir):
 
 
 inDir = '/lustre/atlas/proj-shared/ast125/data_cosmo/particles/'
-inDir = '/lustre/atlas/proj-shared/ast125/data_cosmo/grid/'
+# inDir = '/lustre/atlas/proj-shared/ast125/data_cosmo/grid/'
 outDir = inDir + 'projections/'
 out_base_name = 'proj'
 
