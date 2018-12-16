@@ -39,6 +39,8 @@ using namespace std;
 #include "cosmology/cosmology_units.h"
 #include "cosmology/io_cosmology.h"
 #endif
+
+#include "correction_functions.h"
 #endif
 
 #ifdef COOLING_GRACKLE
@@ -46,10 +48,13 @@ using namespace std;
 #include "cooling/grackle_functions.h"
 #endif
 
-#include "correction_functions.h"
+
+#ifdef CPU_TIME
+#include "timing_functions.h"
+#endif
 
 #define OUTPUT
-#define CPU_TIME
+// #define CPU_TIME
 
 int main(int argc, char *argv[])
 {
@@ -209,6 +214,8 @@ int main(int argc, char *argv[])
   #endif
 
   #ifdef CPU_TIME
+  Time Timer;
+  Timer.Initialize();
   int step_counter = 0;
   Real time_hydro_total, time_potential_total, time_particles_total, time_all_total, time_boundaries_total;
   time_hydro_total = time_potential_total = time_particles_total = time_all_total, time_boundaries_total = 0;

@@ -55,7 +55,7 @@ void Change_GAS_Frame_System( Grid3D &G, bool forward ){
 
 void Change_Cosmological_Frame_Sytem( Grid3D &G, bool forward ){
 
-  if (forward) chprintf( " Converting to Cosmological Comoving System\n");
+  if (forward) chprintf( " Converting to Cosmological Comoving System\n\n");
   else chprintf( " Converting to Cosmological Physical System\n");
   Change_DM_Frame_System( G, forward );
   Change_GAS_Frame_System( G, forward );

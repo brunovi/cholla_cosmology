@@ -32,9 +32,12 @@ void rotate_point(Real x, Real y, Real z, Real delta, Real phi, Real theta, Real
 void WriteData(Grid3D &G, struct parameters P, int nfile)
 {
 
+  chprintf( "\nSaving Snapshot: %d \n", nfile );
+
   #ifdef COSMOLOGY
   Change_Cosmological_Frame_Sytem( G, false );
   #endif
+
 
   #ifndef ONLY_PM
   /*call the data output routine*/
