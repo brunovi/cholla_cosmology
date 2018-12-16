@@ -115,13 +115,13 @@ void Particles_3D::Initialize( struct parameters P, Grav3D &Grav, Real xblocal, 
   #endif
 
 
-  #ifdef PARTICLES_OMP
+  #ifdef GRAVITY_OMP
   chprintf(" Using OMP for particles calculations\n");
   int n_omp_max = omp_get_max_threads();
   chprintf("  MAX OMP Threads: %d\n", n_omp_max);
-  chprintf("  N OMP Threads per MPI process: %d\n", N_OMP_PARTICLE_THREADS);
+  chprintf("  N OMP Threads per MPI process: %d\n", N_OMP_GRAVITY_THREADS);
   // omp_set_num_threads(8);
-  #pragma omp parallel num_threads( N_OMP_PARTICLE_THREADS )
+  #pragma omp parallel num_threads( N_OMP_GRAVITY_THREADS )
   {
     int omp_id, n_omp_procs;
     part_int_t omp_pIndx_start, omp_pIndx_end;

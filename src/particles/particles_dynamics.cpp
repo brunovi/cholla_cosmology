@@ -269,7 +269,7 @@ Real Update_Particles( Grid3D &G, int step ){
   if ( step == 1) Copy_Particles_Vectors( G );
   #endif
 
-  #ifndef PARTICLES_OMP
+  #ifndef GRAVITY_OMP
   if ( step == 1 ){
     #ifndef COSMOLOGY
     Advance_Particles_step1( G.Particles, 0, G.Particles.n_local );
@@ -287,9 +287,9 @@ Real Update_Particles( Grid3D &G, int step ){
   }
   #endif
 
-  #ifdef PARTICLES_OMP
+  #ifdef GRAVITY_OMP
 
-  #pragma omp parallel num_threads( N_OMP_PARTICLE_THREADS )
+  #pragma omp parallel num_threads( N_OMP_GRAVITY_THREADS )
   {
     int omp_id, n_omp_procs;
     part_int_t p_start, p_end;
@@ -299,7 +299,7 @@ Real Update_Particles( Grid3D &G, int step ){
     n_omp_procs = omp_get_num_threads();
     // #pragma omp barrier
 
-    Get_OMP_Indxs( G.Particles.n_local, N_OMP_PARTICLE_THREADS, omp_id, G.Particles.G.nz_local + 2*G.Particles.G.n_ghost_particles_grid, &p_start, &p_end, &g_start, &g_end );
+    Get_OMP_Indxs( G.Particles.n_local, N_OMP_GRAVITY_THREADS, omp_id, G.Particles.G.nz_local + 2*G.Particles.G.n_ghost_particles_grid, &p_start, &p_end, &g_start, &g_end );
 
     // for (int omp_indx = 0; omp_indx<n_omp_procs; omp_indx++){
     //   if (omp_id == omp_indx) chprintf( "omp_id:%d  p_start:%ld  p_end:%ld  g_start:%d  g_end:%d\n", omp_id, p_start, p_end, g_start, g_end );

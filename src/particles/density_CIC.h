@@ -12,8 +12,8 @@
 #include"density_boundaries.h"
 #include "../grid3D.h"
 
-#ifdef PARTICLES_OMP
-#include"particles_omp.h"
+#ifdef GRAVITY_OMP
+#include"../gravity/gravity_omp.h"
 #endif
 
 #ifdef PARTICLES_CUDA

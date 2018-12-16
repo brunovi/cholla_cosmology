@@ -1,0 +1,19 @@
+{
+  "logger": {
+    "title": "Remote Sync"
+  },
+  "uploadOnSave": true,
+  "useAtomicWrites": false,
+  "deleteLocal": false,
+  "hostname": "shamrock.ucsc.edu",
+  "port": "22",
+  "target": "/home/bruno/cholla",
+  "ignore": [
+    ".remote-sync.json",
+    ".git/**"
+  ],
+  "username": "bruno",
+  "watch": [],
+  "useAgent": true,
+  "transport": "scp"
+}

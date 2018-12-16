@@ -451,11 +451,11 @@ int main(int argc, char *argv[])
   ofstream out_file;
   out_file.open("run_timing.log", ios::app);
   out_file << P.nz << " " << P.ny << " " << P.nx << " ";
-  #ifndef PARTICLES_OMP
+  #ifndef GRAVITY_OMP
   out_file << 0 << " ";
   #endif
-  #ifdef PARTICLES_OMP
-  out_file << N_OMP_PARTICLE_THREADS << " ";
+  #ifdef GRAVITY_OMP
+  out_file << N_OMP_GRAVITY_THREADS << " ";
   #endif
   out_file << time_hydro_total << " " << time_boundaries_total << " ";
   out_file << time_potential_total << " " << time_particles_total << " ";

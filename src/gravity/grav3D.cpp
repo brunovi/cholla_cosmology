@@ -72,6 +72,12 @@ void Grav3D::Initialize( Real x_min, Real y_min, Real z_min, Real Lx, Real Ly, R
   // std::cout << xMin << std::endl;
   // chprintf( "\n" );
 
+  #ifdef GRAVITY_OMP
+  chprintf(" Using OMP for gravity calculations\n");
+  int n_omp_max = omp_get_max_threads();
+  chprintf("  MAX OMP Threads: %d\n", n_omp_max);
+  chprintf("  N OMP Threads per MPI process: %d\n", N_OMP_GRAVITY_THREADS);
+  #endif
 }
 
 void Grav3D::AllocateMemory_CPU(void)

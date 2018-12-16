@@ -12,8 +12,8 @@
 #include <iostream>
 #include"gravity_CIC.h"
 
-#ifdef PARTICLES_OMP
-#include "particles_omp.h"
+#ifdef GRAVITY_OMP
+#include"../gravity/gravity_omp.h"
 #endif
 
 #ifdef COSMOLOGY

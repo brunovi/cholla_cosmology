@@ -7,8 +7,8 @@
 #include"../particles/particles_dynamics.h"
 #endif
 
-#ifdef PARTICLES_OMP
-#include"../particles/particles_omp.h"
+#ifdef GRAVITY_OMP
+#include"gravity_omp.h"
 #endif
 
 #ifdef MPI_CHOLLA
@@ -398,12 +398,12 @@ void Add_Gravity_Corrector( Grid3D &G, int g_start, int g_end ){
 
 void Apply_Gavity_Corrector( Grid3D &G ){
 
-  #ifndef PARTICLES_OMP
+  #ifndef GRAVITY_OMP
   Get_Gavity_Corrector( G, 0, G.Grav.nz_local );
   Add_Gravity_Corrector( G, 0, G.Grav.nz_local );
   #else
 
-  #pragma omp parallel num_threads( N_OMP_PARTICLE_THREADS )
+  #pragma omp parallel num_threads( N_OMP_GRAVITY_THREADS )
   {
     int omp_id, n_omp_procs;
     part_int_t p_start, p_end;
