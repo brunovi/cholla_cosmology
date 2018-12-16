@@ -431,7 +431,7 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
     if ( pPos_x < Particles.G.xMin || pPos_x >= Particles.G.xMax ) in_local = false;
     if ( pPos_y < Particles.G.yMin || pPos_y >= Particles.G.yMax ) in_local = false;
     if ( pPos_z < Particles.G.zMin || pPos_z >= Particles.G.zMax ) in_local = false;
-    if ( ! in_local || pID == 65482143 ) {
+    if ( ! in_local || pID == 1057078072 ) {
       #ifdef PARTICLE_IDS
       std::cout << " Particle outside Loacal  domain    pID: " << pID << std::endl;
       #else
