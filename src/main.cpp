@@ -214,8 +214,7 @@ int main(int argc, char *argv[])
   #endif
 
   #ifdef CPU_TIME
-  Time Timer;
-  Timer.Initialize();
+  G.Timer.Initialize();
   int step_counter = 0;
   Real time_hydro_total, time_potential_total, time_particles_total, time_all_total, time_boundaries_total;
   time_hydro_total = time_potential_total = time_particles_total = time_all_total, time_boundaries_total = 0;

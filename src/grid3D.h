@@ -31,6 +31,9 @@
 #include "cooling/cool_grackle.h"
 #endif
 
+#ifdef CPU_TIME
+#include "timing_functions.h"
+#endif
 
 struct Rotation
 {
@@ -266,6 +269,10 @@ class Grid3D
 
     #ifdef COOLING_GRACKLE
     Cool_GK Cool;
+    #endif
+
+    #ifdef CPU_TIME
+    Time Timer;
     #endif
 
     struct Conserved

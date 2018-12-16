@@ -1,6 +1,9 @@
 
 #ifdef CPU_TIME
 
+#ifndef TIMING_FUNCTIONS_H
+#define TIMING_FUNCTIONS_H
+
 #include "global.h"
 
 
@@ -39,4 +42,5 @@ public:
 };
 
 
+#endif
 #endif
