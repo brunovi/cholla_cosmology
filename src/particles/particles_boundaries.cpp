@@ -149,21 +149,6 @@ void Particles_3D::Clear_Vectors_For_Transfers( void ){
 
 void Particles_3D::Select_Particles_to_Transfer( int dir ){
 
-  if ( dir == 0 ){
-    recv_pos_x.clear();
-    recv_pos_y.clear();
-    recv_pos_z.clear();
-    recv_vel_x.clear();
-    recv_vel_y.clear();
-    recv_vel_z.clear();
-    #ifndef SINGLE_PARTICLE_MASS
-    recv_mass.clear();
-    #endif
-    #ifdef PARTICLE_IDS
-    recv_partIDs.clear();
-    #endif
-  }
-
   int i;
   bool already_transfered, pID_in_transfers;
   part_int_t pIndx;
@@ -191,33 +176,11 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
     out_indxs_vec_y1.clear();
     for ( pIndx=0; pIndx<n_local; pIndx++ ){
       pID = partIDs[pIndx];
-      // if ( pID == 1057078072 ){
-      //   std::cout <<  "pID: " << pID << " Sending particle: " << dir << " " << std::endl;
-      //   std::cout << " posX: " << pos_x[pIndx] << " velX: " << vel_x[pIndx] << std::endl;
-      //   std::cout << " posY: " << pos_y[pIndx] << " velY: " << vel_y[pIndx] << std::endl;
-      //   std::cout << " posZ: " << pos_z[pIndx] << " velZ: " << vel_z[pIndx] << std::endl;
-      //   std::cout << " Domain X: " << G.xMin << "  " << G.xMax << std::endl;
-      //   std::cout << " Domain Y: " << G.yMin << "  " << G.yMax << std::endl;
-      //   std::cout << " Domain Z: " << G.zMin << "  " << G.zMax << std::endl;
-      // }
       already_transfered = false;
-      // pID_in_transfers = std::binary_search (transfered_x0.begin(), transfered_x0.end(), pID);
-      // if ( pID_in_transfers ) already_transfered = true;
-      // pID_in_transfers = std::binary_search (transfered_x1.begin(), transfered_x1.end(), pID);
-      // if ( pID_in_transfers ) already_transfered = true;
       if ( pos_x[pIndx] < G.xMin || pos_x[pIndx] >= G.xMax ) already_transfered = true;
       if ( already_transfered ){
         continue;
       }
-      // if ( pID == 1057078072 ){
-      //   std::cout <<  "pID: " << pID << " Sending particle: " << dir << " " << std::endl;
-      //   std::cout << " posX: " << pos_x[pIndx] << " velX: " << vel_x[pIndx] << std::endl;
-      //   std::cout << " posY: " << pos_y[pIndx] << " velY: " << vel_y[pIndx] << std::endl;
-      //   std::cout << " posZ: " << pos_z[pIndx] << " velZ: " << vel_z[pIndx] << std::endl;
-      //   std::cout << " Domain X: " << G.xMin << "  " << G.xMax << std::endl;
-      //   std::cout << " Domain Y: " << G.yMin << "  " << G.yMax << std::endl;
-      //   std::cout << " Domain Z: " << G.zMin << "  " << G.zMax << std::endl;
-      // }
       if ( pos_y[pIndx] < G.yMin ){
         out_indxs_vec_y0.push_back( pIndx );
         continue;
@@ -236,26 +199,9 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
     for ( pIndx=0; pIndx<n_local; pIndx++ ){
       pID = partIDs[pIndx];
       already_transfered = false;
-      // pID_in_transfers = std::binary_search (transfered_x0.begin(), transfered_x0.end(), pID);
-      // if ( pID_in_transfers ) already_transfered = true;
-      // pID_in_transfers = std::binary_search (transfered_x1.begin(), transfered_x1.end(), pID);
-      // if ( pID_in_transfers ) already_transfered = true;
-      // pID_in_transfers = std::binary_search (transfered_y0.begin(), transfered_y0.end(), pID);
-      // if ( pID_in_transfers ) already_transfered = true;
-      // pID_in_transfers = std::binary_search (transfered_y1.begin(), transfered_y1.end(), pID);
-      // if ( pID_in_transfers ) already_transfered = true;
       if ( pos_x[pIndx] < G.xMin || pos_x[pIndx] >= G.xMax || pos_y[pIndx] < G.yMin || pos_y[pIndx] >= G.yMax ) already_transfered = true;
       if ( already_transfered ){
         continue;
-      }
-      if ( pID == 1057078072 ){
-        std::cout <<  "pID: " << pID << " Sending particle: " << dir << " " << std::endl;
-        std::cout << " posX: " << pos_x[pIndx] << " velX: " << vel_x[pIndx] << std::endl;
-        std::cout << " posY: " << pos_y[pIndx] << " velY: " << vel_y[pIndx] << std::endl;
-        std::cout << " posZ: " << pos_z[pIndx] << " velZ: " << vel_z[pIndx] << std::endl;
-        std::cout << " Domain X: " << G.xMin << "  " << G.xMax << std::endl;
-        std::cout << " Domain Y: " << G.yMin << "  " << G.yMax << std::endl;
-        std::cout << " Domain Z: " << G.zMin << "  " << G.zMax << std::endl;
       }
       if ( pos_z[pIndx] < G.zMin ){
         out_indxs_vec_z0.push_back( pIndx );
@@ -277,19 +223,16 @@ void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer
 
   part_int_t n_out;
   int_vector_t *out_indxs_vec;
-  // int_vector_t *transfered_vec;
   part_int_t *n_transfer_1;
   part_int_t *n_transfer_2;
   if ( direction == 0 ){
     if ( side == 0 ){
       out_indxs_vec = &out_indxs_vec_x0;
-      // transfered_vec = &transfered_x0;
       n_transfer_1 = &n_transfer_x0;
       n_transfer_2 = &n_transfer_x0_s;
     }
     if ( side == 1 ){
       out_indxs_vec = &out_indxs_vec_x1;
-      // transfered_vec = &transfered_x1;
       n_transfer_1 = &n_transfer_x1;
       n_transfer_2 = &n_transfer_x1_s;
     }
@@ -297,13 +240,11 @@ void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer
   if ( direction == 1 ){
     if ( side == 0 ){
       out_indxs_vec = &out_indxs_vec_y0;
-      // transfered_vec = &transfered_y0;
       n_transfer_1 = &n_transfer_y0;
       n_transfer_2 = &n_transfer_y0_s;
     }
     if ( side == 1 ){
       out_indxs_vec = &out_indxs_vec_y1;
-      // transfered_vec = &transfered_y1;
       n_transfer_1 = &n_transfer_y1;
       n_transfer_2 = &n_transfer_y1_s;
     }
@@ -311,13 +252,11 @@ void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer
   if ( direction == 2 ){
     if ( side == 0 ){
       out_indxs_vec = &out_indxs_vec_z0;
-      // transfered_vec = &transfered_z0;
       n_transfer_1 = &n_transfer_z0;
       n_transfer_2 = &n_transfer_z0_s;
     }
     if ( side == 1 ){
       out_indxs_vec = &out_indxs_vec_z1;
-      // transfered_vec = &transfered_z1;
       n_transfer_1 = &n_transfer_z1;
       n_transfer_2 = &n_transfer_z1_s;
     }
@@ -357,7 +296,6 @@ void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer
     #endif
     #ifdef PARTICLE_IDS
     offset_extra += 1;
-    // transfered_vec->push_back(partIDs[pIndx]);
     send_buffer[ offset_extra ] = (Real) Get_and_Remove_partID( pIndx, partIDs );
     #endif
 
@@ -371,9 +309,8 @@ void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer
     offset += N_DATA_PER_PARTICLE_TRANSFER;
   }
 
-  // std::sort( (*transfered_vec).begin(), (*transfered_vec).end());
   send_buffer[buffer_start+1] += *n_transfer_2;
-  // std::cout << " send_next: " << out_indxs_vec->size() << std::endl;
+
 }
 
 
@@ -509,16 +446,6 @@ void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int bu
     pId = 0;
     #endif
 
-    if ( pId == 1057078072 ){
-      std::cout <<  "pID: " << pId << " Recived particle: " << direction << " " << side << std::endl;
-      std::cout << " posX: " << pPos_x << " velX: " << pVel_x << std::endl;
-      std::cout << " posY: " << pPos_y << " velY: " << pVel_y << std::endl;
-      std::cout << " posZ: " << pPos_z << " velZ: " << pVel_z << std::endl;
-      std::cout << " Domain X: " << G.xMin << "  " << G.xMax << std::endl;
-      std::cout << " Domain Y: " << G.yMin << "  " << G.yMax << std::endl;
-      std::cout << " Domain Z: " << G.zMin << "  " << G.zMax << std::endl;
-    }
-
 
     offset_buff += N_DATA_PER_PARTICLE_TRANSFER;
     if ( pPos_x <  G.domainMin_x ) pPos_x += ( G.domainMax_x - G.domainMin_x );
@@ -617,13 +544,6 @@ void Particles_3D::Remove_Transfered_Particles( void ){
   n_in_vectors += partIDs.size();
   #endif
 
-  // transfered_x0.clear();
-  // transfered_x1.clear();
-  // transfered_y0.clear();
-  // transfered_y1.clear();
-  // transfered_z0.clear();
-  // transfered_z1.clear();
-
 
 
   if ( n_in_vectors != n_local * N_DATA_PER_PARTICLE_TRANSFER ){
@@ -631,13 +551,6 @@ void Particles_3D::Remove_Transfered_Particles( void ){
     exit(-1);
   }
 
-  // out_indxs_vec_x0.clear();
-  // out_indxs_vec_x1.clear();
-  // out_indxs_vec_y0.clear();
-  // out_indxs_vec_y1.clear();
-  // out_indxs_vec_z0.clear();
-  // out_indxs_vec_z1.clear();
-  // //
   n_in_out_vectors = out_indxs_vec_x0.size() + out_indxs_vec_x1.size() + out_indxs_vec_y0.size() + out_indxs_vec_y1.size() + out_indxs_vec_z0.size() + out_indxs_vec_z1.size();
   if ( n_in_out_vectors != 0 ){
     std::cout << "#################ERROR PARTICLES TRANSFER: OUPTUT VECTORS NOT EMPTY, N_IN_VECTORS: " << n_in_out_vectors << std::endl;
@@ -671,11 +584,6 @@ void Particles_3D::Remove_Transfered_Particles( void ){
     std::cout  << "pos_z: " << pos_z[pId] << " z: " << G.zMin << "  " << G.zMax << std::endl;
     exit(-1);
   }
-  // for ( int i=0; i<nproc; i++ ){
-    // MPI_Barrier(world);
-  // }
-  // MPI_Barrier(world);
-  // std::cout << "   Removed: "<< n_delete << std::endl;
 
 }
 
