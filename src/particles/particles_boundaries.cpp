@@ -222,7 +222,7 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
         continue;
       }
       if ( pID == 1057078072 ){
-        std::cout <<  "pID: " << pID << " Sending particle: " << dire << " " << std::endl;
+        std::cout <<  "pID: " << pID << " Sending particle: " << dir << " " << std::endl;
       }
       if ( pos_z[pIndx] < G.zMin ){
         out_indxs_vec_z0.push_back( pIndx );
