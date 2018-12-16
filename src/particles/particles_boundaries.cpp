@@ -193,6 +193,12 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
       pID = partIDs[pIndx];
       if ( pID == 1057078072 ){
         std::cout <<  "pID: " << pID << " Sending particle: " << dir << " " << std::endl;
+        std::cout << " posX: " << pos_x[indx] << " velX: " << vel_x[indx] << std::endl;
+        std::cout << " posY: " << pos_y[indx] << " velY: " << vel_y[indx] << std::endl;
+        std::cout << " posZ: " << pos_z[indx] << " velZ: " << vel_z[indx] << std::endl;
+        std::cout << " Domain X: " << G.xMin << "  " << G.xMax << std::endl;
+        std::cout << " Domain Y: " << G.yMin << "  " << G.yMax << std::endl;
+        std::cout << " Domain Z: " << G.zMin << "  " << G.zMax << std::endl;
       }
       already_transfered = false;
       // pID_in_transfers = std::binary_search (transfered_x0.begin(), transfered_x0.end(), pID);
