@@ -467,15 +467,15 @@ void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int bu
     pId = 0;
     #endif
 
-    // if ( pId == 65482143 ){
-    //   std::cout <<  "pID: " << pId << " Recived particle: " << direction << " " << side << std::endl;
-    //   std::cout << " posX: " << pPos_x << " velX: " << pVel_x << std::endl;
-    //   std::cout << " posY: " << pPos_y << " velY: " << pVel_y << std::endl;
-    //   std::cout << " posZ: " << pPos_z << " velZ: " << pVel_z << std::endl;
-    //   std::cout << " Domain X: " << G.xMin << "  " << G.xMax << std::endl;
-    //   std::cout << " Domain Y: " << G.yMin << "  " << G.yMax << std::endl;
-    //   std::cout << " Domain Z: " << G.zMin << "  " << G.zMax << std::endl;
-    // }
+    if ( pId == 1057078072 ){
+      std::cout <<  "pID: " << pId << " Recived particle: " << direction << " " << side << std::endl;
+      std::cout << " posX: " << pPos_x << " velX: " << pVel_x << std::endl;
+      std::cout << " posY: " << pPos_y << " velY: " << pVel_y << std::endl;
+      std::cout << " posZ: " << pPos_z << " velZ: " << pVel_z << std::endl;
+      std::cout << " Domain X: " << G.xMin << "  " << G.xMax << std::endl;
+      std::cout << " Domain Y: " << G.yMin << "  " << G.yMax << std::endl;
+      std::cout << " Domain Z: " << G.zMin << "  " << G.zMax << std::endl;
+    }
 
 
     offset_buff += N_DATA_PER_PARTICLE_TRANSFER;
