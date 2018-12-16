@@ -74,12 +74,16 @@ void Sync_Energies_3D_Host(Grid3D &G ){
         ge1 = G.C.GasEnergy[id];
         ge2 = E - 0.5*d*(vx*vx + vy*vy + vz*vz);
 
+        #ifdef EXTRA_FIELD
         G.Grav.F.extra_field[id_grav] = 0;
+        #endif
         if (ge2 > 0.0 && E > 0.0 && ge2/E > 0.001 ) {
         // if (ge2 > 0.0 && E > 0.0 && ge2/E > 0.001 && Ek/Ek_mean > 0.4 ) {
           G.C.GasEnergy[id] = ge2;
           ge1 = ge2;
+          #ifdef EXTRA_FIELD
           G.Grav.F.extra_field[id_grav] = 1;
+          #endif
           // std::cout << ge2/E << std::endl;
         }
 
@@ -94,7 +98,9 @@ void Sync_Energies_3D_Host(Grid3D &G ){
 
         if (ge2/Emax > 0.1 && ge2 > 0.0 && Emax > 0.0) {
           G.C.GasEnergy[id] = ge2;
+          #ifdef EXTRA_FIELD
           G.Grav.F.extra_field[id_grav] = 2;
+          #endif
         }
         // sync the total energy with the internal energy
         else {
