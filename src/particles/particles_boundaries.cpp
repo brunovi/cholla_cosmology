@@ -497,7 +497,7 @@ void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int bu
       continue;
     }
 
-    if (  direction == 1 ){
+    if (  direction == 0 ){
       if ( pPos_y <  G.domainMin_y ) pPos_y += ( G.domainMax_y - G.domainMin_y );
       if ( pPos_y >= G.domainMax_y ) pPos_y -= ( G.domainMax_y - G.domainMin_y );
     }
@@ -527,7 +527,7 @@ void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int bu
       }
     }
 
-    if (  direction == 2 ){
+    if (  direction == 0 ){
       if ( pPos_z <  G.domainMin_z ) pPos_z += ( G.domainMax_z - G.domainMin_z );
       if ( pPos_z >= G.domainMax_z ) pPos_z -= ( G.domainMax_z - G.domainMin_z );
     }
