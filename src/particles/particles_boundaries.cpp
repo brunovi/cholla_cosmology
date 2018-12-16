@@ -149,6 +149,21 @@ void Particles_3D::Clear_Vectors_For_Transfers( void ){
 
 void Particles_3D::Select_Particles_to_Transfer( int dir ){
 
+  if ( dir == 0 ){
+    recv_pos_x.clear();
+    recv_pos_y.clear();
+    recv_pos_z.clear();
+    recv_vel_x.clear();
+    recv_vel_y.clear();
+    recv_vel_z.clear();
+    #ifndef SINGLE_PARTICLE_MASS
+    recv_mass.clear();
+    #endif
+    #ifdef PARTICLE_IDS
+    recv_partIDs.clear();
+    #endif
+  }
+
   int i;
   bool already_transfered, pID_in_transfers;
   part_int_t pIndx;

@@ -77,6 +77,19 @@ class Particles_3D
   int_vector_t out_indxs_vec_y1;
   int_vector_t out_indxs_vec_z0;
   int_vector_t out_indxs_vec_z1;
+
+  real_vector_t recv_pos_x;
+  real_vector_t recv_pos_y;
+  real_vector_t recv_pos_z;
+  real_vector_t recv_vel_x;
+  real_vector_t recv_vel_y;
+  real_vector_t recv_vel_z;
+  #ifndef SINGLE_PARTICLE_MASS
+  real_vector_t recv_mass;
+  #endif
+  #ifdef PARTICLE_IDS
+  int_vector_t recv_partIDs;
+  #endif
   // int_vector_t transfered_x0;
   // int_vector_t transfered_x1;
   // int_vector_t transfered_y0;
