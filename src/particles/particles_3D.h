@@ -77,12 +77,25 @@ class Particles_3D
   int_vector_t out_indxs_vec_y1;
   int_vector_t out_indxs_vec_z0;
   int_vector_t out_indxs_vec_z1;
-  int_vector_t transfered_x0;
-  int_vector_t transfered_x1;
-  int_vector_t transfered_y0;
-  int_vector_t transfered_y1;
-  int_vector_t transfered_z0;
-  int_vector_t transfered_z1;
+  // int_vector_t transfered_x0;
+  // int_vector_t transfered_x1;
+  // int_vector_t transfered_y0;
+  // int_vector_t transfered_y1;
+  // int_vector_t transfered_z0;
+  // int_vector_t transfered_z1;
+
+  part_int_t n_transfer_x0;
+  part_int_t n_transfer_x0_s;
+  part_int_t n_transfer_x1;
+  part_int_t n_transfer_x1_s;
+  part_int_t n_transfer_y0;
+  part_int_t n_transfer_y0_s;
+  part_int_t n_transfer_y1;
+  part_int_t n_transfer_y1_s;
+  part_int_t n_transfer_z0;
+  part_int_t n_transfer_z0_s;
+  part_int_t n_transfer_z1;
+  part_int_t n_transfer_z1_s;
 
 
   bool TRANSFER_DENSITY_BOUNDARIES;
@@ -138,7 +151,7 @@ class Particles_3D
   void Clear_Vectors_For_Transfers( void );
   // void Select_Particles_to_Transfer( void );
     void Select_Particles_to_Transfer( int dir );
-  void Load_Particles_to_Buffer( int direction, int side, int buffer_start, Real *send_buffer, int MAX_PARTICLES_IN_BUFFER  );
+  void Load_Particles_to_Buffer( int direction, int side, int buffer_start, Real *send_buffer, int MAX_PARTICLES_IN_BUFFER , bool secondary );
   void Load_Particles_to_Buffer_X( void );
   void Load_Particles_to_Buffer_Y( void );
   void Load_Particles_to_Buffer_Z( void );

@@ -95,6 +95,58 @@ void Particles_3D::Clear_Vectors_For_Transfers( void ){
 }
 
 
+// void Particles_3D::Select_Particles_to_Transfer( int dir ){
+//
+//   out_indxs_vec_x0.clear();
+//   out_indxs_vec_x1.clear();
+//   out_indxs_vec_y0.clear();
+//   out_indxs_vec_y1.clear();
+//   out_indxs_vec_z0.clear();
+//   out_indxs_vec_z1.clear();
+//   //
+//
+//   part_int_t pIndx;
+//   part_int_t pID;
+//   for ( pIndx=0; pIndx<n_local; pIndx++ ){
+//     if ( pos_x[pIndx] < G.xMin ){
+//       out_indxs_vec_x0.push_back( pIndx );
+//       continue;
+//     }
+//     if ( pos_x[pIndx] >= G.xMax ){
+//       out_indxs_vec_x1.push_back( pIndx );
+//       continue;
+//     }
+//     if ( pos_y[pIndx] < G.yMin ){
+//       out_indxs_vec_y0.push_back( pIndx );
+//       continue;
+//     }
+//     if ( pos_y[pIndx] >= G.yMax ){
+//       out_indxs_vec_y1.push_back( pIndx );
+//       continue;
+//     }
+//     if ( pos_z[pIndx] < G.zMin ){
+//       out_indxs_vec_z0.push_back( pIndx );
+//       continue;
+//     }
+//     if ( pos_z[pIndx] >= G.zMax ){
+//       out_indxs_vec_z1.push_back( pIndx );
+//       continue;
+//     }
+//   }
+//   std::sort(out_indxs_vec_x0.begin(), out_indxs_vec_x0.end());
+//   std::sort(out_indxs_vec_x1.begin(), out_indxs_vec_x1.end());
+//   std::sort(out_indxs_vec_y0.begin(), out_indxs_vec_y0.end());
+//   std::sort(out_indxs_vec_y1.begin(), out_indxs_vec_y1.end());
+//   std::sort(out_indxs_vec_z0.begin(), out_indxs_vec_z0.end());
+//   std::sort(out_indxs_vec_z1.begin(), out_indxs_vec_z1.end());
+// }
+
+
+
+
+
+
+
 void Particles_3D::Select_Particles_to_Transfer( int dir ){
 
   int i;
@@ -106,23 +158,14 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
     out_indxs_vec_x1.clear();
     for ( pIndx=0; pIndx<n_local; pIndx++ ){
       pID = partIDs[pIndx];
-      // if ( pID == 65482143 ){
-      //   std::cout << " pID: " << pID << " pIndx: " << pIndx << std::endl;
-      //   std::cout << " pos_x " << pos_x[pIndx] << std::endl;
-      //   std::cout << " pos_y " << pos_y[pIndx] << std::endl;
-      //   std::cout << " pos_z " << pos_z[pIndx] << std::endl;
-      // }
       if ( pos_x[pIndx] < G.xMin ){
         out_indxs_vec_x0.push_back( pIndx );
-        // if ( pID == 65482143 ) std::cout << " pID: " << pID << " Sending Left "<< std::endl;
         continue;
       }
       if ( pos_x[pIndx] >= G.xMax ){
         out_indxs_vec_x1.push_back( pIndx );
-        // if ( pID == 65482143 ) std::cout << " pID: " << pID << " Sending Right "<< std::endl;
         continue;
       }
-      // if ( pID == 65482143 ) std::cout << " pID: " << pID << " Not sent X "<< std::endl;
     }
     std::sort(out_indxs_vec_x0.begin(), out_indxs_vec_x0.end());
     std::sort(out_indxs_vec_x1.begin(), out_indxs_vec_x1.end());
@@ -134,31 +177,22 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
     for ( pIndx=0; pIndx<n_local; pIndx++ ){
       pID = partIDs[pIndx];
       already_transfered = false;
-      pID_in_transfers = std::binary_search (transfered_x0.begin(), transfered_x0.end(), pID);
-      if ( pID_in_transfers ) already_transfered = true;
-      pID_in_transfers = std::binary_search (transfered_x1.begin(), transfered_x1.end(), pID);
-      if ( pID_in_transfers ) already_transfered = true;
-      // for ( i=0; i<transfered_x0.size(); i++){
-      //   if (pID == transfered_x0[i]) already_transfered = true;
-      // }
-      // for ( i=0; i<transfered_x1.size(); i++){
-      //   if (pID == transfered_x1[i]) already_transfered = true;
-      // }
+      // pID_in_transfers = std::binary_search (transfered_x0.begin(), transfered_x0.end(), pID);
+      // if ( pID_in_transfers ) already_transfered = true;
+      // pID_in_transfers = std::binary_search (transfered_x1.begin(), transfered_x1.end(), pID);
+      // if ( pID_in_transfers ) already_transfered = true;
+      if ( pos_x[pIndx] < G.xMin || pos_x[pIndx] >= G.xMax ) already_transfered = true;
       if ( already_transfered ){
-        // std::cout << " pID: " << pID << " already_transfered "<< std::endl;
         continue;
       }
       if ( pos_y[pIndx] < G.yMin ){
         out_indxs_vec_y0.push_back( pIndx );
-        // if ( pID == 65482143 ) std::cout << " pID: " << pID << " Sending Down "<< std::endl;
         continue;
       }
       if ( pos_y[pIndx] >= G.yMax ){
         out_indxs_vec_y1.push_back( pIndx );
-        // if ( pID == 65482143 ) std::cout << " pID: " << pID << " Sending Up "<< std::endl;
         continue;
       }
-      // if ( pID == 65482143 ) std::cout << " pID: " << pID << " Not sent Y "<< std::endl;
     }
     std::sort(out_indxs_vec_y0.begin(), out_indxs_vec_y0.end());
     std::sort(out_indxs_vec_y1.begin(), out_indxs_vec_y1.end());
@@ -169,28 +203,16 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
     for ( pIndx=0; pIndx<n_local; pIndx++ ){
       pID = partIDs[pIndx];
       already_transfered = false;
-      pID_in_transfers = std::binary_search (transfered_x0.begin(), transfered_x0.end(), pID);
-      if ( pID_in_transfers ) already_transfered = true;
-      pID_in_transfers = std::binary_search (transfered_x1.begin(), transfered_x1.end(), pID);
-      if ( pID_in_transfers ) already_transfered = true;
-      pID_in_transfers = std::binary_search (transfered_y0.begin(), transfered_y0.end(), pID);
-      if ( pID_in_transfers ) already_transfered = true;
-      pID_in_transfers = std::binary_search (transfered_y1.begin(), transfered_y1.end(), pID);
-      if ( pID_in_transfers ) already_transfered = true;
-      // for ( i=0; i<transfered_x0.size(); i++){
-      //   if (pID == transfered_x0[i]) already_transfered = true;
-      // }
-      // for ( i=0; i<transfered_x1.size(); i++){
-      //   if (pID == transfered_x1[i]) already_transfered = true;
-      // }
-      // for ( i=0; i<transfered_y0.size(); i++){
-      //   if (pID == transfered_y0[i]) already_transfered = true;
-      // }
-      // for ( i=0; i<transfered_y1.size(); i++){
-      //   if (pID == transfered_y1[i]) already_transfered = true;
-      // }
+      // pID_in_transfers = std::binary_search (transfered_x0.begin(), transfered_x0.end(), pID);
+      // if ( pID_in_transfers ) already_transfered = true;
+      // pID_in_transfers = std::binary_search (transfered_x1.begin(), transfered_x1.end(), pID);
+      // if ( pID_in_transfers ) already_transfered = true;
+      // pID_in_transfers = std::binary_search (transfered_y0.begin(), transfered_y0.end(), pID);
+      // if ( pID_in_transfers ) already_transfered = true;
+      // pID_in_transfers = std::binary_search (transfered_y1.begin(), transfered_y1.end(), pID);
+      // if ( pID_in_transfers ) already_transfered = true;
+      if ( pos_x[pIndx] < G.xMin || pos_x[pIndx] >= G.xMax || pos_y[pIndx] < G.yMin || pos_y[pIndx] >= G.yMax ) already_transfered = true;
       if ( already_transfered ){
-        // std::cout << " pID: " << pID << " already_transfered "<< std::endl;
         continue;
       }
       if ( pos_z[pIndx] < G.zMin ){
@@ -209,54 +231,75 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
 
 
 
-void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer_start, Real *send_buffer,int MAX_PARTICLES_IN_BUFFER  ){
+void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer_start, Real *send_buffer, int MAX_PARTICLES_IN_BUFFER, bool secondary  ){
 
-  int n_out;
+  part_int_t n_out;
   int_vector_t *out_indxs_vec;
-  int_vector_t *transfered_vec;
+  // int_vector_t *transfered_vec;
+  part_int_t *n_transfer_1;
+  part_int_t *n_transfer_2;
   if ( direction == 0 ){
     if ( side == 0 ){
       out_indxs_vec = &out_indxs_vec_x0;
-      transfered_vec = &transfered_x0;
+      // transfered_vec = &transfered_x0;
+      n_transfer_1 = &n_transfer_x0;
+      n_transfer_2 = &n_transfer_x0_s;
     }
     if ( side == 1 ){
       out_indxs_vec = &out_indxs_vec_x1;
-      transfered_vec = &transfered_x1;
+      // transfered_vec = &transfered_x1;
+      n_transfer_1 = &n_transfer_x1;
+      n_transfer_2 = &n_transfer_x1_s;
     }
   }
   if ( direction == 1 ){
     if ( side == 0 ){
       out_indxs_vec = &out_indxs_vec_y0;
-      transfered_vec = &transfered_y0;
+      // transfered_vec = &transfered_y0;
+      n_transfer_1 = &n_transfer_y0;
+      n_transfer_2 = &n_transfer_y0_s;
     }
     if ( side == 1 ){
       out_indxs_vec = &out_indxs_vec_y1;
-      transfered_vec = &transfered_y1;
+      // transfered_vec = &transfered_y1;
+      n_transfer_1 = &n_transfer_y1;
+      n_transfer_2 = &n_transfer_y1_s;
     }
   }
   if ( direction == 2 ){
     if ( side == 0 ){
       out_indxs_vec = &out_indxs_vec_z0;
-      transfered_vec = &transfered_z0;
+      // transfered_vec = &transfered_z0;
+      n_transfer_1 = &n_transfer_z0;
+      n_transfer_2 = &n_transfer_z0_s;
     }
     if ( side == 1 ){
       out_indxs_vec = &out_indxs_vec_z1;
-      transfered_vec = &transfered_z1;
+      // transfered_vec = &transfered_z1;
+      n_transfer_1 = &n_transfer_z1;
+      n_transfer_2 = &n_transfer_z1_s;
     }
   }
 
-  int offset, n_in_buffer, offset_extra;
-  part_int_t indx, pIndx;
+  part_int_t offset, n_in_buffer, offset_extra;
+  part_int_t indx, pIndx, indx_start;
 
-  n_out = out_indxs_vec->size();
-  n_in_buffer = real_to_int( send_buffer[buffer_start] ) ;
+  if (!secondary){
+    n_out = out_indxs_vec->size();
+    n_in_buffer = real_to_int( send_buffer[buffer_start] ) ;
+    if ( (n_out + n_in_buffer) >= MAX_PARTICLES_IN_BUFFER ) n_out = MAX_PARTICLES_IN_BUFFER - n_in_buffer;
+    *n_transfer_1 = n_out;
+    *n_transfer_2 = out_indxs_vec->size() - n_out;
+    indx_start = 0;
+  }
+  else{
+    indx_start = *n_transfer_1;
+    n_out = *n_transfer_2;
 
-  if ( (n_out + n_in_buffer) >= MAX_PARTICLES_IN_BUFFER ) n_out = MAX_PARTICLES_IN_BUFFER - n_in_buffer;
-
-  // n_in_buffer = 0;
+  }
 
   offset = buffer_start + N_HEADER_PARTICLES_TRANSFER + n_in_buffer*N_DATA_PER_PARTICLE_TRANSFER;
-  for ( indx=0; indx<n_out; indx++ ){
+  for ( indx=indx_start; indx<n_out; indx++ ){
     pIndx = out_indxs_vec->back();
     send_buffer[ offset + 0 ] = Get_and_Remove_Real( pIndx, pos_x );
     send_buffer[ offset + 1 ] = Get_and_Remove_Real( pIndx, pos_y );
@@ -272,8 +315,7 @@ void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer
     #endif
     #ifdef PARTICLE_IDS
     offset_extra += 1;
-    // if ( partIDs[pIndx] == 65482143 ) std::cout << " pID: " << partIDs[pIndx] << " Loading to buffer  "<< direction << "  " <<  side << std::endl;
-    transfered_vec->push_back(partIDs[pIndx]);
+    // transfered_vec->push_back(partIDs[pIndx]);
     send_buffer[ offset_extra ] = (Real) Get_and_Remove_partID( pIndx, partIDs );
     #endif
 
@@ -287,15 +329,8 @@ void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer
     offset += N_DATA_PER_PARTICLE_TRANSFER;
   }
 
-  std::sort( (*transfered_vec).begin(), (*transfered_vec).end());
-
-  // out_indxs_vec->clear();
-  // if (direction==0 && side==1){
-  //   out_indxs_vec_x1.clear();
-  //   std::cout << " size: " << out_indxs_vec->size() <<  out_indxs_vec_x1.size() << std::endl;
-  // }
-  // n_local -= n_out;
-  send_buffer[buffer_start+1] += out_indxs_vec->size();
+  // std::sort( (*transfered_vec).begin(), (*transfered_vec).end());
+  send_buffer[buffer_start+1] += *n_transfer_2;
   // std::cout << " send_next: " << out_indxs_vec->size() << std::endl;
 }
 
@@ -481,23 +516,12 @@ void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int bu
       continue;
     }
 
-    if (direction  != 1 ){
+    if (direction  == 1 ){
       if ( pPos_y < G.yMin ){
-        // std::cout << "  Adding to Y0 " << std::endl;
         Add_Particle_To_Buffer( send_buffer_y0, buffer_start_y, max_particles, send_buffer_y0_second, 0, pId, pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pVel_z, secondary);
         continue;
       }
       if ( pPos_y >= G.yMax ){
-        // if ( pId == 65482143 ){
-        //   std::cout <<  "pID: " << pId << " Seond Transfer sending UP " << direction << " " << side << std::endl;
-        //   std::cout << " posX: " << pPos_x << " velX: " << pVel_x << std::endl;
-        //   std::cout << " posY: " << pPos_y << " velY: " << pVel_y << std::endl;
-        //   std::cout << " posZ: " << pPos_z << " velZ: " << pVel_z << std::endl;
-        //   std::cout << " Domain X: " << G.xMin << "  " << G.xMax << std::endl;
-        //   std::cout << " Domain Y: " << G.yMin << "  " << G.yMax << std::endl;
-        //   std::cout << " Domain Z: " << G.zMin << "  " << G.zMax << std::endl;
-        // }
-        // std::cout << "  Adding to Y1 " << std::endl;
         Add_Particle_To_Buffer( send_buffer_y1, buffer_start_y, max_particles, send_buffer_y1_second, 0, pId, pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pVel_z, secondary);
         continue;
       }
@@ -551,12 +575,12 @@ void Particles_3D::Remove_Transfered_Particles( void ){
   n_in_vectors += partIDs.size();
   #endif
 
-  transfered_x0.clear();
-  transfered_x1.clear();
-  transfered_y0.clear();
-  transfered_y1.clear();
-  transfered_z0.clear();
-  transfered_z1.clear();
+  // transfered_x0.clear();
+  // transfered_x1.clear();
+  // transfered_y0.clear();
+  // transfered_y1.clear();
+  // transfered_z0.clear();
+  // transfered_z1.clear();
 
 
 
@@ -564,6 +588,14 @@ void Particles_3D::Remove_Transfered_Particles( void ){
     std::cout << "ERROR PARTICLES TRANSFER: DATA IN VECTORS DIFFERENT FROM N_LOCAL###########" << std::endl;
     exit(-1);
   }
+
+  // out_indxs_vec_x0.clear();
+  // out_indxs_vec_x1.clear();
+  // out_indxs_vec_y0.clear();
+  // out_indxs_vec_y1.clear();
+  // out_indxs_vec_z0.clear();
+  // out_indxs_vec_z1.clear();
+  // //
   n_in_out_vectors = out_indxs_vec_x0.size() + out_indxs_vec_x1.size() + out_indxs_vec_y0.size() + out_indxs_vec_y1.size() + out_indxs_vec_z0.size() + out_indxs_vec_z1.size();
   if ( n_in_out_vectors != 0 ){
     std::cout << "#################ERROR PARTICLES TRANSFER: OUPTUT VECTORS NOT EMPTY, N_IN_VECTORS: " << n_in_out_vectors << std::endl;

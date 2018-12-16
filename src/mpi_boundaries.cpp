@@ -114,6 +114,13 @@ void Grid3D::Set_Boundaries_MPI_SLAB(int *flags, struct parameters P)
 
 void Grid3D::Set_Boundaries_MPI_BLOCK(int *flags, struct parameters P)
 {
+
+  // #ifdef PARTICLES
+  // if ( !Particles.TRANSFER_DENSITY_BOUNDARIES && !Grav.TRANSFER_POTENTIAL_BOUNDARIES){
+  //   Particles.Select_Particles_to_Transfer( 0);
+  // }
+  // #endif
+
   if (H.nx > 1) {
 
     /* Step 1 - Send MPI x-boundaries */
@@ -767,12 +774,12 @@ void Grid3D::Load_Particles_to_Buffer_X0( bool secondary ){
   if ( !secondary ){
     buffer_start = x_buffer_length_hydro;
     max_particles = N_PARTICLES_TRANSFER;
-    Particles.Load_Particles_to_Buffer( 0, 0, buffer_start , send_buffer_x0, max_particles  );
+    Particles.Load_Particles_to_Buffer( 0, 0, buffer_start , send_buffer_x0, max_particles, secondary  );
   }
   else{
     int buffer_start = 0;
     int max_particles = ( buffer_length_second_particles_x0_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER;
-    Particles.Load_Particles_to_Buffer( 0, 0, buffer_start , send_buffer_x0_second_particles, max_particles  );
+    Particles.Load_Particles_to_Buffer( 0, 0, buffer_start , send_buffer_x0_second_particles, max_particles, secondary  );
   }
 }
 
@@ -781,12 +788,12 @@ void Grid3D::Load_Particles_to_Buffer_X1( bool secondary ){
   if ( !secondary ){
     buffer_start = x_buffer_length_hydro;
     max_particles = N_PARTICLES_TRANSFER;
-    Particles.Load_Particles_to_Buffer( 0, 1, buffer_start , send_buffer_x1, max_particles  );
+    Particles.Load_Particles_to_Buffer( 0, 1, buffer_start , send_buffer_x1, max_particles , secondary );
   }
   else{
     int buffer_start = 0;
     int max_particles = ( buffer_length_second_particles_x1_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER;
-    Particles.Load_Particles_to_Buffer( 0, 1, buffer_start , send_buffer_x1_second_particles, max_particles  );
+    Particles.Load_Particles_to_Buffer( 0, 1, buffer_start , send_buffer_x1_second_particles, max_particles , secondary );
   }
 }
 
@@ -795,12 +802,12 @@ void Grid3D::Load_Particles_to_Buffer_Y0( bool secondary ){
   if ( !secondary ){
     buffer_start = y_buffer_length_hydro;
     max_particles = N_PARTICLES_TRANSFER;
-    Particles.Load_Particles_to_Buffer( 1, 0, buffer_start , send_buffer_y0, max_particles  );
+    Particles.Load_Particles_to_Buffer( 1, 0, buffer_start , send_buffer_y0, max_particles , secondary );
   }
   else{
     int buffer_start = 0;
     int max_particles = ( buffer_length_second_particles_y0_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER;
-    Particles.Load_Particles_to_Buffer( 1, 0, buffer_start , send_buffer_y0_second_particles, max_particles  );
+    Particles.Load_Particles_to_Buffer( 1, 0, buffer_start , send_buffer_y0_second_particles, max_particles , secondary );
   }
 }
 
@@ -809,12 +816,12 @@ void Grid3D::Load_Particles_to_Buffer_Y1( bool secondary ){
   if ( !secondary ){
     buffer_start = y_buffer_length_hydro;
     max_particles = N_PARTICLES_TRANSFER;
-    Particles.Load_Particles_to_Buffer( 1, 1, buffer_start , send_buffer_y1, max_particles  );
+    Particles.Load_Particles_to_Buffer( 1, 1, buffer_start , send_buffer_y1, max_particles , secondary );
   }
   else{
     int buffer_start = 0;
     int max_particles = ( buffer_length_second_particles_y1_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER;
-    Particles.Load_Particles_to_Buffer( 1, 1, buffer_start , send_buffer_y1_second_particles, max_particles  );
+    Particles.Load_Particles_to_Buffer( 1, 1, buffer_start , send_buffer_y1_second_particles, max_particles , secondary );
   }
 }
 
@@ -823,12 +830,12 @@ void Grid3D::Load_Particles_to_Buffer_Z0( bool secondary ){
   if ( !secondary ){
     buffer_start = z_buffer_length_hydro;
     max_particles = N_PARTICLES_TRANSFER;
-    Particles.Load_Particles_to_Buffer( 2, 0, buffer_start , send_buffer_z0, max_particles  );
+    Particles.Load_Particles_to_Buffer( 2, 0, buffer_start , send_buffer_z0, max_particles, secondary  );
   }
   else{
     int buffer_start = 0;
     int max_particles = ( buffer_length_second_particles_z0_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER;
-    Particles.Load_Particles_to_Buffer( 2, 0, buffer_start , send_buffer_z0_second_particles, max_particles  );
+    Particles.Load_Particles_to_Buffer( 2, 0, buffer_start , send_buffer_z0_second_particles, max_particles , secondary );
   }
 }
 
@@ -837,12 +844,12 @@ void Grid3D::Load_Particles_to_Buffer_Z1( bool secondary ){
   if ( !secondary ){
     buffer_start = z_buffer_length_hydro;
     max_particles = N_PARTICLES_TRANSFER;
-    Particles.Load_Particles_to_Buffer( 2, 1, buffer_start , send_buffer_z1, max_particles  );
+    Particles.Load_Particles_to_Buffer( 2, 1, buffer_start , send_buffer_z1, max_particles , secondary );
   }
   else{
     int buffer_start = 0;
     int max_particles = ( buffer_length_second_particles_z1_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER;
-    Particles.Load_Particles_to_Buffer( 2, 1, buffer_start , send_buffer_z1_second_particles, max_particles  );
+    Particles.Load_Particles_to_Buffer( 2, 1, buffer_start , send_buffer_z1_second_particles, max_particles  , secondary );
   }
 }
 
