@@ -176,6 +176,15 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
     out_indxs_vec_y1.clear();
     for ( pIndx=0; pIndx<n_local; pIndx++ ){
       pID = partIDs[pIndx];
+      if ( pID == 1057078072 ){
+        std::cout <<  "pID: " << pID << " Sending particle: " << direction << " " << std::endl;
+        std::cout << " posX: " << pPos_x << " velX: " << pVel_x << std::endl;
+        std::cout << " posY: " << pPos_y << " velY: " << pVel_y << std::endl;
+        std::cout << " posZ: " << pPos_z << " velZ: " << pVel_z << std::endl;
+        std::cout << " Domain X: " << G.xMin << "  " << G.xMax << std::endl;
+        std::cout << " Domain Y: " << G.yMin << "  " << G.yMax << std::endl;
+        std::cout << " Domain Z: " << G.zMin << "  " << G.zMax << std::endl;
+      }
       already_transfered = false;
       // pID_in_transfers = std::binary_search (transfered_x0.begin(), transfered_x0.end(), pID);
       // if ( pID_in_transfers ) already_transfered = true;
@@ -184,6 +193,15 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
       if ( pos_x[pIndx] < G.xMin || pos_x[pIndx] >= G.xMax ) already_transfered = true;
       if ( already_transfered ){
         continue;
+      }
+      if ( pID == 1057078072 ){
+        std::cout <<  "pID: " << pID << " Sending particle: " << direction << " " << std::endl;
+        std::cout << " posX: " << pPos_x << " velX: " << pVel_x << std::endl;
+        std::cout << " posY: " << pPos_y << " velY: " << pVel_y << std::endl;
+        std::cout << " posZ: " << pPos_z << " velZ: " << pVel_z << std::endl;
+        std::cout << " Domain X: " << G.xMin << "  " << G.xMax << std::endl;
+        std::cout << " Domain Y: " << G.yMin << "  " << G.yMax << std::endl;
+        std::cout << " Domain Z: " << G.zMin << "  " << G.zMax << std::endl;
       }
       if ( pos_y[pIndx] < G.yMin ){
         out_indxs_vec_y0.push_back( pIndx );
@@ -214,6 +232,15 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
       if ( pos_x[pIndx] < G.xMin || pos_x[pIndx] >= G.xMax || pos_y[pIndx] < G.yMin || pos_y[pIndx] >= G.yMax ) already_transfered = true;
       if ( already_transfered ){
         continue;
+      }
+      if ( pID == 1057078072 ){
+        std::cout <<  "pID: " << pID << " Sending particle: " << direction << " " << std::endl;
+        std::cout << " posX: " << pPos_x << " velX: " << pVel_x << std::endl;
+        std::cout << " posY: " << pPos_y << " velY: " << pVel_y << std::endl;
+        std::cout << " posZ: " << pPos_z << " velZ: " << pVel_z << std::endl;
+        std::cout << " Domain X: " << G.xMin << "  " << G.xMax << std::endl;
+        std::cout << " Domain Y: " << G.yMin << "  " << G.yMax << std::endl;
+        std::cout << " Domain Z: " << G.zMin << "  " << G.zMax << std::endl;
       }
       if ( pos_z[pIndx] < G.zMin ){
         out_indxs_vec_z0.push_back( pIndx );
