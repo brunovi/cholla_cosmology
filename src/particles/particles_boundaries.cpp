@@ -193,9 +193,9 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
       pID = partIDs[pIndx];
       if ( pID == 1057078072 ){
         std::cout <<  "pID: " << pID << " Sending particle: " << dir << " " << std::endl;
-        std::cout << " posX: " << pos_x[indx] << " velX: " << vel_x[indx] << std::endl;
-        std::cout << " posY: " << pos_y[indx] << " velY: " << vel_y[indx] << std::endl;
-        std::cout << " posZ: " << pos_z[indx] << " velZ: " << vel_z[indx] << std::endl;
+        std::cout << " posX: " << pos_x[pIndx] << " velX: " << vel_x[pIndx] << std::endl;
+        std::cout << " posY: " << pos_y[pIndx] << " velY: " << vel_y[pIndx] << std::endl;
+        std::cout << " posZ: " << pos_z[pIndx] << " velZ: " << vel_z[pIndx] << std::endl;
         std::cout << " Domain X: " << G.xMin << "  " << G.xMax << std::endl;
         std::cout << " Domain Y: " << G.yMin << "  " << G.yMax << std::endl;
         std::cout << " Domain Z: " << G.zMin << "  " << G.zMax << std::endl;
@@ -211,6 +211,12 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
       }
       if ( pID == 1057078072 ){
         std::cout <<  "pID: " << pID << " Sending particle: " << dir << " " << std::endl;
+        std::cout << " posX: " << pos_x[pIndx] << " velX: " << vel_x[pIndx] << std::endl;
+        std::cout << " posY: " << pos_y[pIndx] << " velY: " << vel_y[pIndx] << std::endl;
+        std::cout << " posZ: " << pos_z[pIndx] << " velZ: " << vel_z[pIndx] << std::endl;
+        std::cout << " Domain X: " << G.xMin << "  " << G.xMax << std::endl;
+        std::cout << " Domain Y: " << G.yMin << "  " << G.yMax << std::endl;
+        std::cout << " Domain Z: " << G.zMin << "  " << G.zMax << std::endl;
       }
       if ( pos_y[pIndx] < G.yMin ){
         out_indxs_vec_y0.push_back( pIndx );
@@ -244,6 +250,12 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
       }
       if ( pID == 1057078072 ){
         std::cout <<  "pID: " << pID << " Sending particle: " << dir << " " << std::endl;
+        std::cout << " posX: " << pos_x[pIndx] << " velX: " << vel_x[pIndx] << std::endl;
+        std::cout << " posY: " << pos_y[pIndx] << " velY: " << vel_y[pIndx] << std::endl;
+        std::cout << " posZ: " << pos_z[pIndx] << " velZ: " << vel_z[pIndx] << std::endl;
+        std::cout << " Domain X: " << G.xMin << "  " << G.xMax << std::endl;
+        std::cout << " Domain Y: " << G.yMin << "  " << G.yMax << std::endl;
+        std::cout << " Domain Z: " << G.zMin << "  " << G.zMax << std::endl;
       }
       if ( pos_z[pIndx] < G.zMin ){
         out_indxs_vec_z0.push_back( pIndx );
