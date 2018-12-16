@@ -177,7 +177,7 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
     for ( pIndx=0; pIndx<n_local; pIndx++ ){
       pID = partIDs[pIndx];
       if ( pID == 1057078072 ){
-        std::cout <<  "pID: " << pID << " Sending particle: " << direction << " " << std::endl;
+        std::cout <<  "pID: " << pID << " Sending particle: " << dir << " " << std::endl;
       }
       already_transfered = false;
       // pID_in_transfers = std::binary_search (transfered_x0.begin(), transfered_x0.end(), pID);
@@ -189,7 +189,7 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
         continue;
       }
       if ( pID == 1057078072 ){
-        std::cout <<  "pID: " << pID << " Sending particle: " << direction << " " << std::endl;
+        std::cout <<  "pID: " << pID << " Sending particle: " << dir << " " << std::endl;
       }
       if ( pos_y[pIndx] < G.yMin ){
         out_indxs_vec_y0.push_back( pIndx );
@@ -222,7 +222,7 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
         continue;
       }
       if ( pID == 1057078072 ){
-        std::cout <<  "pID: " << pID << " Sending particle: " << direction << " " << std::endl;
+        std::cout <<  "pID: " << pID << " Sending particle: " << dire << " " << std::endl;
       }
       if ( pos_z[pIndx] < G.zMin ){
         out_indxs_vec_z0.push_back( pIndx );
