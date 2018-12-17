@@ -138,9 +138,14 @@ void Compute_Gravitational_Potential( Grid3D &G, Potential_PFFT_3D &p_solver, Re
   chprintf( " Density Average:  %f\n", dens_avrg);
   #endif
 
-  time_potential = p_solver.Get_Potential( G.Grav );
-
-  *time_pot = time_potential;
+  #ifdef CPU_TIME
+  G.Timer.Start_Timer();
+  p_solver.Get_Potential( G.Grav );
+  G.Timer.End_and_Record_Time( 3 );
+  #else
+  p_solver.Get_Potential( G.Grav );
+  #endif
+  // *time_pot = time_potential;
 }
 #endif
 

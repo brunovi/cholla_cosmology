@@ -225,7 +225,7 @@ void Potential_PFFT_3D::Apply_G_Funtion( void ){
 
 Real Potential_PFFT_3D::Get_Potential( Grav3D &Grav ){
 
-  double start = get_time();
+  // double start = get_time();
 
   Copy_Input( Grav );
 
@@ -235,10 +235,11 @@ Real Potential_PFFT_3D::Get_Potential( Grav3D &Grav ){
   pfft_execute( plan_bwd );
   Copy_Output( Grav );
 
-  double stop = get_time();
-  double milliseconds = (stop - start) * 1000.0;
-  chprintf( " PFFT: Potential Time = %f   msecs\n", milliseconds);
-  return milliseconds;
+  // double stop = get_time();
+  // double milliseconds = (stop - start) * 1000.0;
+  // chprintf( " PFFT: Potential Time = %f   msecs\n", milliseconds);
+  // return milliseconds;
+  return 0;
 }
 
 #endif //POTENTIAL_CUFFT

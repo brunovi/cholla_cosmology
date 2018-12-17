@@ -33,6 +33,23 @@ public:
   Real time_potential_max;
   Real time_potential_mean;
   Real time_potential_all;
+
+  #ifdef PARTICLES
+  Real time_part_dens_transf_min;
+  Real time_part_dens_transf_max;
+  Real time_part_dens_transf_mean;
+  Real time_part_dens_transf_all;
+
+  Real time_advance_particles_1_min;
+  Real time_advance_particles_1_max;
+  Real time_advance_particles_1_mean;
+  Real time_advance_particles_1_all;
+
+  Real time_advance_particles_2_min;
+  Real time_advance_particles_2_max;
+  Real time_advance_particles_2_mean;
+  Real time_advance_particles_2_all;  
+  #endif
   #endif
 
   Time();

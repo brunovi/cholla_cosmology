@@ -134,8 +134,6 @@ int main(int argc, char *argv[])
   #ifdef POTENTIAL_PFFT
   Potential_PFFT_3D p_solver;
   #endif
-
-
   p_solver.Initialize( G.Grav );
   #endif
 
@@ -302,9 +300,9 @@ int main(int argc, char *argv[])
     #ifdef GRAVITY
     Compute_Gravitational_Potential( G, p_solver, &time_potential, &time_particles_density, &time_particles_density_transf, P );
     Copy_Potential_To_Hydro_Grid( G );
-    #ifdef CPU_TIME
-    chprintf( " Time Potential: %f\n", time_potential );
-    #endif
+    // #ifdef CPU_TIME
+    // chprintf( " Time Potential: %f\n", time_potential );
+    // #endif
     #endif
 
 
