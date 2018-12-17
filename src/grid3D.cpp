@@ -601,6 +601,20 @@ Real Grid3D::Update_Grid(void)
 
 }
 
+void Grid3D::Update_Time(void){
+  H.t += H.dt;
+  #ifdef PARTICLES
+  Particles.t += Particles.dt;
+  #ifdef COSMOLOGY
+  Cosmo.current_a += Cosmo.delta_a;
+  Cosmo.current_z = 1./Cosmo.current_a - 1;
+  Particles.current_a = Cosmo.current_a;
+  Particles.current_z = Cosmo.current_z;
+  Grav.current_a = Cosmo.current_a;
+  #endif
+  #endif
+}
+
 
 /*! \fn void Reset(void)
  *  \brief Reset the Grid3D class. */

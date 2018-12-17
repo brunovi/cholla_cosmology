@@ -418,7 +418,7 @@ void Copy_Particles_Density_to_Gravity( Grid3D &G ){
 
 
 
-void Get_Particles_Density_CIC( Grid3D &G, struct parameters P, Real *time_pDens, Real *time_pDens_trans ){
+void Get_Particles_Density_CIC( Grid3D &G, struct parameters P ){
 
 
   #ifdef CPU_TIME
@@ -448,10 +448,6 @@ void Get_Particles_Density_CIC( Grid3D &G, struct parameters P, Real *time_pDens
   #endif
 
 
-
-
-  *time_pDens = 0;
-  *time_pDens_trans = 0;
 
 }
 

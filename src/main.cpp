@@ -61,8 +61,8 @@ int main(int argc, char *argv[])
   double start_total, stop_total, start_step, stop_step;
   #ifdef CPU_TIME
   double stop_init, init_min, init_max, init_avg;
-  double start_bound, stop_bound, bound_min, bound_max, bound_avg;
-  double start_hydro, stop_hydro, hydro_min, hydro_max, hydro_avg;
+  // double start_bound, stop_bound, bound_min, bound_max, bound_avg;
+  // double start_hydro, stop_hydro, hydro_min, hydro_max, hydro_avg;
   double init, bound, hydro;
   init = bound = hydro = 0;
   #endif //CPU_TIME
@@ -136,8 +136,6 @@ int main(int argc, char *argv[])
   p_solver.Initialize( G.Grav );
   #endif
 
-
-  Real time_advance_particles = 0 ;
   #ifdef PARTICLES
   G.Particles.Initialize( P, G.Grav, G.H.xblocal, G.H.yblocal, G.H.zblocal, G.H.xbound, G.H.ybound, G.H.zbound, G.H.xdglobal, G.H.ydglobal, G.H.zdglobal );
   #endif
@@ -147,16 +145,10 @@ int main(int argc, char *argv[])
   Change_Cosmological_Frame_Sytem( G, true );
   #endif
 
-
-
-  Real time_potential, time_particles_density, time_particles_density_transf;
-  time_potential = time_particles_density, time_particles_density_transf = 0;
   #ifdef GRAVITY
-  Compute_Gravitational_Potential( G, p_solver, &time_potential, &time_particles_density, &time_particles_density_transf, P );
-  chprintf( " Time Particles Density: %f\n", time_particles_density );
+  Compute_Gravitational_Potential( G, p_solver,  P );
   Copy_Potential_To_Hydro_Grid( G );
   #endif
-
 
   // set boundary conditions (assign appropriate values to ghost cells)
   chprintf("Setting boundary conditions...\n");
@@ -206,15 +198,8 @@ int main(int argc, char *argv[])
   #endif //MPI_CHOLLA
   #endif //CPU_TIME
 
-  #ifdef PARTICLES
-  Real dt_particles, dt_min;
-  #endif
-
   #ifdef CPU_TIME
   G.Timer.Initialize();
-  int step_counter = 0;
-  Real time_hydro_total, time_potential_total, time_particles_total, time_all_total, time_boundaries_total;
-  time_hydro_total = time_potential_total = time_particles_total = time_all_total, time_boundaries_total = 0;
   #endif
 
   bool output_now = false;
@@ -242,14 +227,9 @@ int main(int argc, char *argv[])
     #endif
     #endif
 
-
     #ifdef GRAVITY
     Set_dt( G, output_now, G.H.n_step + 1 );
-    #endif
-
-
     // Extrapolate gravitational potential for hydro step
-    #ifdef GRAVITY
     Extrapolate_Grav_Potential( G );
     #endif
 
@@ -266,32 +246,20 @@ int main(int argc, char *argv[])
 
     #ifdef PARTICLES
     //Advance the particles ( first step )
-    time_advance_particles = Update_Particles( G, 1 );
+    Update_Particles( G, 1 );
     #endif
 
     // update the time
-    G.H.t += G.H.dt;
-    #ifdef PARTICLES
-    G.Particles.t += G.Particles.dt;
-    #ifdef COSMOLOGY
-    G.Cosmo.current_a += G.Cosmo.delta_a;
-    G.Cosmo.current_z = 1./G.Cosmo.current_a - 1;
-    G.Particles.current_a = G.Cosmo.current_a;
-    G.Particles.current_z = G.Cosmo.current_z;
-    G.Grav.current_a = G.Cosmo.current_a;
-    // #endif
-    #endif
-    #endif
+    G.Update_Time();
 
     // add one to the timestep count
     G.H.n_step++;
 
     //Compute Gravitational potential for next step
     #ifdef GRAVITY
-    Compute_Gravitational_Potential( G, p_solver, &time_potential, &time_particles_density, &time_particles_density_transf, P );
+    Compute_Gravitational_Potential( G, p_solver, P );
     Copy_Potential_To_Hydro_Grid( G );
     #endif
-
 
     #ifdef GRAVITY_CORRECTOR
     Apply_Gavity_Corrector( G, P);
@@ -300,7 +268,6 @@ int main(int argc, char *argv[])
     #ifdef REVERT_STEP
     Get_Delta_Conserved( G );
     #endif
-
 
     // set boundary conditions for next time step
     #ifdef CPU_TIME
@@ -311,16 +278,9 @@ int main(int argc, char *argv[])
     G.Set_Boundary_Conditions(P);
     #endif //CPU_TIME
 
-
     #ifdef PARTICLES
     //Advance the particles ( second step )
-    time_advance_particles += Update_Particles( G, 2 );
-    #ifdef CPU_TIME
-    chprintf( " Time Particles Density: %f\n", time_particles_density );
-    chprintf( " Time PartDensity Transf: %f\n", time_particles_density_transf );
-    chprintf( " Time Advance Particles: %f\n", time_advance_particles );
-    chprintf( " N Local Particles: %ld\n", G.Particles.n_local );
-    #endif
+    Update_Particles( G, 2 );
     #endif
 
     #ifdef CPU_TIME
@@ -372,17 +332,6 @@ int main(int argc, char *argv[])
 
     }
 
-    #ifdef CPU_TIME
-    if (step_counter > 0 ){
-      time_potential_total += time_potential;
-      time_particles_total += time_particles_density;
-      time_particles_total += time_advance_particles;
-      time_hydro_total += hydro*1000;
-      time_boundaries_total += bound*1000;
-      time_all_total += (stop_step-start_step)*1000;
-    }
-    step_counter += 1;
-    #endif
 
     // if (step_counter == 1) break;
 
@@ -413,37 +362,37 @@ int main(int argc, char *argv[])
 
   } /*end loop over timesteps*/
 
-
-  #ifdef CPU_TIME
-  time_hydro_total /= ( step_counter -1 );
-  time_boundaries_total /= ( step_counter -1 );
-  time_all_total /= ( step_counter -1 );
-  time_potential_total /= ( step_counter -1 );
-  time_particles_total /= ( step_counter -1 );
-  chprintf("\n\nSimulation Finished\n");
-  chprintf(" N Steps: %d\n", step_counter);
-  chprintf(" Time Average Hydro: %f\n", time_hydro_total);
-  chprintf(" Time Average Boundaries: %f\n", time_boundaries_total);
-  chprintf(" Time Average Potential: %f\n", time_potential_total);
-  chprintf(" Time Average Particles: %f\n", time_particles_total);
-  chprintf(" Time Average Total: %f\n", time_all_total);
-
-
-  // Output timing values
-  ofstream out_file;
-  out_file.open("run_timing.log", ios::app);
-  out_file << P.nz << " " << P.ny << " " << P.nx << " ";
-  #ifndef GRAVITY_OMP
-  out_file << 0 << " ";
-  #endif
-  #ifdef GRAVITY_OMP
-  out_file << N_OMP_GRAVITY_THREADS << " ";
-  #endif
-  out_file << time_hydro_total << " " << time_boundaries_total << " ";
-  out_file << time_potential_total << " " << time_particles_total << " ";
-  out_file << "\n";
-  out_file.close();
-  #endif
+  //
+  // #ifdef CPU_TIME
+  // time_hydro_total /= ( step_counter -1 );
+  // time_boundaries_total /= ( step_counter -1 );
+  // time_all_total /= ( step_counter -1 );
+  // time_potential_total /= ( step_counter -1 );
+  // time_particles_total /= ( step_counter -1 );
+  // chprintf("\n\nSimulation Finished\n");
+  // chprintf(" N Steps: %d\n", step_counter);
+  // chprintf(" Time Average Hydro: %f\n", time_hydro_total);
+  // chprintf(" Time Average Boundaries: %f\n", time_boundaries_total);
+  // chprintf(" Time Average Potential: %f\n", time_potential_total);
+  // chprintf(" Time Average Particles: %f\n", time_particles_total);
+  // chprintf(" Time Average Total: %f\n", time_all_total);
+  //
+  //
+  // // Output timing values
+  // ofstream out_file;
+  // out_file.open("run_timing.log", ios::app);
+  // out_file << P.nz << " " << P.ny << " " << P.nx << " ";
+  // #ifndef GRAVITY_OMP
+  // out_file << 0 << " ";
+  // #endif
+  // #ifdef GRAVITY_OMP
+  // out_file << N_OMP_GRAVITY_THREADS << " ";
+  // #endif
+  // out_file << time_hydro_total << " " << time_boundaries_total << " ";
+  // out_file << time_potential_total << " " << time_particles_total << " ";
+  // out_file << "\n";
+  // out_file.close();
+  // #endif
 
 
   // free the grid

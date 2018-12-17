@@ -260,13 +260,15 @@ Real Get_Particles_dt_cosmo( Grid3D &G ){
 }
 #endif
 
-Real Update_Particles( Grid3D &G, int step ){
+void Update_Particles( Grid3D &G, int step ){
 
-  Real start, stop, milliseconds;
-  start = get_time();
 
   #ifdef REVERT_STEP
   if ( step == 1) Copy_Particles_Vectors( G );
+  #endif
+
+  #ifdef CPU_TIME
+  G.Timer.Start_Timer();
   #endif
 
   #ifndef GRAVITY_OMP
@@ -297,13 +299,8 @@ Real Update_Particles( Grid3D &G, int step ){
 
     omp_id = omp_get_thread_num();
     n_omp_procs = omp_get_num_threads();
-    // #pragma omp barrier
 
     Get_OMP_Indxs( G.Particles.n_local, N_OMP_GRAVITY_THREADS, omp_id, G.Particles.G.nz_local + 2*G.Particles.G.n_ghost_particles_grid, &p_start, &p_end, &g_start, &g_end );
-
-    // for (int omp_indx = 0; omp_indx<n_omp_procs; omp_indx++){
-    //   if (omp_id == omp_indx) chprintf( "omp_id:%d  p_start:%ld  p_end:%ld  g_start:%d  g_end:%d\n", omp_id, p_start, p_end, g_start, g_end );
-    // }
 
     if ( step == 1 ){
       #ifndef COSMOLOGY
@@ -325,9 +322,11 @@ Real Update_Particles( Grid3D &G, int step ){
   }
   #endif
 
-  stop = get_time();
-  milliseconds = (stop - start) * 1000.0;
-  return milliseconds;
+  #ifdef CPU_TIME
+  if ( step == 1) G.Timer.End_and_Record_Time(6);
+  if ( step == 2) G.Timer.End_and_Record_Time(7);
+  #endif
+
 }
 
 #ifdef REVERT_STEP

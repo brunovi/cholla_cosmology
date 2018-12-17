@@ -371,6 +371,8 @@ class Grid3D
      *  \brief Update the conserved quantities in each cell. */
     Real Update_Grid(void);
 
+    void Update_Time(void);
+
     /*! \fn void Write_Header_Binary(FILE *fp)
      *  \brief Write the relevant header info to a binary output file. */
     void Write_Header_Binary(FILE *fp);

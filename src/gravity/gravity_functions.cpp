@@ -121,13 +121,13 @@ void Compute_Gravitational_Potential( Grid3D &G, Potential_FFTW_3D &p_solver, Re
 
 
 #ifdef POTENTIAL_PFFT
-void Compute_Gravitational_Potential( Grid3D &G, Potential_PFFT_3D &p_solver, Real *time_pot, Real *time_pDens, Real *time_pDens_trans, struct parameters P ){
+void Compute_Gravitational_Potential( Grid3D &G, Potential_PFFT_3D &p_solver, struct parameters P ){
   Real time_potential;
 
   Copy_Hydro_Density_to_Gravity( G );
 
   #ifdef PARTICLES
-  Get_Particles_Density_CIC( G, P, time_pDens, time_pDens_trans );
+  Get_Particles_Density_CIC( G, P );
   Copy_Particles_Density_to_Gravity( G );
   #endif
 
@@ -149,7 +149,7 @@ void Compute_Gravitational_Potential( Grid3D &G, Potential_PFFT_3D &p_solver, Re
   #else
   p_solver.Get_Potential( G.Grav );
   #endif
-  // *time_pot = time_potential;
+
 }
 #endif
 
