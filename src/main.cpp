@@ -290,19 +290,11 @@ int main(int argc, char *argv[])
     #ifdef GRAVITY
     Compute_Gravitational_Potential( G, p_solver, &time_potential, &time_particles_density, &time_particles_density_transf, P );
     Copy_Potential_To_Hydro_Grid( G );
-    // #ifdef CPU_TIME
-    // chprintf( " Time Potential: %f\n", time_potential );
-    // #endif
     #endif
 
 
     #ifdef GRAVITY_CORRECTOR
-    //Apply second order correction to gravity in hydro
-    // Transfer_Potential_Boundaries_MPI( G, P);
     Apply_Gavity_Corrector( G, P);
-    // #ifdef DE
-    // Sync_Energies_3D_Host( G );
-    // #endif
     #endif
 
     #ifdef REVERT_STEP
@@ -343,10 +335,14 @@ int main(int argc, char *argv[])
       // break;
     }
     #endif
-    chprintf("hydro min: %9.4f  max: %9.4f  avg: %9.4f\n", hydro_min, hydro_max, hydro_avg);
-    chprintf("bound min: %9.4f  max: %9.4f  avg: %9.4f\n", bound_min, bound_max, bound_avg);
+    // chprintf("hydro min: %9.4f  max: %9.4f  avg: %9.4f\n", hydro_min, hydro_max, hydro_avg);
+    // chprintf("bound min: %9.4f  max: %9.4f  avg: %9.4f\n", bound_min, bound_max, bound_avg);
     #endif //MPI_CHOLLA
     #endif //CPU_TIME
+
+    #ifdef CPU_TIME
+    G.Timer.Print_Times();
+    #endif
 
     // get the time to compute the total timestep
     stop_step = get_time();

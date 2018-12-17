@@ -48,7 +48,7 @@ public:
   Real time_advance_particles_2_min;
   Real time_advance_particles_2_max;
   Real time_advance_particles_2_mean;
-  Real time_advance_particles_2_all;  
+  Real time_advance_particles_2_all;
   #endif
   #endif
 
@@ -56,6 +56,7 @@ public:
   void Initialize();
   void Start_Timer();
   void End_and_Record_Time( int time_var );
+  void Print_Times();
 };
 
 
