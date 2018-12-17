@@ -47,7 +47,7 @@ void Copy_Potential_To_Hydro_Grid( Grid3D &G );
 
 #ifdef GRAVITY_CORRECTOR
 void Get_Gavity_Corrector( Grid3D &G, int g_start, int g_end);
-void Apply_Gavity_Corrector( Grid3D &G );
+void Apply_Gavity_Corrector( Grid3D &G, struct parameters P );
 #endif
 
 #ifdef MPI_CHOLLA

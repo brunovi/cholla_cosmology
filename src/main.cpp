@@ -40,7 +40,6 @@ using namespace std;
 #include "cosmology/io_cosmology.h"
 #endif
 
-#include "correction_functions.h"
 #endif
 
 #ifdef COOLING_GRACKLE
@@ -300,7 +299,7 @@ int main(int argc, char *argv[])
     #ifdef GRAVITY_CORRECTOR
     //Apply second order correction to gravity in hydro
     // Transfer_Potential_Boundaries_MPI( G, P);
-    Apply_Gavity_Corrector( G );
+    Apply_Gavity_Corrector( G, P);
     // #ifdef DE
     // Sync_Energies_3D_Host( G );
     // #endif

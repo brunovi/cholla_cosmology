@@ -11,6 +11,10 @@
 #include"gravity_omp.h"
 #endif
 
+#ifdef GRAVITY_CORRECTOR
+#include "../correction_functions.h"
+#endif
+
 #ifdef MPI_CHOLLA
 void Transfer_Potential_Boundaries_MPI( Grid3D &G, struct parameters P){
 
@@ -401,7 +405,7 @@ void Add_Gravity_Corrector( Grid3D &G, int g_start, int g_end ){
 }
 
 
-void Apply_Gavity_Corrector( Grid3D &G ){
+void Apply_Gavity_Corrector( Grid3D &G, struct parameters P ){
 
   Transfer_Potential_Boundaries_MPI( G, P);
 
