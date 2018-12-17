@@ -263,7 +263,7 @@ int main(int argc, char *argv[])
     #else
     dti = G.Update_Grid();
     #endif //CPU_TIME
-    
+
 
     #ifdef PARTICLES
     //Advance the particles ( first step )
@@ -313,20 +313,12 @@ int main(int argc, char *argv[])
 
     // set boundary conditions for next time step
     #ifdef CPU_TIME
-    start_bound = get_time();
-    #endif //CPU_TIME
+    G.Timer.Start_Timer();
     G.Set_Boundary_Conditions(P);
-    #ifdef CPU_TIME
-    stop_bound = get_time();
-    bound = stop_bound - start_bound;
-    chprintf( " Time Boundaries: %f\n", bound*1000 );
-    #ifdef MPI_CHOLLA
-    bound_min = ReduceRealMin(bound);
-    bound_max = ReduceRealMax(bound);
-    bound_avg = ReduceRealAvg(bound);
-    #endif //MPI_CHOLLA
+    G.Timer.End_and_Record_Time( 2 );
+    #else
+    G.Set_Boundary_Conditions(P);
     #endif //CPU_TIME
-
 
 
     #ifdef PARTICLES
