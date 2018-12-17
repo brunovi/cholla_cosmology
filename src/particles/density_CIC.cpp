@@ -410,14 +410,7 @@ void Copy_Particles_Density_to_Gravity( Grid3D &G ){
       for ( i=0; i<nx; i++ ){
       id_CIC = (i+nGHST) + (j+nGHST)*(nx+2*nGHST) + (k+nGHST)*(nx+2*nGHST)*(ny+2*nGHST);
       id_grid = i + j*nx + k*nx*ny;
-      // #ifndef COSMOLOGY
-      // // G.Grav.F.density_h[id_grid] += 4 * M_PI * G.Particles.G.density[id_CIC];
-      // G.Grav.F.density_h[id_grid] += G.Particles.G.density[id_CIC];
-      // #else
       G.Grav.F.density_h[id_grid] += G.Particles.G.density[id_CIC];
-      // G.Grav.F.density_h[id_grid] += 4 * M_PI * G.Cosmo.cosmo_G * ( G.Particles.G.density[id_CIC] - G.Cosmo.rho_0_dm ) / G.Cosmo.current_a ;
-      // G.Grav.F.density_h[id_grid] += 4 * M_PI * G.Cosmo.cosmo_G * ( G.Particles.G.density[id_CIC] - G.Cosmo.dens_avrg ) / G.Cosmo.current_a ;
-      // #endif
       }
     }
   }
@@ -427,37 +420,38 @@ void Copy_Particles_Density_to_Gravity( Grid3D &G ){
 
 void Get_Particles_Density_CIC( Grid3D &G, struct parameters P, Real *time_pDens, Real *time_pDens_trans ){
 
-  // chprintf(" Computing Particles Density: CIC\n");
 
-  Real start, stop, time_dens, time_dens_trans;
-
+  #ifdef CPU_TIME
+  G.Timer.Start_Timer();
+  #endif
   Clear_Density( G.Particles );
-
-  start = get_time();
   #ifdef GRAVITY_OMP
   // Get_Density_CIC_OMP( G.Particles );
   Get_Density_CIC( G.Particles );
-  #elif PARTICLES_CUDA
-  Get_Density_CIC_CUDA( G.Particles );
   #else
   Get_Density_CIC( G.Particles );
   #endif
-  stop = get_time();
-  time_dens = (stop - start) * 1000.0;
+  #ifdef CPU_TIME
+  G.Timer.End_and_Record_Time( 4 );
+  #endif
 
-  start = get_time();
+  #ifdef CPU_TIME
+  G.Timer.Start_Timer();
+  #endif
   #ifndef MPI_CHOLLA
   Transfer_Particles_Density_Boundaries( G.Particles );
   #else
   Transfer_Particles_Density_Boundaries_MPI( G, P );
   #endif
-  stop = get_time();
-  time_dens_trans = (stop - start) * 1000.0;
+  #ifdef CPU_TIME
+  G.Timer.End_and_Record_Time( 5 );
+  #endif
 
 
 
-  *time_pDens = time_dens;
-  *time_pDens_trans = time_dens_trans;
+
+  *time_pDens = 0;
+  *time_pDens_trans = 0;
 
 }
 

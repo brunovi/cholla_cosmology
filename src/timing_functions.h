@@ -35,6 +35,12 @@ public:
   Real time_potential_all;
 
   #ifdef PARTICLES
+
+  Real time_part_dens_min;
+  Real time_part_dens_max;
+  Real time_part_dens_mean;
+  Real time_part_dens_all;
+
   Real time_part_dens_transf_min;
   Real time_part_dens_transf_max;
   Real time_part_dens_transf_mean;

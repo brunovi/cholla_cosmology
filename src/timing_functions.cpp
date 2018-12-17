@@ -69,13 +69,31 @@ void Time::End_and_Record_Time( int time_var ){
     time_potential_mean = t_avg;
     time_potential_all += t_avg;
   }
+
+  if( time_var == 4 ){
+    time_part_dens_min = t_min;
+    time_part_dens_max = t_max;
+    time_part_dens_mean = t_avg;
+    time_part_dens_all += t_avg;
+  }
+
+  if( time_var == 5 ){
+    time_part_dens_transf_min = t_min;
+    time_part_dens_transf_max = t_max;
+    time_part_dens_transf_mean = t_avg;
+    time_part_dens_transf_all += t_avg;
+  }
 }
 
 void Time::Print_Times(){
-  chprintf(" Time Hydro  min: %9.4f  max: %9.4f  avg: %9.4f\n", time_potential_min, time_potential_max, time_potential_mean);
-  chprintf(" Time Boundaries  min: %9.4f  max: %9.4f  avg: %9.4f\n", time_bound_min, time_bound_max, time_bound_mean);
+  chprintf(" Time Hydro             min: %9.4f  max: %9.4f  avg: %9.4f\n", time_potential_min, time_potential_max, time_potential_mean);
+  chprintf(" Time Boundaries        min: %9.4f  max: %9.4f  avg: %9.4f\n", time_bound_min, time_bound_max, time_bound_mean);
   #ifdef GRAVITY
-  chprintf(" Time Potential  min: %9.4f  max: %9.4f  avg: %9.4f\n", time_potential_min, time_potential_max, time_potential_mean);
+  chprintf(" Time Potential         min: %9.4f  max: %9.4f  avg: %9.4f\n", time_potential_min, time_potential_max, time_potential_mean);
+  #ifdef PARTICLES
+  chprintf(" Time Part Density      min: %9.4f  max: %9.4f  avg: %9.4f\n", time_part_dens_min, time_part_dens_max, time_part_dens_mean);
+  chprintf(" Time Part Dens Transf  min: %9.4f  max: %9.4f  avg: %9.4f\n", time_part_dens_transf_min, time_part_dens_transf_max, time_part_dens_transf_mean);
+  #endif
   #endif
 
 }
