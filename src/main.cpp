@@ -283,22 +283,12 @@ int main(int argc, char *argv[])
     Update_Particles( G, 2 );
     #endif
 
-    #ifdef CPU_TIME
-    #ifdef MPI_CHOLLA
-    #ifdef PARTICLES
-    part_int_t n_total;
-    MPI_Barrier(world);
-    n_total = ReducePartIntSum( G.Particles.n_local );
-    chprintf( " Total Particles: %ld\n", n_total );
-    if ( n_total != G.Grav.nx_total * G.Grav.ny_total * G.Grav.nz_total) {
-      chprintf( " WARNING:  Lost %ld particles\n", G.Grav.nx_total * G.Grav.ny_total * G.Grav.nz_total - n_total );
-      // break;
-    }
-    #endif
+    // #ifdef CPU_TIME
+    // #ifdef MPI_CHOLLA
     // chprintf("hydro min: %9.4f  max: %9.4f  avg: %9.4f\n", hydro_min, hydro_max, hydro_avg);
     // chprintf("bound min: %9.4f  max: %9.4f  avg: %9.4f\n", bound_min, bound_max, bound_avg);
-    #endif //MPI_CHOLLA
-    #endif //CPU_TIME
+    // #endif //MPI_CHOLLA
+    // #endif //CPU_TIME
 
     #ifdef CPU_TIME
     G.Timer.Print_Times();

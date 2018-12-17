@@ -13,6 +13,10 @@ public:
 
   int n_steps;
 
+  // Real start_step;
+  // Real end_step;
+  // Real time_step;
+
   Real time_start;
   Real time_end;
   Real time;

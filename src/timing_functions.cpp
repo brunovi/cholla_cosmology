@@ -38,6 +38,27 @@ void Time::Initialize(){
 void Time::Start_Timer(){
   time_start = get_time();
 }
+// 
+// void Time::Start_Timer_Step(){
+//   start_step = get_time();
+// }
+//
+//
+// void Time::End_and_Record_Time_Step(){
+//
+//   time_end = get_time();
+//   time = (time_end - time_start)*1000;
+//
+//   Real t_min, t_max, t_avg;
+//
+//   #ifdef MPI_CHOLLA
+//   t_min = ReduceRealMin(time);
+//   t_max = ReduceRealMax(time);
+//   t_avg = ReduceRealAvg(time);
+//   #endif
+//
+//
+// }
 
 void Time::End_and_Record_Time( int time_var ){
 
