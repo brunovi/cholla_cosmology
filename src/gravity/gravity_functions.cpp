@@ -403,6 +403,8 @@ void Add_Gravity_Corrector( Grid3D &G, int g_start, int g_end ){
 
 void Apply_Gavity_Corrector( Grid3D &G ){
 
+  Transfer_Potential_Boundaries_MPI( G, P);
+
   #ifndef GRAVITY_OMP
   Get_Gavity_Corrector( G, 0, G.Grav.nz_local );
   Add_Gravity_Corrector( G, 0, G.Grav.nz_local );
@@ -424,9 +426,10 @@ void Apply_Gavity_Corrector( Grid3D &G ){
     #pragma omp barrier
     Add_Gravity_Corrector( G, g_start, g_end );
   }
+  #endif
 
-
-
+  #ifdef DE
+  Sync_Energies_3D_Host( G );
   #endif
 
 

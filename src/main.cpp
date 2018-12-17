@@ -299,11 +299,11 @@ int main(int argc, char *argv[])
 
     #ifdef GRAVITY_CORRECTOR
     //Apply second order correction to gravity in hydro
-    Transfer_Potential_Boundaries_MPI( G, P);
+    // Transfer_Potential_Boundaries_MPI( G, P);
     Apply_Gavity_Corrector( G );
-    #ifdef DE
-    Sync_Energies_3D_Host( G );
-    #endif
+    // #ifdef DE
+    // Sync_Energies_3D_Host( G );
+    // #endif
     #endif
 
     #ifdef REVERT_STEP
