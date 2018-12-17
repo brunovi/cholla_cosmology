@@ -50,16 +50,21 @@ void Time::End_and_Record_Time( int time_var ){
   #endif
 
   if( time_var == 1 ){
+    time_hydro_min = t_min;
+    time_hydro_max = t_max;
+    time_hydro_mean = t_avg;
+    time_hydro_all += t_avg;
+    chprintf(" Time Hydro  min: %9.4f  max: %9.4f  avg: %9.4f\n", time_potential_min, time_potential_max, time_potential_mean);
 
   }
-  if( time_var == 1 ){
+  if( time_var == 2 ){
 
   }
   if( time_var == 3 ){
     time_potential_min = t_min;
     time_potential_max = t_max;
     time_potential_mean = t_avg;
-    time_potential_all += time_potential_mean;
+    time_potential_all += t_avg;
     chprintf(" Time Potential  min: %9.4f  max: %9.4f  avg: %9.4f\n", time_potential_min, time_potential_max, time_potential_mean);
   }
 

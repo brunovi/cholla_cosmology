@@ -254,25 +254,16 @@ int main(int argc, char *argv[])
     Extrapolate_Grav_Potential( G );
     #endif
 
+
     // Advance the grid by one timestep
     #ifdef CPU_TIME
-    start_hydro = get_time();
-    #endif //CPU_TIME
-    #ifndef ONLY_PM
+    G.Timer.Start_Timer();
     dti = G.Update_Grid();
-    #endif
-    #ifdef CPU_TIME
-    stop_hydro = get_time();
-    hydro = stop_hydro - start_hydro;
-    chprintf( " Time Hydro: %f\n", hydro*1000 );
-    #ifdef MPI_CHOLLA
-    hydro_min = ReduceRealMin(hydro);
-    hydro_max = ReduceRealMax(hydro);
-    hydro_avg = ReduceRealAvg(hydro);
-    #endif //MPI_CHOLLA
+    G.Timer.End_and_Record_Time( 1 );
+    #else
+    dti = G.Update_Grid();
     #endif //CPU_TIME
-    //printf("%d After Grid Update: %f %f\n", procID, G.H.dt, dti);
-
+    
 
     #ifdef PARTICLES
     //Advance the particles ( first step )
