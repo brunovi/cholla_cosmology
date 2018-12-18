@@ -9,6 +9,8 @@
 
 
 #ifdef PARTICLES
+#include "particles/particles_boundaries.h"
+
 void Clear_Buffers_For_Particles_Transfers( void ){
   send_buffer_x0[x_buffer_length_hydro] = 0;
   send_buffer_x1[x_buffer_length_hydro] = 0;
@@ -778,7 +780,7 @@ void Grid3D::Load_Particles_to_Buffer_X0( bool secondary ){
   }
   else{
     int buffer_start = 0;
-    int max_particles = ( buffer_length_second_particles_x0_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER;
+    int max_particles = ( buffer_length_second_particles_x0_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER* 10;
     Particles.Load_Particles_to_Buffer( 0, 0, buffer_start , send_buffer_x0_second_particles, max_particles, secondary  );
   }
 }
@@ -792,7 +794,7 @@ void Grid3D::Load_Particles_to_Buffer_X1( bool secondary ){
   }
   else{
     int buffer_start = 0;
-    int max_particles = ( buffer_length_second_particles_x1_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER;
+    int max_particles = ( buffer_length_second_particles_x1_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER* 10;
     Particles.Load_Particles_to_Buffer( 0, 1, buffer_start , send_buffer_x1_second_particles, max_particles , secondary );
   }
 }
@@ -806,7 +808,7 @@ void Grid3D::Load_Particles_to_Buffer_Y0( bool secondary ){
   }
   else{
     int buffer_start = 0;
-    int max_particles = ( buffer_length_second_particles_y0_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER;
+    int max_particles = ( buffer_length_second_particles_y0_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER* 10;
     Particles.Load_Particles_to_Buffer( 1, 0, buffer_start , send_buffer_y0_second_particles, max_particles , secondary );
   }
 }
@@ -820,7 +822,7 @@ void Grid3D::Load_Particles_to_Buffer_Y1( bool secondary ){
   }
   else{
     int buffer_start = 0;
-    int max_particles = ( buffer_length_second_particles_y1_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER;
+    int max_particles = ( buffer_length_second_particles_y1_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER* 10;
     Particles.Load_Particles_to_Buffer( 1, 1, buffer_start , send_buffer_y1_second_particles, max_particles , secondary );
   }
 }
@@ -834,7 +836,7 @@ void Grid3D::Load_Particles_to_Buffer_Z0( bool secondary ){
   }
   else{
     int buffer_start = 0;
-    int max_particles = ( buffer_length_second_particles_z0_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER;
+    int max_particles = ( buffer_length_second_particles_z0_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER * 10;
     Particles.Load_Particles_to_Buffer( 2, 0, buffer_start , send_buffer_z0_second_particles, max_particles , secondary );
   }
 }
@@ -848,7 +850,7 @@ void Grid3D::Load_Particles_to_Buffer_Z1( bool secondary ){
   }
   else{
     int buffer_start = 0;
-    int max_particles = ( buffer_length_second_particles_z1_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER;
+    int max_particles = ( buffer_length_second_particles_z1_send - N_HEADER_PARTICLES_TRANSFER ) / N_DATA_PER_PARTICLE_TRANSFER* 10;
     Particles.Load_Particles_to_Buffer( 2, 1, buffer_start , send_buffer_z1_second_particles, max_particles  , secondary );
   }
 }
@@ -1015,8 +1017,8 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       ireq++;
 
       #ifdef PARTICLES
-      n_transfer_secondary = send_buffer_x0[x_buffer_length_hydro + 1];
-      if ( n_transfer_secondary > 0 ){
+      n_transfer_secondary = real_to_int( send_buffer_x0[x_buffer_length_hydro + 1]);
+      if ( n_transfer_secondary > 0 && transfer_hydro ){
         std::cout << "  N_secondary send x0: " << n_transfer_secondary << std::endl;
         buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_transfer_secondary*N_DATA_PER_PARTICLE_TRANSFER;
         Check_and_Grow_Particles_Buffer( &send_buffer_x0_second_particles, &buffer_length_second_particles_x0_send, buffer_length_secondary );
@@ -1101,8 +1103,8 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       //keep track of how many sends and receives are expected
       ireq++;
       #ifdef PARTICLES
-      n_transfer_secondary = send_buffer_x1[x_buffer_length_hydro + 1];
-      if ( n_transfer_secondary > 0 ){
+      n_transfer_secondary = real_to_int(send_buffer_x1[x_buffer_length_hydro + 1]);
+      if ( n_transfer_secondary > 0 && transfer_hydro ){
         std::cout << "  N_secondary send x1: " << n_transfer_secondary << std::endl;
         buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_transfer_secondary*N_DATA_PER_PARTICLE_TRANSFER;
         Check_and_Grow_Particles_Buffer( &send_buffer_x1_second_particles, &buffer_length_second_particles_x1_send, buffer_length_secondary );
@@ -1179,8 +1181,8 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       //keep track of how many sends and receives are expected
       ireq++;
       #ifdef PARTICLES
-      n_transfer_secondary = send_buffer_y0[y_buffer_length_hydro + 1];
-      if ( n_transfer_secondary > 0 ){
+      n_transfer_secondary = real_to_int(send_buffer_y0[y_buffer_length_hydro + 1]);
+      if ( n_transfer_secondary > 0 && transfer_hydro ){
         std::cout << "  N_secondary send y0: " << n_transfer_secondary << std::endl;
         buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_transfer_secondary*N_DATA_PER_PARTICLE_TRANSFER;
         Check_and_Grow_Particles_Buffer( &send_buffer_y0_second_particles, &buffer_length_second_particles_y0_send, buffer_length_secondary );
@@ -1253,8 +1255,8 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       //keep track of how many sends and receives are expected
       ireq++;
       #ifdef PARTICLES
-      n_transfer_secondary = send_buffer_y1[y_buffer_length_hydro + 1];
-      if ( n_transfer_secondary > 0 ){
+      n_transfer_secondary = real_to_int(send_buffer_y1[y_buffer_length_hydro + 1]);
+      if ( n_transfer_secondary > 0 && transfer_hydro ){
         std::cout << "  N_secondary send y1: " << n_transfer_secondary << std::endl;
         buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_transfer_secondary*N_DATA_PER_PARTICLE_TRANSFER;
         Check_and_Grow_Particles_Buffer( &send_buffer_y1_second_particles, &buffer_length_second_particles_y1_send, buffer_length_secondary );
@@ -1317,8 +1319,8 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       //keep track of how many sends and receives are expected
       ireq++;
       #ifdef PARTICLES
-      n_transfer_secondary = send_buffer_z0[z_buffer_length_hydro + 1];
-      if ( n_transfer_secondary > 0 ){
+      n_transfer_secondary = real_to_int(send_buffer_z0[z_buffer_length_hydro + 1]);
+      if ( n_transfer_secondary > 0 && transfer_hydro ){
         std::cout << "  N_secondary send z0: " << n_transfer_secondary << std::endl;
         buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_transfer_secondary*N_DATA_PER_PARTICLE_TRANSFER;
         Check_and_Grow_Particles_Buffer( &send_buffer_z0_second_particles, &buffer_length_second_particles_z0_send, buffer_length_secondary );
@@ -1377,8 +1379,8 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       ireq++;
 
       #ifdef PARTICLES
-      int n_transfer_secondary = send_buffer_z1[z_buffer_length_hydro + 1];
-      if ( n_transfer_secondary > 0 ){
+      int n_transfer_secondary = real_to_int(send_buffer_z1[z_buffer_length_hydro + 1]);
+      if ( n_transfer_secondary > 0 && transfer_hydro ){
         std::cout << "  N_secondary send z1: " << n_transfer_secondary << std::endl;
         buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_transfer_secondary*N_DATA_PER_PARTICLE_TRANSFER;
         Check_and_Grow_Particles_Buffer( &send_buffer_z1_second_particles, &buffer_length_second_particles_z1_send, buffer_length_secondary );
@@ -1815,7 +1817,7 @@ void Grid3D::Set_Particles_Secondary_Transfer_Recv( int index, int buffer_start 
   if ( index == 5 ) recv_buffer = recv_buffer_z1;
 
   int n_secondary_transfer, buffer_length_secondary;
-  n_secondary_transfer = recv_buffer[buffer_start+1];
+  n_secondary_transfer = real_to_int(recv_buffer[buffer_start+1]);
   if ( n_secondary_transfer == 0 ) return;
   buffer_length_secondary = N_HEADER_PARTICLES_TRANSFER + n_secondary_transfer * N_DATA_PER_PARTICLE_TRANSFER;
 

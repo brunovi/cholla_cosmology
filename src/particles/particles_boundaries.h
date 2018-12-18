@@ -6,6 +6,7 @@
 
 #include "particles_3D.h"
 
+int real_to_int( Real inVal );
 
 void Tranfer_Particles_Boundaries( Particles_3D &Parts );
 

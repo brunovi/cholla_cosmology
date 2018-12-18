@@ -957,7 +957,7 @@ void Allocate_MPI_Buffers_BLOCK(struct Header *H)
 
   int n_max = std::max( H->nx, H->ny );
   n_max = std::max( H->nz, n_max );
-  N_PARTICLES_TRANSFER = n_max * n_max  * 1 ;
+  N_PARTICLES_TRANSFER = n_max * n_max * 2 ;
   N_DATA_PER_PARTICLE_TRANSFER = 6;
   #ifndef SINGLE_PARTICLE_MASS
   N_DATA_PER_PARTICLE_TRANSFER += 1;
@@ -970,18 +970,19 @@ void Allocate_MPI_Buffers_BLOCK(struct Header *H)
   y_buffer_length_hydro = ybsize;
   z_buffer_length_hydro = zbsize;
 
-  buffer_length_second_particles_x0_send = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;
-  buffer_length_second_particles_x1_send = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;
-  buffer_length_second_particles_y0_send = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;
-  buffer_length_second_particles_y1_send = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;
-  buffer_length_second_particles_z0_send = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;
-  buffer_length_second_particles_z1_send = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;
-  buffer_length_second_particles_x0_recv = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;
-  buffer_length_second_particles_x1_recv = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;
-  buffer_length_second_particles_y0_recv = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;
-  buffer_length_second_particles_y1_recv = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;
-  buffer_length_second_particles_z0_recv = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;
-  buffer_length_second_particles_z1_recv = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;
+  int factor = 1;
+  buffer_length_second_particles_x0_send = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  buffer_length_second_particles_x1_send = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  buffer_length_second_particles_y0_send = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  buffer_length_second_particles_y1_send = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  buffer_length_second_particles_z0_send = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  buffer_length_second_particles_z1_send = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  buffer_length_second_particles_x0_recv = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  buffer_length_second_particles_x1_recv = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  buffer_length_second_particles_y0_recv = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  buffer_length_second_particles_y1_recv = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  buffer_length_second_particles_z0_recv = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  buffer_length_second_particles_z1_recv = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
 
 
   xbsize += N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;

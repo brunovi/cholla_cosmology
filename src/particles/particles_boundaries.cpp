@@ -265,22 +265,22 @@ void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer
   part_int_t offset, n_in_buffer, offset_extra;
   part_int_t indx, pIndx, indx_start;
 
-  if (!secondary){
-    n_out = out_indxs_vec->size();
-    n_in_buffer = real_to_int( send_buffer[buffer_start] ) ;
-    if ( (n_out + n_in_buffer) >= MAX_PARTICLES_IN_BUFFER ) n_out = MAX_PARTICLES_IN_BUFFER - n_in_buffer;
-    *n_transfer_1 = n_out;
-    *n_transfer_2 = out_indxs_vec->size() - n_out;
-    indx_start = 0;
-  }
-  else{
-    indx_start = *n_transfer_1;
-    n_out = *n_transfer_2;
+  // if (!secondary){
+  n_out = out_indxs_vec->size();
+  n_in_buffer = real_to_part_int( send_buffer[buffer_start] ) ;
+  if ( (n_out + n_in_buffer) >= MAX_PARTICLES_IN_BUFFER ) n_out = MAX_PARTICLES_IN_BUFFER - n_in_buffer;
+  // *n_transfer_1 = n_out;
+  // *n_transfer_2 = out_indxs_vec->size() - n_out;
+  // indx_start = 0;
+// }
+// else{
+  // indx_start = *n_transfer_1;
+  // n_out = *n_transfer_2;
 
-  }
+  // }
 
   offset = buffer_start + N_HEADER_PARTICLES_TRANSFER + n_in_buffer*N_DATA_PER_PARTICLE_TRANSFER;
-  for ( indx=indx_start; indx<n_out; indx++ ){
+  for ( indx=0; indx<n_out; indx++ ){
     pIndx = out_indxs_vec->back();
     send_buffer[ offset + 0 ] = Get_and_Remove_Real( pIndx, pos_x );
     send_buffer[ offset + 1 ] = Get_and_Remove_Real( pIndx, pos_y );
@@ -309,7 +309,9 @@ void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer
     offset += N_DATA_PER_PARTICLE_TRANSFER;
   }
 
-  send_buffer[buffer_start+1] += *n_transfer_2;
+  if (secondary && (out_indxs_vec->size() > 0 ) ) std::cout << "ERROR: Particle output vector not empty after secondary transfer " << std::endl;
+  send_buffer[buffer_start+1] += out_indxs_vec->size();
+
 
 }
 
@@ -319,7 +321,7 @@ void Particles_3D::Add_Particle_To_Buffer( Real *buffer, int buffer_start, int m
                             Real pVel_x, Real pVel_y, Real pVel_z, bool secondary ){
   int n_in_buffer, offset_out, offset_extra;
   if ( !secondary ){
-    n_in_buffer = real_to_int( buffer[buffer_start] );
+    n_in_buffer = real_to_part_int( buffer[buffer_start] );
     if ( n_in_buffer < max_particles ){
       offset_out = buffer_start + N_HEADER_PARTICLES_TRANSFER + n_in_buffer*N_DATA_PER_PARTICLE_TRANSFER;
       buffer[offset_out + 0] = pPos_x;
@@ -343,7 +345,7 @@ void Particles_3D::Add_Particle_To_Buffer( Real *buffer, int buffer_start, int m
     }
     else{
       buffer[buffer_start+1] += 1;
-      n_in_buffer = real_to_int( buffer_secondary[buffer_start_secondary] );
+      n_in_buffer = real_to_part_int( buffer_secondary[buffer_start_secondary] );
       offset_out = buffer_start_secondary + N_HEADER_PARTICLES_TRANSFER + n_in_buffer*N_DATA_PER_PARTICLE_TRANSFER;
       buffer_secondary[offset_out + 0] = pPos_x;
       buffer_secondary[offset_out + 1] = pPos_y;
@@ -366,7 +368,7 @@ void Particles_3D::Add_Particle_To_Buffer( Real *buffer, int buffer_start, int m
     }
   }
   else{
-    n_in_buffer = real_to_int( buffer[buffer_start] );
+    n_in_buffer = real_to_part_int( buffer[buffer_start] );
     offset_out = buffer_start + N_HEADER_PARTICLES_TRANSFER + n_in_buffer*N_DATA_PER_PARTICLE_TRANSFER;
 
     buffer[offset_out + 0] = pPos_x;
@@ -421,8 +423,7 @@ void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int bu
   part_int_t pId;
   Real pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pVel_z;
 
-  n_recv = real_to_int( recv_buffer[buffer_start] );
-  int n_added = 0;
+  n_recv = real_to_part_int( recv_buffer[buffer_start] );
   offset_buff = buffer_start + N_HEADER_PARTICLES_TRANSFER;
   for ( indx = 0; indx<n_recv; indx++ ){
     pPos_x = recv_buffer[ offset_buff + 0 ];
@@ -527,10 +528,8 @@ void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int bu
         continue;
       }
     }
-    n_added += 1;
     Add_Particle_To_Vectors( pId, pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pVel_z );
   }
-  // std::cout << "N_recv: " << n_recv << "  N_added: " << n_added << std::endl;
 }
 
 void Particles_3D::Remove_Transfered_Particles( void ){
