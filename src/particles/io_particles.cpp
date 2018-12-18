@@ -489,6 +489,7 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
   MPI_Barrier(world);
   part_int_t n_total_loaded;
   n_total_loaded = ReducePartIntSum( Particles.n_local );
+  Particles.n_total_0 = n_total_loaded;
   chprintf( " Total Particles Loaded: %ld\n", n_total_loaded );
   #endif
 

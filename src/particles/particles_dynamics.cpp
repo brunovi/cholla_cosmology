@@ -332,8 +332,8 @@ void Update_Particles( Grid3D &G, int step ){
     // MPI_Barrier(world);
     n_total = ReducePartIntSum( G.Particles.n_local );
     chprintf( " Total Particles: %ld\n", n_total );
-    if ( n_total != G.Grav.nx_total * G.Grav.ny_total * G.Grav.nz_total) {
-      chprintf( " WARNING:  Lost %ld particles\n", G.Grav.nx_total * G.Grav.ny_total * G.Grav.nz_total - n_total );
+    if ( n_total != G.Particles.n_total_0) {
+      chprintf( " WARNING:  Lost %ld particles\n", G.Particles.n_total_0 - n_total );
       // break;
     }
   }

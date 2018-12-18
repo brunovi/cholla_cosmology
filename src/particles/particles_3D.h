@@ -24,6 +24,7 @@ class Particles_3D
   part_int_t n_local;
 
   part_int_t n_total;
+  part_int_t n_total_0;
 
   int n_inside;
   int n_outside;
