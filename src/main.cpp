@@ -150,6 +150,12 @@ int main(int argc, char *argv[])
   Copy_Potential_To_Hydro_Grid( G );
   #endif
 
+
+  // set boundary conditions (assign appropriate values to ghost cells)
+  chprintf("\nSetting boundary conditions...\n");
+  G.Set_Boundary_Conditions(P);
+  chprintf("Boundary conditions set.\n");
+
   #ifdef COOLING_GRACKLE
   Initialize_Grackle( G.Cool, P, G.Grav, G.Cosmo );
   Initialize_Grackle_Fields( G );
@@ -160,11 +166,6 @@ int main(int argc, char *argv[])
   time_cool = stop_cool - start_cool;
   chprintf( " Time Cooling: %f\n", time_cool*1000 );
   #endif
-
-  // set boundary conditions (assign appropriate values to ghost cells)
-  chprintf("\nSetting boundary conditions...\n");
-  G.Set_Boundary_Conditions(P);
-  chprintf("Boundary conditions set.\n");
 
   #ifdef PARTICLES
   Get_Particles_Acceleration( G, 0, G.Particles.n_local, 0, G.Particles.G.nz_local + 2*G.Particles.G.n_ghost_particles_grid );

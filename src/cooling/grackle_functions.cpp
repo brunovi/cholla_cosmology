@@ -96,16 +96,38 @@ void Set_Initial_Fields_Grackle( Grid3D &G ){
 }
 
 void Copy_Fields_to_Grackle( Grid3D &G ){
-  // set temperature units
-  double temperature_units = MASS_HYDROGEN * pow(G.Cool.units.a_units * G.Cool.units.length_units / G.Cool.units.time_units, 2) / K_BOLTZ;
 
-  chprintf( "H fraction: %f\n", grackle_data->HydrogenFractionByMass );
+  // set temperature units
+  // double temperature_units = MASS_HYDROGEN * pow(G.Cool.units.a_units * G.Cool.units.length_units / G.Cool.units.time_units, 2) / K_BOLTZ;
+
+  
   for (int i = 0;i < G.Cool.field_size;i++) {
     G.Cool.fields.density[i] = G.C.density[i] * G.Cool.dens_conv ;
     G.Cool.fields.internal_energy[i] = G.C.GasEnergy[i]  / G.Cool.fields.density[i] * G.Cool.energy_conv * G.Cool.dens_conv / G.Cosmo.current_a / G.Cosmo.current_a ;
     // initilize internal energy (here 1000 K for no reason)
     // G.Cool.fields.internal_energy[i] = 1000./ ( G.Cool.gamma -1 ) / temperature_units;
   }
+  //
+  // int nx, ny, nz, nx_real, ny_real, nz_real, nGHST;
+  // nx = G.H.nx;
+  // ny = G.H.ny;
+  // nz = G.H.nz;
+  // nx_real = G.H.nx_real;
+  // ny_real = G.H.ny_real;
+  // nz_real = G.H.nz_real;
+  // nGHST = G.H.n_ghost;
+  // int i, j, k, id;
+  // for ( k=0; k<nz_real; k++ ){
+  //   for ( j=0; j<ny_real; j++ ){
+  //     for ( i=0; i<nx_real; i++ ){
+  //       id = i + j*nx + k*nx*ny;
+  //       G.Cool.fields.density[id] = G.C.density[id] * G.Cool.dens_conv ;
+  //       G.Cool.fields.internal_energy[id] = G.C.GasEnergy[id]  / G.Cool.fields.density[id] * G.Cool.energy_conv * G.Cool.dens_conv / G.Cosmo.current_a / G.Cosmo.current_a ;
+  //     }
+  //   }
+  // }
+
+
 }
 
 void Do_Cooling_Step( Real dt, Grid3D &G ){
