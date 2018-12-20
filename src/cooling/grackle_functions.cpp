@@ -100,7 +100,7 @@ void Copy_Fields_to_Grackle( Grid3D &G ){
   // set temperature units
   // double temperature_units = MASS_HYDROGEN * pow(G.Cool.units.a_units * G.Cool.units.length_units / G.Cool.units.time_units, 2) / K_BOLTZ;
 
-  
+
   for (int i = 0;i < G.Cool.field_size;i++) {
     G.Cool.fields.density[i] = G.C.density[i] * G.Cool.dens_conv ;
     G.Cool.fields.internal_energy[i] = G.C.GasEnergy[i]  / G.Cool.fields.density[i] * G.Cool.energy_conv * G.Cool.dens_conv / G.Cosmo.current_a / G.Cosmo.current_a ;
