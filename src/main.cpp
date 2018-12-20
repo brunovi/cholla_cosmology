@@ -150,15 +150,6 @@ int main(int argc, char *argv[])
   Copy_Potential_To_Hydro_Grid( G );
   #endif
 
-  // set boundary conditions (assign appropriate values to ghost cells)
-  chprintf("Setting boundary conditions...\n");
-  G.Set_Boundary_Conditions(P);
-  chprintf("Boundary conditions set.\n");
-
-  #ifdef PARTICLES
-  Get_Particles_Acceleration( G, 0, G.Particles.n_local, 0, G.Particles.G.nz_local + 2*G.Particles.G.n_ghost_particles_grid );
-  #endif
-
   #ifdef COOLING_GRACKLE
   Initialize_Grackle( G.Cool, P, G.Grav, G.Cosmo );
   Initialize_Grackle_Fields( G );
@@ -169,6 +160,16 @@ int main(int argc, char *argv[])
   time_cool = stop_cool - start_cool;
   chprintf( " Time Cooling: %f\n", time_cool*1000 );
   #endif
+
+  // set boundary conditions (assign appropriate values to ghost cells)
+  chprintf("\nSetting boundary conditions...\n");
+  G.Set_Boundary_Conditions(P);
+  chprintf("Boundary conditions set.\n");
+
+  #ifdef PARTICLES
+  Get_Particles_Acceleration( G, 0, G.Particles.n_local, 0, G.Particles.G.nz_local + 2*G.Particles.G.n_ghost_particles_grid );
+  #endif
+
 
   chprintf("Dimensions of each cell: dx = %f dy = %f dz = %f\n", G.H.dx, G.H.dy, G.H.dz);
   chprintf("Ratio of specific heats gamma = %f\n",gama);
@@ -205,10 +206,13 @@ int main(int argc, char *argv[])
   bool output_now = false;
   // Evolve the grid, one timestep at a time
   chprintf("Starting calculations.\n");
-  // P.tout = 0;
   while (G.H.t < P.tout)
   //while (G.H.n_step < 1)
   {
+    #ifdef COOLING_GRACKLE
+    break;
+    #endif
+
     chprintf("n_step: %d \n", G.H.n_step + 1 );
     // get the start time
     start_step = get_time();

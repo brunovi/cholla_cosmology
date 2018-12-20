@@ -82,6 +82,8 @@ void Initialize_Grackle( Cool_GK &Cool, struct parameters P,  Grav3D &Grav, Cosm
   Cool.data->grackle_data_file = "src/cooling/CloudyData_UVB=HM2012.h5"; // data file
   Cool.data->omp_nthreads = 5;
 
+  if ( Cool.data->UVbackground == 1) chprintf( "GRACKLE: Loading UV Background File: %s\n", Cool.data->grackle_data_file );
+
   // Finally, initialize the chemistry object.
   if (initialize_chemistry_data(&Cool.units) == 0) {
     chprintf( "GRACKLE: Error in initialize_chemistry_data.\n");
