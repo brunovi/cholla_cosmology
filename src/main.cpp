@@ -158,6 +158,13 @@ int main(int argc, char *argv[])
   G.H.TRANSFER_HYDRO_BOUNDARIES = false;
   chprintf("Boundary conditions set.\n");
 
+  #ifdef PARTICLES
+  //Transfer Particles Boundaries
+  G.Particles.TRANSFER_PARTICLES_BOUNDARIES = true;
+
+  G.Particles.TRANSFER_PARTICLES_BOUNDARIES = false;
+  #endif
+
   #ifdef COOLING_GRACKLE
   Initialize_Grackle( G.Cool, P, G.Grav, G.Cosmo );
   Initialize_Grackle_Fields( G );
@@ -286,6 +293,15 @@ int main(int argc, char *argv[])
     #else
     G.Set_Boundary_Conditions(P);
     #endif //CPU_TIME
+
+    #ifdef PARTICLES
+    //Transfer Particles Boundaries
+    G.Particles.TRANSFER_PARTICLES_BOUNDARIES = true;
+    G.Timer.Start_Timer();
+    G.Set_Boundary_Conditions(P);
+    G.Timer.End_and_Record_Time( 8 );
+    G.Particles.TRANSFER_PARTICLES_BOUNDARIES = false;
+    #endif
 
     #ifdef PARTICLES
     //Advance the particles ( second step )

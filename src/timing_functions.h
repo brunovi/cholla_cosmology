@@ -50,6 +50,12 @@ public:
   Real time_part_dens_transf_mean;
   Real time_part_dens_transf_all;
 
+  Real time_part_tranf_min;
+  Real time_part_tranf_max;
+  Real time_part_tranf_mean;
+  Real time_part_tranf_all;
+
+
   Real time_advance_particles_1_min;
   Real time_advance_particles_1_max;
   Real time_advance_particles_1_mean;

@@ -91,6 +91,7 @@ class Particles_3D
 
   #endif
   bool TRANSFER_DENSITY_BOUNDARIES;
+  bool TRANSFER_PARTICLES_BOUNDARIES;
 
   #ifdef COSMOLOGY
   Real current_z;
