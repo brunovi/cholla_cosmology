@@ -101,6 +101,9 @@ extern int x_buffer_length_hydro;
 extern int y_buffer_length_hydro;
 extern int z_buffer_length_hydro;
 
+extern MPI_Request *send_request_n_particles;
+extern MPI_Request *recv_request_n_particles;
+
 #endif
 
 

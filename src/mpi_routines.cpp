@@ -95,6 +95,9 @@ int buffer_length_second_particles_z1;
 int x_buffer_length_hydro;
 int y_buffer_length_hydro;
 int z_buffer_length_hydro;
+
+MPI_Request *send_request_n_particles;
+MPI_Request *recv_request_n_particles;
 #endif
 
 /*local domain sizes*/
@@ -180,6 +183,17 @@ void InitializeChollaMPI(int *pargc, char **pargv[])
   if(!(recv_request_secondary_particles = (MPI_Request *) malloc(2*sizeof(MPI_Request))))
   {
     chprintf("Error allocating recv_request for secondary particles transfer.\n");
+    chexit(-2);
+  }
+
+  if(!(send_request_n_particles = (MPI_Request *) malloc(2*sizeof(MPI_Request))))
+  {
+    chprintf("Error allocating send_request for number of particles for transfer.\n");
+    chexit(-2);
+  }
+  if(!(recv_request_n_particles = (MPI_Request *) malloc(2*sizeof(MPI_Request))))
+  {
+    chprintf("Error allocating recv_request for number of particles for transfer.\n");
     chexit(-2);
   }
   #endif
