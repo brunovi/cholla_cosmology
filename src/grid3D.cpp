@@ -143,7 +143,6 @@ void Grid3D::Initialize(struct parameters *P)
 
 #else  /*MPI_CHOLLA*/
 
-  H.TRANSFER_HYDRO_BOUNDARIES = false;
   /* perform domain decomposition
    * and set grid dimensions
    * and allocate comm buffers */
@@ -151,6 +150,7 @@ void Grid3D::Initialize(struct parameters *P)
 
 #endif /*MPI_CHOLLA*/
 
+  H.TRANSFER_HYDRO_BOUNDARIES = false;
   // failsafe
   if(H.n_cells<=0)
   {

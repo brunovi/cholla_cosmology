@@ -430,7 +430,8 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers(int dir, int *flags)
     case BLOCK_DECOMP:
       /*load communication buffers*/
       #ifdef PARTICLES
-      if ( !Particles.TRANSFER_DENSITY_BOUNDARIES && !Grav.TRANSFER_POTENTIAL_BOUNDARIES && !Particles.TRANSFER_PARTICLES_BOUNDARIES){
+      if ( H.TRANSFER_HYDRO_BOUNDARIES){
+        // chprintf("Selecting Particles to Transfer  dir:%d\n", dir);
         Particles.Select_Particles_to_Transfer( dir );
       }
       #endif
@@ -1146,7 +1147,6 @@ int Grid3D::Load_Hydro_Buffer_Z1(){
 
 void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
 {
-  if ( Particles.TRANSFER_PARTICLES_BOUNDARIES ) return;
 
   int ireq;
   ireq = 0;
@@ -1156,15 +1156,15 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
   // bool transfer_hydro = H.TRANSFER_HYDRO_BOUNDARIES;
 
   #ifdef PARTICLES
-  if ( Particles.TRANSFER_DENSITY_BOUNDARIES ) H.TRANSFER_HYDRO_BOUNDARIES = false;
-  if ( Particles.TRANSFER_PARTICLES_BOUNDARIES ) H.TRANSFER_HYDRO_BOUNDARIES = false;
+  // if ( Particles.TRANSFER_DENSITY_BOUNDARIES ) H.TRANSFER_HYDRO_BOUNDARIES = false;
+  // if ( Particles.TRANSFER_PARTICLES_BOUNDARIES ) H.TRANSFER_HYDRO_BOUNDARIES = false;
 
   int n_transfer_secondary, buffer_length_secondary;
   MPI_Status status_particles_secondary_0, status_particles_secondary_1;
   #endif
 
   #ifdef GRAVITY
-  if ( Grav.TRANSFER_POTENTIAL_BOUNDARIES ) H.TRANSFER_HYDRO_BOUNDARIES = false;
+  // if ( Grav.TRANSFER_POTENTIAL_BOUNDARIES ) H.TRANSFER_HYDRO_BOUNDARIES = false;
   #endif
 
   /* x boundaries */
@@ -1180,6 +1180,9 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       }
       else if ( Particles.TRANSFER_DENSITY_BOUNDARIES) {
         buffer_length = Load_Particles_Density_Boundary_to_Buffer( 0, 0, send_buffer_x0  );
+      }
+      else if ( Particles.TRANSFER_PARTICLES_BOUNDARIES ){
+        buffer_length = 0;
       }
       #endif
 
@@ -1221,6 +1224,9 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       }
       else if ( Particles.TRANSFER_DENSITY_BOUNDARIES) {
         buffer_length = Load_Particles_Density_Boundary_to_Buffer( 0, 1, send_buffer_x1  );
+      }
+      else if ( Particles.TRANSFER_PARTICLES_BOUNDARIES ){
+        buffer_length = 0;
       }
       #endif
 
@@ -1266,6 +1272,9 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       else if ( Particles.TRANSFER_DENSITY_BOUNDARIES) {
        buffer_length = Load_Particles_Density_Boundary_to_Buffer( 1, 0, send_buffer_y0  );
       }
+      else if ( Particles.TRANSFER_PARTICLES_BOUNDARIES ){
+        buffer_length = 0;
+      }
       #endif
 
       #ifdef GRAVITY
@@ -1304,6 +1313,9 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       }
       else if ( Particles.TRANSFER_DENSITY_BOUNDARIES) {
         buffer_length = Load_Particles_Density_Boundary_to_Buffer( 1, 1, send_buffer_y1  );
+      }
+      else if ( Particles.TRANSFER_PARTICLES_BOUNDARIES ){
+        buffer_length = 0;
       }
       #endif
 
@@ -1347,6 +1359,9 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       else if ( Particles.TRANSFER_DENSITY_BOUNDARIES) {
         buffer_length = Load_Particles_Density_Boundary_to_Buffer( 2, 0, send_buffer_z0  );
       }
+      else if ( Particles.TRANSFER_PARTICLES_BOUNDARIES ){
+        buffer_length = 0;
+      }
       #endif
 
       #ifdef GRAVITY
@@ -1386,6 +1401,9 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       }
       else if ( Particles.TRANSFER_DENSITY_BOUNDARIES) {
         buffer_length = Load_Particles_Density_Boundary_to_Buffer( 2, 1, send_buffer_z1  );
+      }
+      else if ( Particles.TRANSFER_PARTICLES_BOUNDARIES ){
+        buffer_length = 0;
       }
       #endif
 
@@ -1500,9 +1518,9 @@ void Grid3D::Unload_MPI_Comm_Buffers(int index)
       break;
     case BLOCK_DECOMP:
       Unload_MPI_Comm_Buffers_BLOCK(index);
-      #ifdef PARTICLES
-      Unload_Particles_From_Buffers_BLOCK(index);
-      #endif
+      // #ifdef PARTICLES
+      // Unload_Particles_From_Buffers_BLOCK(index);
+      // #endif
       break;
   }
 }
@@ -1565,11 +1583,11 @@ void Grid3D::Unload_MPI_Comm_Buffers_BLOCK(int index)
   // bool transfer_hydro = H.TRANSFER_HYDRO_BOUNDARIES;
 
   #ifdef PARTICLES
-  if ( Particles.TRANSFER_DENSITY_BOUNDARIES ) H.TRANSFER_HYDRO_BOUNDARIES = false;
-  if ( Particles.TRANSFER_PARTICLES_BOUNDARIES ) H.TRANSFER_HYDRO_BOUNDARIES = false;
+  // if ( Particles.TRANSFER_DENSITY_BOUNDARIES ) H.TRANSFER_HYDRO_BOUNDARIES = false;
+  // if ( Particles.TRANSFER_PARTICLES_BOUNDARIES ) H.TRANSFER_HYDRO_BOUNDARIES = false;
   #endif
   #ifdef GRAVITY
-  if ( Grav.TRANSFER_POTENTIAL_BOUNDARIES ) H.TRANSFER_HYDRO_BOUNDARIES = false;
+  // if ( Grav.TRANSFER_POTENTIAL_BOUNDARIES ) H.TRANSFER_HYDRO_BOUNDARIES = false;
   #endif
 
   if ( H.TRANSFER_HYDRO_BOUNDARIES ){
@@ -1770,6 +1788,7 @@ void Grid3D::Unload_MPI_Comm_Buffers_BLOCK(int index)
   }
 
   #ifdef PARTICLES
+  if( H.TRANSFER_HYDRO_BOUNDARIES)  Unload_Particles_From_Buffers_BLOCK(index);
   if (  Particles.TRANSFER_DENSITY_BOUNDARIES ){
     if ( index == 0 ) Unload_Particles_Density_Boundary_From_Buffer( 0, 0, recv_buffer_x0 );
     if ( index == 1 ) Unload_Particles_Density_Boundary_From_Buffer( 0, 1, recv_buffer_x1 );
