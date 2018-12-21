@@ -81,21 +81,16 @@ class Particles_3D
 
 
   part_int_t n_transfer_x0;
-  part_int_t n_transfer_x0_s;
   part_int_t n_transfer_x1;
-  part_int_t n_transfer_x1_s;
   part_int_t n_transfer_y0;
-  part_int_t n_transfer_y0_s;
   part_int_t n_transfer_y1;
-  part_int_t n_transfer_y1_s;
   part_int_t n_transfer_z0;
-  part_int_t n_transfer_z0_s;
   part_int_t n_transfer_z1;
-  part_int_t n_transfer_z1_s;
 
 
-  bool TRANSFER_DENSITY_BOUNDARIES;
+
   #endif
+  bool TRANSFER_DENSITY_BOUNDARIES;
 
   #ifdef COSMOLOGY
   Real current_z;
@@ -146,7 +141,7 @@ class Particles_3D
   #ifdef MPI_CHOLLA
   void Clear_Vectors_For_Transfers( void );
   // void Select_Particles_to_Transfer( void );
-    void Select_Particles_to_Transfer( int dir );
+  void Select_Particles_to_Transfer( int dir );
   void Load_Particles_to_Buffer( int direction, int side, int buffer_start, Real *send_buffer, int MAX_PARTICLES_IN_BUFFER , bool secondary );
   void Load_Particles_to_Buffer_X( void );
   void Load_Particles_to_Buffer_Y( void );
@@ -155,6 +150,7 @@ class Particles_3D
   void Add_Particle_To_Buffer( Real *buffer, int buffer_start, int max_particles, Real *buffer_secondary, int buffer_start_secondary, Real pId, Real pMass, Real pPos_x, Real pPos_y, Real pPos_z, Real pVel_x, Real pVel_y, Real pVel_z, bool secondary );
   void Add_Particle_To_Vectors( Real pId, Real pMass, Real pPos_x, Real pPos_y, Real pPos_z, Real pVel_x, Real pVel_y, Real pVel_z );
   void Remove_Transfered_Particles( void );
+  void Clear_Particles_For_Transfer( void );
   #endif
 
   void Reset( void );

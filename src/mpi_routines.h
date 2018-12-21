@@ -23,6 +23,10 @@ extern MPI_Comm node;	/*communicator for each node*/
 
 extern MPI_Datatype MPI_CHREAL; /*data type describing float precision*/
 
+#ifdef PARTICLES
+extern MPI_Datatype MPI_PART_INT; /*data type describing interger for particles precision*/
+#endif
+
 //extern MPI_Request send_request[6];
 //extern MPI_Request recv_request[6];
 extern MPI_Request *send_request;
@@ -96,6 +100,7 @@ extern int buffer_length_second_particles_z1_recv;
 extern int x_buffer_length_hydro;
 extern int y_buffer_length_hydro;
 extern int z_buffer_length_hydro;
+
 #endif
 
 

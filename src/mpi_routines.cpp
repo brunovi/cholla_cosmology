@@ -22,6 +22,10 @@ MPI_Comm node;  /*global communicator*/
 
 MPI_Datatype MPI_CHREAL; /*set equal to MPI_FLOAT or MPI_DOUBLE*/
 
+#ifdef PARTICLES
+MPI_Datatype MPI_PART_INT; /*set equal to MPI_INT or MPI_LONG*/
+#endif
+
 //MPI_Requests for nonblocking comm
 MPI_Request *send_request;
 MPI_Request *recv_request;
@@ -145,6 +149,14 @@ void InitializeChollaMPI(int *pargc, char **pargv[])
   #if PRECISION == 2
   MPI_CHREAL = MPI_DOUBLE;
   #endif /*PRECISION*/
+
+  #ifdef PARTICLES
+  #ifdef LONG_INTS
+  MPI_PART_INT = MPI_LONG;
+  #else
+  MPI_PART_INT = MPI_INT;
+  #endif
+  #endif
 
   /*create the MPI_Request arrays for non-blocking sends*/
   if(!(send_request = (MPI_Request *) malloc(2*sizeof(MPI_Request))))

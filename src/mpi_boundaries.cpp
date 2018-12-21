@@ -36,17 +36,14 @@ void Clear_Buffers_For_Particles_Transfers( void ){
   send_buffer_y1_second_particles[1] = 0;
   send_buffer_z0_second_particles[1] = 0;
   send_buffer_z1_second_particles[1] = 0;
+
+
 }
 
 void Grid3D::Finish_Particles_Transfer( void ){
 
   Particles.Remove_Transfered_Particles();
-  // Clear_Buffers_For_Particles_Transfers();
 
-  // part_int_t n_total;
-  // n_total = ReducePartIntSum( Particles.n_local );
-  // chprintf( " Total Particles: %ld\n", n_total );
-  // std::cout << "N_Local: " << Particles.n_local << std::endl;
 }
 #endif
 
@@ -68,7 +65,10 @@ void Grid3D::Set_Boundaries_MPI(struct parameters P)
       break;
     case BLOCK_DECOMP:
       #ifdef PARTICLES
-      Clear_Buffers_For_Particles_Transfers();
+      if ( H.TRANSFER_HYDRO_BOUNDARIES){
+        Clear_Buffers_For_Particles_Transfers();
+        Particles.Clear_Particles_For_Transfer();
+      }
       #endif
       Set_Boundaries_MPI_BLOCK(flags,P);
       break;
@@ -175,7 +175,7 @@ void Grid3D::Set_Boundaries_MPI_BLOCK(int *flags, struct parameters P)
   }
 
   #ifdef PARTICLES
-  if ( !Particles.TRANSFER_DENSITY_BOUNDARIES && !Grav.TRANSFER_POTENTIAL_BOUNDARIES)  Finish_Particles_Transfer();
+  if ( H.TRANSFER_HYDRO_BOUNDARIES)  Finish_Particles_Transfer();
   #endif
 
 }
@@ -1159,7 +1159,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
 
   //Flag to omit hydro transfer when doing particles_density Transfering
   int buffer_length;
-  bool transfer_hydro = true;
+  bool transfer_hydro = H.TRANSFER_HYDRO_BOUNDARIES;
 
   #ifdef PARTICLES
   if ( Particles.TRANSFER_DENSITY_BOUNDARIES ) transfer_hydro = false;
@@ -1193,7 +1193,6 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       }
       #endif
 
-      // if (transfer_hydro ) std::cout << " N Loaded X0: " << send_buffer_x0[x_buffer_length_hydro]  << std::endl;
       //post non-blocking receive left x communication buffer
       MPI_Irecv(recv_buffer_x0, buffer_length, MPI_CHREAL, source[0], 0, world, &recv_request[ireq]);
 
@@ -1235,7 +1234,6 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       }
       #endif
 
-      // if (transfer_hydro) std::cout << " N Loaded X1: " << send_buffer_x1[x_buffer_length_hydro]  << std::endl;
       //post non-blocking receive right x communication buffer
       MPI_Irecv(recv_buffer_x1, buffer_length, MPI_CHREAL, source[1], 1, world, &recv_request[ireq]);
 
@@ -1279,7 +1277,6 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
         buffer_length = Load_Potential_To_Buffer( 1, 0, send_buffer_y0, 0 );
       }
       #endif
-      // if (transfer_hydro) std::cout << " N Loaded Y0: " << send_buffer_y0[y_buffer_length_hydro]  << std::endl;
       //post non-blocking receive left y communication buffer
       MPI_Irecv(recv_buffer_y0, buffer_length, MPI_CHREAL, source[2], 2, world, &recv_request[ireq]);
 
@@ -1319,7 +1316,6 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
         buffer_length = Load_Potential_To_Buffer( 1, 1, send_buffer_y1, 0 );
       }
       #endif
-      // if (transfer_hydro) std::cout << " N Loaded Y1: " << send_buffer_y0[y_buffer_length_hydro]  << std::endl;
       //post non-blocking receive right y communication buffer
       MPI_Irecv(recv_buffer_y1, buffer_length, MPI_CHREAL, source[3], 3, world, &recv_request[ireq]);
 
@@ -1363,7 +1359,6 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       }
       #endif
 
-      // if (transfer_hydro ) std::cout << " N Loaded Z0: " << send_buffer_z0[z_buffer_length_hydro]  << std::endl;
       //post non-blocking receive left z communication buffer
       MPI_Irecv(recv_buffer_z0, buffer_length, MPI_CHREAL, source[4], 4, world, &recv_request[ireq]);
 
@@ -1569,7 +1564,7 @@ void Grid3D::Unload_MPI_Comm_Buffers_BLOCK(int index)
   int gidx;
   int offset;
 
-  bool transfer_hydro = true;
+  bool transfer_hydro = H.TRANSFER_HYDRO_BOUNDARIES;
 
   #ifdef PARTICLES
   if ( Particles.TRANSFER_DENSITY_BOUNDARIES ) transfer_hydro = false;

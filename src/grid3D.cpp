@@ -140,8 +140,10 @@ void Grid3D::Initialize(struct parameters *P)
   // set total number of cells
   H.n_cells = H.nx * H.ny * H.nz;
 
+
 #else  /*MPI_CHOLLA*/
 
+  H.TRANSFER_HYDRO_BOUNDARIES = false;
   /* perform domain decomposition
    * and set grid dimensions
    * and allocate comm buffers */

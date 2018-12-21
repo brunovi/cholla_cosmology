@@ -94,6 +94,15 @@ void Particles_3D::Clear_Vectors_For_Transfers( void ){
   out_indxs_vec_z1.clear();
 }
 
+void Particles_3D::Clear_Particles_For_Transfer( void ){
+  n_transfer_x0 = 0;
+  n_transfer_x1 = 0;
+  n_transfer_y0 = 0;
+  n_transfer_y1 = 0;
+  n_transfer_z0 = 0;
+  n_transfer_z1 = 0;
+}
+
 
 // void Particles_3D::Select_Particles_to_Transfer( int dir ){
 //
@@ -223,42 +232,29 @@ void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer
 
   part_int_t n_out;
   int_vector_t *out_indxs_vec;
-  part_int_t *n_transfer_1;
-  part_int_t *n_transfer_2;
+
   if ( direction == 0 ){
     if ( side == 0 ){
       out_indxs_vec = &out_indxs_vec_x0;
-      n_transfer_1 = &n_transfer_x0;
-      n_transfer_2 = &n_transfer_x0_s;
     }
     if ( side == 1 ){
       out_indxs_vec = &out_indxs_vec_x1;
-      n_transfer_1 = &n_transfer_x1;
-      n_transfer_2 = &n_transfer_x1_s;
     }
   }
   if ( direction == 1 ){
     if ( side == 0 ){
       out_indxs_vec = &out_indxs_vec_y0;
-      n_transfer_1 = &n_transfer_y0;
-      n_transfer_2 = &n_transfer_y0_s;
     }
     if ( side == 1 ){
       out_indxs_vec = &out_indxs_vec_y1;
-      n_transfer_1 = &n_transfer_y1;
-      n_transfer_2 = &n_transfer_y1_s;
     }
   }
   if ( direction == 2 ){
     if ( side == 0 ){
       out_indxs_vec = &out_indxs_vec_z0;
-      n_transfer_1 = &n_transfer_z0;
-      n_transfer_2 = &n_transfer_z0_s;
     }
     if ( side == 1 ){
       out_indxs_vec = &out_indxs_vec_z1;
-      n_transfer_1 = &n_transfer_z1;
-      n_transfer_2 = &n_transfer_z1_s;
     }
   }
 

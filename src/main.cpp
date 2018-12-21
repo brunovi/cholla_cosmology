@@ -153,7 +153,9 @@ int main(int argc, char *argv[])
 
   // set boundary conditions (assign appropriate values to ghost cells)
   chprintf("\nSetting boundary conditions...\n");
+  G.H.TRANSFER_HYDRO_BOUNDARIES = true;
   G.Set_Boundary_Conditions(P);
+  G.H.TRANSFER_HYDRO_BOUNDARIES = false;
   chprintf("Boundary conditions set.\n");
 
   #ifdef COOLING_GRACKLE
@@ -277,7 +279,9 @@ int main(int argc, char *argv[])
     // set boundary conditions for next time step
     #ifdef CPU_TIME
     G.Timer.Start_Timer();
+    G.H.TRANSFER_HYDRO_BOUNDARIES = true;
     G.Set_Boundary_Conditions(P);
+    G.H.TRANSFER_HYDRO_BOUNDARIES = false;
     G.Timer.End_and_Record_Time( 2 );
     #else
     G.Set_Boundary_Conditions(P);
