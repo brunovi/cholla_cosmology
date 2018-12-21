@@ -101,6 +101,20 @@ void Particles_3D::Clear_Particles_For_Transfer( void ){
   n_transfer_y1 = 0;
   n_transfer_z0 = 0;
   n_transfer_z1 = 0;
+
+  n_send_x0 = 0;
+  n_send_x1 = 0;
+  n_send_y0 = 0;
+  n_send_y1 = 0;
+  n_send_z0 = 0;
+  n_send_z1 = 0;
+
+  n_recv_x0 = 0;
+  n_recv_x1 = 0;
+  n_recv_y0 = 0;
+  n_recv_y1 = 0;
+  n_recv_z0 = 0;
+  n_recv_z1 = 0;
 }
 
 
@@ -231,30 +245,37 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
 void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer_start, Real *send_buffer, int MAX_PARTICLES_IN_BUFFER, bool secondary  ){
 
   part_int_t n_out;
+  part_int_t *n_send;
   int_vector_t *out_indxs_vec;
 
   if ( direction == 0 ){
     if ( side == 0 ){
       out_indxs_vec = &out_indxs_vec_x0;
+      n_send = &n_send_x0;
     }
     if ( side == 1 ){
       out_indxs_vec = &out_indxs_vec_x1;
+      n_send = &n_send_x1;
     }
   }
   if ( direction == 1 ){
     if ( side == 0 ){
       out_indxs_vec = &out_indxs_vec_y0;
+      n_send = &n_send_y0;
     }
     if ( side == 1 ){
       out_indxs_vec = &out_indxs_vec_y1;
+      n_send = &n_send_y1;
     }
   }
   if ( direction == 2 ){
     if ( side == 0 ){
       out_indxs_vec = &out_indxs_vec_z0;
+      n_send = &n_send_z0;
     }
     if ( side == 1 ){
       out_indxs_vec = &out_indxs_vec_z1;
+      n_send = &n_send_z1;
     }
   }
 
@@ -300,6 +321,7 @@ void Particles_3D::Load_Particles_to_Buffer( int direction, int side, int buffer
     Remove_Real( pIndx, grav_z );
 
     send_buffer[buffer_start] += 1;
+    *n_send += 1;
     n_local -= 1;
     out_indxs_vec->pop_back();
     offset += N_DATA_PER_PARTICLE_TRANSFER;
@@ -484,10 +506,12 @@ void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int bu
 
     if (direction  == 0 ){
       if ( pPos_y < G.yMin ){
+        n_send_y0 += 1;
         Add_Particle_To_Buffer( send_buffer_y0, buffer_start_y, max_particles, send_buffer_y0_second, 0, pId, pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pVel_z, secondary);
         continue;
       }
       if ( pPos_y >= G.yMax ){
+        n_send_y1 += 1;
         Add_Particle_To_Buffer( send_buffer_y1, buffer_start_y, max_particles, send_buffer_y1_second, 0, pId, pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pVel_z, secondary);
         continue;
       }
@@ -514,12 +538,12 @@ void Particles_3D::Unload_Particles_from_Buffer( int direction, int side, int bu
   //
     if (direction  !=2 ){
       if ( pPos_z < G.zMin ){
-        // std::cout << "  Adding to Z0 " << std::endl;
+        n_send_z0 += 1;
         Add_Particle_To_Buffer( send_buffer_z0, buffer_start_z, max_particles, send_buffer_z0_second, 0, pId, pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pVel_z, secondary);
         continue;
       }
       if ( pPos_z >= G.zMax ){
-        // std::cout << "  Adding to Z1 " << std::endl;
+        n_send_z1 += 1;
         Add_Particle_To_Buffer( send_buffer_z1, buffer_start_z, max_particles, send_buffer_z1_second, 0, pId, pMass, pPos_x, pPos_y, pPos_z, pVel_x, pVel_y, pVel_z, secondary);
         continue;
       }

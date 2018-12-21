@@ -87,6 +87,19 @@ class Particles_3D
   part_int_t n_transfer_z0;
   part_int_t n_transfer_z1;
 
+  part_int_t n_send_x0;
+  part_int_t n_send_x1;
+  part_int_t n_send_y0;
+  part_int_t n_send_y1;
+  part_int_t n_send_z0;
+  part_int_t n_send_z1;
+
+  part_int_t n_recv_x0;
+  part_int_t n_recv_x1;
+  part_int_t n_recv_y0;
+  part_int_t n_recv_y1;
+  part_int_t n_recv_z0;
+  part_int_t n_recv_z1;
 
 
   #endif
