@@ -1174,6 +1174,12 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
 
       if( H.TRANSFER_HYDRO_BOUNDARIES ) buffer_length = Load_Hydro_Buffer_X0();
 
+      #ifdef GRAVITY
+      if ( Grav.TRANSFER_POTENTIAL_BOUNDARIES ){
+        buffer_length = Load_Potential_To_Buffer( 0, 0, send_buffer_x0, 0 );
+      }
+      #endif
+
       #ifdef PARTICLES
       if ( H.TRANSFER_HYDRO_BOUNDARIES ){
       Load_Particles_to_Buffer_X0( false );
@@ -1183,12 +1189,7 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       }
       else if ( Particles.TRANSFER_PARTICLES_BOUNDARIES ){
         buffer_length = 0;
-      }
-      #endif
-
-      #ifdef GRAVITY
-      if ( Grav.TRANSFER_POTENTIAL_BOUNDARIES ){
-        buffer_length = Load_Potential_To_Buffer( 0, 0, send_buffer_x0, 0 );
+        // MPI_Isend(Particles.n_send_x0, 1, MPI_PART_INT, dest[0],   1, world, &send_request_n_particles[0]);
       }
       #endif
 
@@ -1218,6 +1219,12 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
 
       if (H.TRANSFER_HYDRO_BOUNDARIES) buffer_length = Load_Hydro_Buffer_X1();
 
+      #ifdef GRAVITY
+      if ( Grav.TRANSFER_POTENTIAL_BOUNDARIES ){
+        buffer_length = Load_Potential_To_Buffer( 0, 1, send_buffer_x1, 0 );
+      }
+      #endif
+
       #ifdef PARTICLES
       if ( H.TRANSFER_HYDRO_BOUNDARIES ){
       Load_Particles_to_Buffer_X1( false );
@@ -1227,12 +1234,6 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       }
       else if ( Particles.TRANSFER_PARTICLES_BOUNDARIES ){
         buffer_length = 0;
-      }
-      #endif
-
-      #ifdef GRAVITY
-      if ( Grav.TRANSFER_POTENTIAL_BOUNDARIES ){
-        buffer_length = Load_Potential_To_Buffer( 0, 1, send_buffer_x1, 0 );
       }
       #endif
 
@@ -1265,6 +1266,12 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
 
       if ( H.TRANSFER_HYDRO_BOUNDARIES ) buffer_length = Load_Hydro_Buffer_Y0();
 
+      #ifdef GRAVITY
+      if ( Grav.TRANSFER_POTENTIAL_BOUNDARIES ){
+        buffer_length = Load_Potential_To_Buffer( 1, 0, send_buffer_y0, 0 );
+      }
+      #endif
+
       #ifdef PARTICLES
       if ( H.TRANSFER_HYDRO_BOUNDARIES ){
       Load_Particles_to_Buffer_Y0( false );
@@ -1277,11 +1284,6 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       }
       #endif
 
-      #ifdef GRAVITY
-      if ( Grav.TRANSFER_POTENTIAL_BOUNDARIES ){
-        buffer_length = Load_Potential_To_Buffer( 1, 0, send_buffer_y0, 0 );
-      }
-      #endif
       //post non-blocking receive left y communication buffer
       MPI_Irecv(recv_buffer_y0, buffer_length, MPI_CHREAL, source[2], 2, world, &recv_request[ireq]);
 
@@ -1307,6 +1309,12 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
 
       if ( H.TRANSFER_HYDRO_BOUNDARIES ) buffer_length = Load_Hydro_Buffer_Y1();
 
+      #ifdef GRAVITY
+      if ( Grav.TRANSFER_POTENTIAL_BOUNDARIES ){
+        buffer_length = Load_Potential_To_Buffer( 1, 1, send_buffer_y1, 0 );
+      }
+      #endif
+
       #ifdef PARTICLES
       if ( H.TRANSFER_HYDRO_BOUNDARIES ){
       Load_Particles_to_Buffer_Y1( false );
@@ -1319,11 +1327,6 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       }
       #endif
 
-      #ifdef GRAVITY
-      if ( Grav.TRANSFER_POTENTIAL_BOUNDARIES ){
-        buffer_length = Load_Potential_To_Buffer( 1, 1, send_buffer_y1, 0 );
-      }
-      #endif
       //post non-blocking receive right y communication buffer
       MPI_Irecv(recv_buffer_y1, buffer_length, MPI_CHREAL, source[3], 3, world, &recv_request[ireq]);
 
@@ -1352,6 +1355,12 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
     {
       if ( H.TRANSFER_HYDRO_BOUNDARIES ) buffer_length = Load_Hydro_Buffer_Z0();
 
+      #ifdef GRAVITY
+      if ( Grav.TRANSFER_POTENTIAL_BOUNDARIES ){
+        buffer_length = Load_Potential_To_Buffer( 2, 0, send_buffer_z0, 0 );
+      }
+      #endif
+
       #ifdef PARTICLES
       if ( H.TRANSFER_HYDRO_BOUNDARIES ){
       Load_Particles_to_Buffer_Z0( false );
@@ -1361,12 +1370,6 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       }
       else if ( Particles.TRANSFER_PARTICLES_BOUNDARIES ){
         buffer_length = 0;
-      }
-      #endif
-
-      #ifdef GRAVITY
-      if ( Grav.TRANSFER_POTENTIAL_BOUNDARIES ){
-        buffer_length = Load_Potential_To_Buffer( 2, 0, send_buffer_z0, 0 );
       }
       #endif
 
@@ -1394,6 +1397,12 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
     {
 
       if ( H.TRANSFER_HYDRO_BOUNDARIES ) buffer_length = Load_Hydro_Buffer_Z1();
+      
+      #ifdef GRAVITY
+      if ( Grav.TRANSFER_POTENTIAL_BOUNDARIES ){
+        buffer_length = Load_Potential_To_Buffer( 2, 1, send_buffer_z1, 0 );
+      }
+      #endif
 
       #ifdef PARTICLES
       if ( H.TRANSFER_HYDRO_BOUNDARIES ){
@@ -1404,12 +1413,6 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
       }
       else if ( Particles.TRANSFER_PARTICLES_BOUNDARIES ){
         buffer_length = 0;
-      }
-      #endif
-
-      #ifdef GRAVITY
-      if ( Grav.TRANSFER_POTENTIAL_BOUNDARIES ){
-        buffer_length = Load_Potential_To_Buffer( 2, 1, send_buffer_z1, 0 );
       }
       #endif
 
