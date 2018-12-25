@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
   #ifdef PARTICLES
   //Transfer Particles Boundaries
   G.Particles.TRANSFER_PARTICLES_BOUNDARIES = true;
-
+  G.Set_Boundary_Conditions(P);
   G.Particles.TRANSFER_PARTICLES_BOUNDARIES = false;
   #endif
 
