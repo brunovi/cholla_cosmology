@@ -179,7 +179,7 @@ void Particles_3D::Select_Particles_to_Transfer_All(  ){
   int i;
   bool already_transfered, pID_in_transfers;
   part_int_t pIndx;
-  part_int_t pID;
+  // part_int_t pID;
   // if ( dir == 0 ){
   out_indxs_vec_x0.clear();
   out_indxs_vec_x1.clear();
@@ -189,7 +189,7 @@ void Particles_3D::Select_Particles_to_Transfer_All(  ){
   out_indxs_vec_z1.clear();
 
   for ( pIndx=0; pIndx<n_local; pIndx++ ){
-    pID = partIDs[pIndx];
+    // pID = partIDs[pIndx];
     if ( pos_x[pIndx] < G.xMin ){
       out_indxs_vec_x0.push_back( pIndx );
       continue;
@@ -236,12 +236,12 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
   int i;
   bool already_transfered, pID_in_transfers;
   part_int_t pIndx;
-  part_int_t pID;
+  // part_int_t pID;
   if ( dir == 0 ){
     out_indxs_vec_x0.clear();
     out_indxs_vec_x1.clear();
     for ( pIndx=0; pIndx<n_local; pIndx++ ){
-      pID = partIDs[pIndx];
+      // pID = partIDs[pIndx];
       if ( pos_x[pIndx] < G.xMin ){
         out_indxs_vec_x0.push_back( pIndx );
         continue;
@@ -261,7 +261,7 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
     out_indxs_vec_y0.clear();
     out_indxs_vec_y1.clear();
     for ( pIndx=0; pIndx<n_local; pIndx++ ){
-      pID = partIDs[pIndx];
+      // pID = partIDs[pIndx];
       already_transfered = false;
       if ( pos_x[pIndx] < G.xMin || pos_x[pIndx] >= G.xMax ) already_transfered = true;
       if ( already_transfered ){
@@ -285,7 +285,7 @@ void Particles_3D::Select_Particles_to_Transfer( int dir ){
     out_indxs_vec_z0.clear();
     out_indxs_vec_z1.clear();
     for ( pIndx=0; pIndx<n_local; pIndx++ ){
-      pID = partIDs[pIndx];
+      // pID = partIDs[pIndx];
       already_transfered = false;
       if ( pos_x[pIndx] < G.xMin || pos_x[pIndx] >= G.xMax || pos_y[pIndx] < G.yMin || pos_y[pIndx] >= G.yMax ) already_transfered = true;
       if ( already_transfered ){
