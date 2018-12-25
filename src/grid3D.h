@@ -565,32 +565,14 @@ class Grid3D
     #ifdef PARTICLES
     int Load_Particles_Density_Boundary_to_Buffer( int direction, int side, Real *buffer );
     void Unload_Particles_Density_Boundary_From_Buffer( int direction, int side, Real *buffer  );
-    // void Load_Particles_to_Buffer_X0( bool secondary );
-    // void Load_Particles_to_Buffer_X1( bool secondary );
-    // void Load_Particles_to_Buffer_Y0( bool secondary );
-    // void Load_Particles_to_Buffer_Y1( bool secondary );
-    // void Load_Particles_to_Buffer_Z0( bool secondary );
-    // void Load_Particles_to_Buffer_Z1( bool secondary );
-
-    void Unload_Particles_from_Buffer_X_0( bool secondary );
-    void Unload_Particles_from_Buffer_X_1( bool secondary );
-    void Unload_Particles_from_Buffer_Y_0( bool secondary );
-    void Unload_Particles_from_Buffer_Y_1( bool secondary );
-    void Unload_Particles_from_Buffer_Z_0( bool secondary );
-    void Unload_Particles_from_Buffer_Z_1( bool secondary );
-    void Unload_Particles_From_Buffers_BLOCK( int indx );
-    void Set_Particles_Secondary_Transfer_Recv( int index, int buffer_start );
     void Finish_Particles_Transfer( void );
-
-
-
     void Unload_Particles_from_Buffer_X0();
     void Unload_Particles_from_Buffer_X1();
     void Unload_Particles_from_Buffer_Y0();
     void Unload_Particles_from_Buffer_Y1();
     void Unload_Particles_from_Buffer_Z0();
     void Unload_Particles_from_Buffer_Z1();
-    void Unload_Particles_From_Buffers_BLOCK_new( int indx );
+    void Unload_Particles_From_Buffers_BLOCK( int indx );
     void Wait_and_Recv_Particles_Transfer_BLOCK(int dir, int *flags);
     void Load_N_Particles_Transfer(int index, int *ireq_particles_transfer);
     void Wait_and_Unload_MPI_Comm_Particles_Buffers_BLOCK(int dir, int *flags);

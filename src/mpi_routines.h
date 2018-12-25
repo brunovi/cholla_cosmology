@@ -70,36 +70,6 @@ extern int y_buffer_length;
 extern int z_buffer_length;
 
 #ifdef PARTICLES
-// extern MPI_Request *send_request_secondary_particles;
-// extern MPI_Request *recv_request_secondary_particles;
-// // For BLOCK
-// extern Real *send_buffer_x0_second_particles;
-// extern Real *send_buffer_x1_second_particles;
-// extern Real *send_buffer_y0_second_particles;
-// extern Real *send_buffer_y1_second_particles;
-// extern Real *send_buffer_z0_second_particles;
-// extern Real *send_buffer_z1_second_particles;
-// extern Real *recv_buffer_x0_second_particles;
-// extern Real *recv_buffer_x1_second_particles;
-// extern Real *recv_buffer_y0_second_particles;
-// extern Real *recv_buffer_y1_second_particles;
-// extern Real *recv_buffer_z0_second_particles;
-// extern Real *recv_buffer_z1_second_particles;
-// extern int buffer_length_second_particles_x0_send;
-// extern int buffer_length_second_particles_x0_recv;
-// extern int buffer_length_second_particles_x1_send;
-// extern int buffer_length_second_particles_x1_recv;
-// extern int buffer_length_second_particles_y0_send;
-// extern int buffer_length_second_particles_y0_recv;
-// extern int buffer_length_second_particles_y1_send;
-// extern int buffer_length_second_particles_y1_recv;
-// extern int buffer_length_second_particles_z0_send;
-// extern int buffer_length_second_particles_z0_recv;
-// extern int buffer_length_second_particles_z1_send;
-// extern int buffer_length_second_particles_z1_recv;
-// extern int x_buffer_length_hydro;
-// extern int y_buffer_length_hydro;
-// extern int z_buffer_length_hydro;
 
 extern Real *send_buffer_x0_particles;
 extern Real *send_buffer_x1_particles;

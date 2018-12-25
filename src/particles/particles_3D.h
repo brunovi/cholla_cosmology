@@ -174,9 +174,9 @@ class Particles_3D
   void Remove_Transfered_Particles( void );
   void Clear_Particles_For_Transfer( void );
 
-  void Load_Particles_to_Buffer_new( int direction, int side, Real *send_buffer, int buffer_length  );
-  void Add_Particle_To_Buffer_new( Real *buffer, part_int_t n_in_buffer, int buffer_length, Real pId, Real pMass, Real pPos_x, Real pPos_y, Real pPos_z, Real pVel_x, Real pVel_y, Real pVel_z);
-  void Unload_Particles_from_Buffer_new( int direction, int side, Real *recv_buffer, part_int_t n_recv,  Real *send_buffer_y0, Real *send_buffer_y1, Real *send_buffer_z0, Real *send_buffer_z1, int buffer_length_y0, int buffer_length_y1, int buffer_length_z0, int buffer_length_z1);
+  void Load_Particles_to_Buffer( int direction, int side, Real *send_buffer, int buffer_length  );
+  void Add_Particle_To_Buffer( Real *buffer, part_int_t n_in_buffer, int buffer_length, Real pId, Real pMass, Real pPos_x, Real pPos_y, Real pPos_z, Real pVel_x, Real pVel_y, Real pVel_z);
+  void Unload_Particles_from_Buffer( int direction, int side, Real *recv_buffer, part_int_t n_recv,  Real *send_buffer_y0, Real *send_buffer_y1, Real *send_buffer_z0, Real *send_buffer_z1, int buffer_length_y0, int buffer_length_y1, int buffer_length_z0, int buffer_length_z1);
   #endif
 
   void Reset( void );
