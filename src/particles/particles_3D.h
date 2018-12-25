@@ -101,6 +101,13 @@ class Particles_3D
   part_int_t n_recv_z0;
   part_int_t n_recv_z1;
 
+  part_int_t n_in_buffer_x0;
+  part_int_t n_in_buffer_x1;
+  part_int_t n_in_buffer_y0;
+  part_int_t n_in_buffer_y1;
+  part_int_t n_in_buffer_z0;
+  part_int_t n_in_buffer_z1;
+
 
   #endif
   bool TRANSFER_DENSITY_BOUNDARIES;
@@ -156,6 +163,7 @@ class Particles_3D
   void Clear_Vectors_For_Transfers( void );
   // void Select_Particles_to_Transfer( void );
   void Select_Particles_to_Transfer( int dir );
+  void Select_Particles_to_Transfer_All(  );
   void Load_Particles_to_Buffer( int direction, int side, int buffer_start, Real *send_buffer, int MAX_PARTICLES_IN_BUFFER , bool secondary );
   void Load_Particles_to_Buffer_X( void );
   void Load_Particles_to_Buffer_Y( void );
@@ -165,6 +173,10 @@ class Particles_3D
   void Add_Particle_To_Vectors( Real pId, Real pMass, Real pPos_x, Real pPos_y, Real pPos_z, Real pVel_x, Real pVel_y, Real pVel_z );
   void Remove_Transfered_Particles( void );
   void Clear_Particles_For_Transfer( void );
+
+  void Load_Particles_to_Buffer_new( int direction, int side, Real *send_buffer, int buffer_length  );
+  void Add_Particle_To_Buffer_new( Real *buffer, part_int_t n_in_buffer, int buffer_length, Real pId, Real pMass, Real pPos_x, Real pPos_y, Real pPos_z, Real pVel_x, Real pVel_y, Real pVel_z);
+  void Unload_Particles_from_Buffer_new( int direction, int side, Real *recv_buffer, part_int_t n_recv,  Real *send_buffer_y0, Real *send_buffer_y1, Real *send_buffer_z0, Real *send_buffer_z1, int buffer_length_y0, int buffer_length_y1, int buffer_length_z0, int buffer_length_z1);
   #endif
 
   void Reset( void );

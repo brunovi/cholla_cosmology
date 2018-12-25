@@ -147,7 +147,7 @@ void Particles_3D::Initialize( struct parameters P, Grav3D &Grav, Real xblocal, 
   chprintf( " N_Particles Boundaries Buffer Size: %d\n", N_PARTICLES_TRANSFER);
   // chprintf( " N_Particles Boundaries Secondary Buffer Size: %d\n", N_PARTICLES_TRANSFER_SECONDARY);
   chprintf( " N_Data per Particle Transfer: %d\n", N_DATA_PER_PARTICLE_TRANSFER);
-  chprintf( " N_Header Particle Transfer: %d\n", N_HEADER_PARTICLES_TRANSFER);
+  // chprintf( " N_Header Particle Transfer: %d\n", N_HEADER_PARTICLES_TRANSFER);
   #endif
   TRANSFER_DENSITY_BOUNDARIES = false;
   TRANSFER_PARTICLES_BOUNDARIES = false;

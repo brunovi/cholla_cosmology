@@ -65,39 +65,68 @@ int y_buffer_length;
 int z_buffer_length;
 
 #ifdef PARTICLES
-MPI_Request *send_request_secondary_particles;
-MPI_Request *recv_request_secondary_particles;
-Real *send_buffer_x0_second_particles;
-Real *send_buffer_x1_second_particles;
-Real *send_buffer_y0_second_particles;
-Real *send_buffer_y1_second_particles;
-Real *send_buffer_z0_second_particles;
-Real *send_buffer_z1_second_particles;
-Real *recv_buffer_x0_second_particles;
-Real *recv_buffer_x1_second_particles;
-Real *recv_buffer_y0_second_particles;
-Real *recv_buffer_y1_second_particles;
-Real *recv_buffer_z0_second_particles;
-Real *recv_buffer_z1_second_particles;
-int buffer_length_second_particles_x0_send;
-int buffer_length_second_particles_x0_recv;
-int buffer_length_second_particles_x1_send;
-int buffer_length_second_particles_x1_recv;
-int buffer_length_second_particles_y0_send;
-int buffer_length_second_particles_y0_recv;
-int buffer_length_second_particles_y1_send;
-int buffer_length_second_particles_y1_recv;
-int buffer_length_second_particles_z0_send;
-int buffer_length_second_particles_z0_recv;
-int buffer_length_second_particles_z1_send;
-int buffer_length_second_particles_z1_recv;
-int buffer_length_second_particles_z1;
-int x_buffer_length_hydro;
-int y_buffer_length_hydro;
-int z_buffer_length_hydro;
+// MPI_Request *send_request_secondary_particles;
+// MPI_Request *recv_request_secondary_particles;
+// Real *send_buffer_x0_second_particles;
+// Real *send_buffer_x1_second_particles;
+// Real *send_buffer_y0_second_particles;
+// Real *send_buffer_y1_second_particles;
+// Real *send_buffer_z0_second_particles;
+// Real *send_buffer_z1_second_particles;
+// Real *recv_buffer_x0_second_particles;
+// Real *recv_buffer_x1_second_particles;
+// Real *recv_buffer_y0_second_particles;
+// Real *recv_buffer_y1_second_particles;
+// Real *recv_buffer_z0_second_particles;
+// Real *recv_buffer_z1_second_particles;
+// int buffer_length_second_particles_x0_send;
+// int buffer_length_second_particles_x0_recv;
+// int buffer_length_second_particles_x1_send;
+// int buffer_length_second_particles_x1_recv;
+// int buffer_length_second_particles_y0_send;
+// int buffer_length_second_particles_y0_recv;
+// int buffer_length_second_particles_y1_send;
+// int buffer_length_second_particles_y1_recv;
+// int buffer_length_second_particles_z0_send;
+// int buffer_length_second_particles_z0_recv;
+// int buffer_length_second_particles_z1_send;
+// int buffer_length_second_particles_z1_recv;
+// int buffer_length_second_particles_z1;
+// int x_buffer_length_hydro;
+// int y_buffer_length_hydro;
+// int z_buffer_length_hydro;
+
+Real *send_buffer_x0_particles;
+Real *send_buffer_x1_particles;
+Real *send_buffer_y0_particles;
+Real *send_buffer_y1_particles;
+Real *send_buffer_z0_particles;
+Real *send_buffer_z1_particles;
+Real *recv_buffer_x0_particles;
+Real *recv_buffer_x1_particles;
+Real *recv_buffer_y0_particles;
+Real *recv_buffer_y1_particles;
+Real *recv_buffer_z0_particles;
+Real *recv_buffer_z1_particles;
+
+int buffer_length_particles_x0_send;
+int buffer_length_particles_x0_recv;
+int buffer_length_particles_x1_send;
+int buffer_length_particles_x1_recv;
+int buffer_length_particles_y0_send;
+int buffer_length_particles_y0_recv;
+int buffer_length_particles_y1_send;
+int buffer_length_particles_y1_recv;
+int buffer_length_particles_z0_send;
+int buffer_length_particles_z0_recv;
+int buffer_length_particles_z1_send;
+int buffer_length_particles_z1_recv;
 
 MPI_Request *send_request_n_particles;
 MPI_Request *recv_request_n_particles;
+MPI_Request *send_request_particles_transfer;
+MPI_Request *recv_request_particles_transfer;
+
 #endif
 
 /*local domain sizes*/
@@ -174,17 +203,17 @@ void InitializeChollaMPI(int *pargc, char **pargv[])
   }
 
   #ifdef PARTICLES
-  /*create the MPI_Request arrays for non-blocking secondary particles sends*/
-  if(!(send_request_secondary_particles = (MPI_Request *) malloc(2*sizeof(MPI_Request))))
-  {
-    chprintf("Error allocating send_request for secondary particles transfer.\n");
-    chexit(-2);
-  }
-  if(!(recv_request_secondary_particles = (MPI_Request *) malloc(2*sizeof(MPI_Request))))
-  {
-    chprintf("Error allocating recv_request for secondary particles transfer.\n");
-    chexit(-2);
-  }
+  // /*create the MPI_Request arrays for non-blocking secondary particles sends*/
+  // if(!(send_request_secondary_particles = (MPI_Request *) malloc(2*sizeof(MPI_Request))))
+  // {
+  //   chprintf("Error allocating send_request for secondary particles transfer.\n");
+  //   chexit(-2);
+  // }
+  // if(!(recv_request_secondary_particles = (MPI_Request *) malloc(2*sizeof(MPI_Request))))
+  // {
+  //   chprintf("Error allocating recv_request for secondary particles transfer.\n");
+  //   chexit(-2);
+  // }
 
   if(!(send_request_n_particles = (MPI_Request *) malloc(2*sizeof(MPI_Request))))
   {
@@ -194,6 +223,17 @@ void InitializeChollaMPI(int *pargc, char **pargv[])
   if(!(recv_request_n_particles = (MPI_Request *) malloc(2*sizeof(MPI_Request))))
   {
     chprintf("Error allocating recv_request for number of particles for transfer.\n");
+    chexit(-2);
+  }
+
+  if(!(send_request_particles_transfer = (MPI_Request *) malloc(2*sizeof(MPI_Request))))
+  {
+    chprintf("Error allocating send_request for particles transfer.\n");
+    chexit(-2);
+  }
+  if(!(recv_request_particles_transfer = (MPI_Request *) malloc(2*sizeof(MPI_Request))))
+  {
+    chprintf("Error allocating recv_request for particles transfer.\n");
     chexit(-2);
   }
   #endif
@@ -991,32 +1031,47 @@ void Allocate_MPI_Buffers_BLOCK(struct Header *H)
   #ifdef PARTICLE_IDS
   N_DATA_PER_PARTICLE_TRANSFER += 1;
   #endif
-  N_HEADER_PARTICLES_TRANSFER = 2;
-  x_buffer_length_hydro = xbsize;
-  y_buffer_length_hydro = ybsize;
-  z_buffer_length_hydro = zbsize;
+  // N_HEADER_PARTICLES_TRANSFER = 2;
+  // x_buffer_length_hydro = xbsize;
+  // y_buffer_length_hydro = ybsize;
+  // z_buffer_length_hydro = zbsize;
 
   int factor = 1;
-  buffer_length_second_particles_x0_send = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
-  buffer_length_second_particles_x1_send = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
-  buffer_length_second_particles_y0_send = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
-  buffer_length_second_particles_y1_send = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
-  buffer_length_second_particles_z0_send = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
-  buffer_length_second_particles_z1_send = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
-  buffer_length_second_particles_x0_recv = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
-  buffer_length_second_particles_x1_recv = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
-  buffer_length_second_particles_y0_recv = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
-  buffer_length_second_particles_y1_recv = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
-  buffer_length_second_particles_z0_recv = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
-  buffer_length_second_particles_z1_recv = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  // buffer_length_second_particles_x0_send = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  // buffer_length_second_particles_x1_send = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  // buffer_length_second_particles_y0_send = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  // buffer_length_second_particles_y1_send = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  // buffer_length_second_particles_z0_send = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  // buffer_length_second_particles_z1_send = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  // buffer_length_second_particles_x0_recv = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  // buffer_length_second_particles_x1_recv = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  // buffer_length_second_particles_y0_recv = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  // buffer_length_second_particles_y1_recv = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  // buffer_length_second_particles_z0_recv = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  // buffer_length_second_particles_z1_recv = N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
 
 
-  xbsize += N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;
-  ybsize += N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;
-  zbsize += N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;
+  // xbsize += N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;
+  // ybsize += N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;
+  // zbsize += N_HEADER_PARTICLES_TRANSFER + N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER;
   // int n_min = std::min( xbsize, ybsize );
   // n_min = std::min( zbsize, n_min );
   // N_PARTICLES_TRANSFER_SECONDARY = (n_min - N_HEADER_PARTICLES_TRANSFER) / N_DATA_PER_PARTICLE_TRANSFER;
+
+  buffer_length_particles_x0_send = N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  buffer_length_particles_x0_recv = N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  buffer_length_particles_x1_send = N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  buffer_length_particles_x1_recv = N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  buffer_length_particles_y0_send = N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  buffer_length_particles_y0_recv = N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  buffer_length_particles_y1_send = N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  buffer_length_particles_y1_recv = N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  buffer_length_particles_z0_send = N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  buffer_length_particles_z0_recv = N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  buffer_length_particles_z1_send = N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+  buffer_length_particles_z1_recv = N_PARTICLES_TRANSFER * N_DATA_PER_PARTICLE_TRANSFER * factor;
+
+
   #endif
 
   x_buffer_length = xbsize;
@@ -1067,46 +1122,89 @@ void Allocate_MPI_Buffers_BLOCK(struct Header *H)
   }
 
   #ifdef PARTICLES
-  chprintf("Allocating MPI communication buffers for particles secondary transfers ( N_Particles: %d ).\n", N_PARTICLES_TRANSFER );
+  // chprintf("Allocating MPI communication buffers for particles secondary transfers ( N_Particles: %d ).\n", N_PARTICLES_TRANSFER );
+  //
+  // if(!( send_buffer_x0_second_particles = (Real *) malloc(buffer_length_second_particles_x0_send*sizeof(Real))))
+  // {
+  //   chprintf("Error allocating send_buffer_x0_second_paricles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_second_particles_x0_send*sizeof(Real));
+  //   chexit(-1);
+  // }
+  // if(!( send_buffer_x1_second_particles = (Real *) malloc(buffer_length_second_particles_x1_send*sizeof(Real))))
+  // {
+  //   chprintf("Error allocating send_buffer_x1_second_paricles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_second_particles_x1_send*sizeof(Real));
+  //   chexit(-1);
+  // }
+  // if(!(recv_buffer_x0_second_particles = (Real *) malloc(buffer_length_second_particles_x0_recv*sizeof(Real))))
+  // {
+  //   chprintf("Error allocating recv_buffer_x0_second_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_second_particles_x0_recv*sizeof(Real));
+  //   chexit(-1);
+  // }
+  // if(!(recv_buffer_x1_second_particles = (Real *) malloc(buffer_length_second_particles_x1_recv*sizeof(Real))))
+  // {
+  //   chprintf("Error allocating recv_buffer_x1_second_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_second_particles_x1_recv*sizeof(Real));
+  //   chexit(-1);
+  // }
+  // if(!(send_buffer_y0_second_particles = (Real *) malloc(buffer_length_second_particles_y0_send*sizeof(Real))))
+  // {
+  //   chprintf("Error allocating send_buffer_y0_second_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_second_particles_y0_send*sizeof(Real));
+  //   chexit(-1);
+  // }
+  // if(!(send_buffer_y1_second_particles = (Real *) malloc(buffer_length_second_particles_y1_send*sizeof(Real))))
+  // {
+  //   chprintf("Error allocating send_buffer_y1_second_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_second_particles_y1_send*sizeof(Real));
+  //   chexit(-1);
+  // }
+  // if(!(recv_buffer_y0_second_particles = (Real *) malloc(buffer_length_second_particles_y0_recv*sizeof(Real))))
+  // {
+  //   chprintf("Error allocating recv_buffer_y0_second_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_second_particles_y0_recv*sizeof(Real));
+  //   chexit(-1);
+  // }
+  // if(!(recv_buffer_y1_second_particles = (Real *) malloc(buffer_length_second_particles_y1_recv*sizeof(Real))))
+  // {
+  //   chprintf("Error allocating recv_buffer_y1_second_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_second_particles_y1_recv*sizeof(Real));
+  //   chexit(-1);
+  // }
 
-  if(!( send_buffer_x0_second_particles = (Real *) malloc(buffer_length_second_particles_x0_send*sizeof(Real))))
+  //Allocate buffers for particles transfers
+  chprintf("Allocating MPI communication buffers for particle transfers ( N_Particles: %d ).\n", N_PARTICLES_TRANSFER );
+  if(!( send_buffer_x0_particles = (Real *) malloc(buffer_length_particles_x0_send*sizeof(Real))))
   {
-    chprintf("Error allocating send_buffer_x0_second_paricles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_second_particles_x0_send*sizeof(Real));
+    chprintf("Error allocating send_buffer_x0_paricles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_particles_x0_send*sizeof(Real));
     chexit(-1);
   }
-  if(!( send_buffer_x1_second_particles = (Real *) malloc(buffer_length_second_particles_x1_send*sizeof(Real))))
+  if(!( send_buffer_x1_particles = (Real *) malloc(buffer_length_particles_x1_send*sizeof(Real))))
   {
-    chprintf("Error allocating send_buffer_x1_second_paricles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_second_particles_x1_send*sizeof(Real));
+    chprintf("Error allocating send_buffer_x1_paricles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_particles_x1_send*sizeof(Real));
     chexit(-1);
   }
-  if(!(recv_buffer_x0_second_particles = (Real *) malloc(buffer_length_second_particles_x0_recv*sizeof(Real))))
+  if(!(recv_buffer_x0_particles = (Real *) malloc(buffer_length_particles_x0_recv*sizeof(Real))))
   {
-    chprintf("Error allocating recv_buffer_x0_second_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_second_particles_x0_recv*sizeof(Real));
+    chprintf("Error allocating recv_buffer_x0_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_particles_x0_recv*sizeof(Real));
     chexit(-1);
   }
-  if(!(recv_buffer_x1_second_particles = (Real *) malloc(buffer_length_second_particles_x1_recv*sizeof(Real))))
+  if(!(recv_buffer_x1_particles = (Real *) malloc(buffer_length_particles_x1_recv*sizeof(Real))))
   {
-    chprintf("Error allocating recv_buffer_x1_second_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_second_particles_x1_recv*sizeof(Real));
+    chprintf("Error allocating recv_buffer_x1_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_particles_x1_recv*sizeof(Real));
     chexit(-1);
   }
-  if(!(send_buffer_y0_second_particles = (Real *) malloc(buffer_length_second_particles_y0_send*sizeof(Real))))
+  if(!(send_buffer_y0_particles = (Real *) malloc(buffer_length_particles_y0_send*sizeof(Real))))
   {
-    chprintf("Error allocating send_buffer_y0_second_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_second_particles_y0_send*sizeof(Real));
+    chprintf("Error allocating send_buffer_y0_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_particles_y0_send*sizeof(Real));
     chexit(-1);
   }
-  if(!(send_buffer_y1_second_particles = (Real *) malloc(buffer_length_second_particles_y1_send*sizeof(Real))))
+  if(!(send_buffer_y1_particles = (Real *) malloc(buffer_length_particles_y1_send*sizeof(Real))))
   {
-    chprintf("Error allocating send_buffer_y1_second_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_second_particles_y1_send*sizeof(Real));
+    chprintf("Error allocating send_buffer_y1_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_particles_y1_send*sizeof(Real));
     chexit(-1);
   }
-  if(!(recv_buffer_y0_second_particles = (Real *) malloc(buffer_length_second_particles_y0_recv*sizeof(Real))))
+  if(!(recv_buffer_y0_particles = (Real *) malloc(buffer_length_particles_y0_recv*sizeof(Real))))
   {
-    chprintf("Error allocating recv_buffer_y0_second_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_second_particles_y0_recv*sizeof(Real));
+    chprintf("Error allocating recv_buffer_y0_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_particles_y0_recv*sizeof(Real));
     chexit(-1);
   }
-  if(!(recv_buffer_y1_second_particles = (Real *) malloc(buffer_length_second_particles_y1_recv*sizeof(Real))))
+  if(!(recv_buffer_y1_particles = (Real *) malloc(buffer_length_particles_y1_recv*sizeof(Real))))
   {
-    chprintf("Error allocating recv_buffer_y1_second_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_second_particles_y1_recv*sizeof(Real));
+    chprintf("Error allocating recv_buffer_y1_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_particles_y1_recv*sizeof(Real));
     chexit(-1);
   }
   #endif
@@ -1138,24 +1236,45 @@ void Allocate_MPI_Buffers_BLOCK(struct Header *H)
     }
 
     #ifdef PARTICLES
-    if(!(send_buffer_z0_second_particles = (Real *) malloc(buffer_length_second_particles_z0_send*sizeof(Real))))
+    // if(!(send_buffer_z0_second_particles = (Real *) malloc(buffer_length_second_particles_z0_send*sizeof(Real))))
+    // {
+    //   chprintf("Error allocating send_buffer_z0_second_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_second_particles_z0_send*sizeof(Real));
+    //   chexit(-1);
+    // }
+    // if(!(send_buffer_z1_second_particles = (Real *) malloc(buffer_length_second_particles_z1_send*sizeof(Real))))
+    // {
+    //   chprintf("Error allocating send_buffer_z1_second_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_second_particles_z1_send*sizeof(Real));
+    //   chexit(-1);
+    // }
+    // if(!(recv_buffer_z0_second_particles = (Real *) malloc(buffer_length_second_particles_z0_recv*sizeof(Real))))
+    // {
+    //   chprintf("Error allocating recv_buffer_z0_second_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_second_particles_z0_recv*sizeof(Real));
+    //   chexit(-1);
+    // }
+    // if(!(recv_buffer_z1_second_particles = (Real *) malloc(buffer_length_second_particles_z1_recv*sizeof(Real))))
+    // {
+    //   chprintf("Error allocating recv_buffer_z1_second_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_second_particles_z1_recv*sizeof(Real));
+    //   chexit(-1);
+    // }
+
+    if(!(send_buffer_z0_particles = (Real *) malloc(buffer_length_particles_z0_send*sizeof(Real))))
     {
-      chprintf("Error allocating send_buffer_z0_second_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_second_particles_z0_send*sizeof(Real));
+      chprintf("Error allocating send_buffer_z0_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_particles_z0_send*sizeof(Real));
       chexit(-1);
     }
-    if(!(send_buffer_z1_second_particles = (Real *) malloc(buffer_length_second_particles_z1_send*sizeof(Real))))
+    if(!(send_buffer_z1_particles = (Real *) malloc(buffer_length_particles_z1_send*sizeof(Real))))
     {
-      chprintf("Error allocating send_buffer_z1_second_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_second_particles_z1_send*sizeof(Real));
+      chprintf("Error allocating send_buffer_z1_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_particles_z1_send*sizeof(Real));
       chexit(-1);
     }
-    if(!(recv_buffer_z0_second_particles = (Real *) malloc(buffer_length_second_particles_z0_recv*sizeof(Real))))
+    if(!(recv_buffer_z0_particles = (Real *) malloc(buffer_length_particles_z0_recv*sizeof(Real))))
     {
-      chprintf("Error allocating recv_buffer_z0_second_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_second_particles_z0_recv*sizeof(Real));
+      chprintf("Error allocating recv_buffer_z0_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_particles_z0_recv*sizeof(Real));
       chexit(-1);
     }
-    if(!(recv_buffer_z1_second_particles = (Real *) malloc(buffer_length_second_particles_z1_recv*sizeof(Real))))
+    if(!(recv_buffer_z1_particles = (Real *) malloc(buffer_length_particles_z1_recv*sizeof(Real))))
     {
-      chprintf("Error allocating recv_buffer_z1_second_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_second_particles_z1_recv*sizeof(Real));
+      chprintf("Error allocating recv_buffer_z1_particles in Allocate_MPI_Buffers_BLOCK (size = %ld).\n",buffer_length_particles_z1_recv*sizeof(Real));
       chexit(-1);
     }
     #endif
@@ -1169,12 +1288,12 @@ void Check_and_Grow_Particles_Buffer( Real **part_buffer, int *current_size_ptr,
   if ( new_size <= current_size ) return;
 
   new_size = (int) 2 * new_size;
-  std::cout << " #####################################Growing Particles Buffer, size: " << current_size << "  new_size: " << new_size << std::endl;
+  std::cout << " #####################################Growing Particles Transfer Buffer, size: " << current_size << "  new_size: " << new_size << std::endl;
 
   Real *new_buffer;
   new_buffer = (Real *) realloc( *part_buffer, new_size*sizeof(Real) );
   if ( new_buffer == NULL ){
-    std::cout << " Error When Allocating New Particles Buffer" << std::endl;
+    std::cout << " Error When Allocating New Particles Transfer Buffer" << std::endl;
     chexit(-1);
   }
   *part_buffer = new_buffer;
