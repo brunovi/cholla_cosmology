@@ -572,6 +572,12 @@ class Grid3D
     void Unload_Particles_from_Buffer_Y1();
     void Unload_Particles_from_Buffer_Z0();
     void Unload_Particles_from_Buffer_Z1();
+    void Load_and_Send_Particles_X0( int ireq_n_particles, int ireq_particles_transfer );
+    void Load_and_Send_Particles_X1( int ireq_n_particles, int ireq_particles_transfer );
+    void Load_and_Send_Particles_Y0( int ireq_n_particles, int ireq_particles_transfer );
+    void Load_and_Send_Particles_Y1( int ireq_n_particles, int ireq_particles_transfer );
+    void Load_and_Send_Particles_Z0( int ireq_n_particles, int ireq_particles_transfer );
+    void Load_and_Send_Particles_Z1( int ireq_n_particles, int ireq_particles_transfer );
     void Unload_Particles_From_Buffers_BLOCK( int indx );
     void Wait_and_Recv_Particles_Transfer_BLOCK(int dir, int *flags);
     void Load_N_Particles_Transfer(int index, int *ireq_particles_transfer);

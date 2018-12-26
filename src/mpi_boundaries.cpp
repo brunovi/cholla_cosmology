@@ -766,6 +766,85 @@ void Grid3D::Unload_Particles_from_Buffer_Z1(){
   Particles.Unload_Particles_from_Buffer( 2, 1, recv_buffer_z1_particles, Particles.n_recv_z1, send_buffer_y0_particles, send_buffer_y1_particles, send_buffer_z0_particles, send_buffer_z1_particles, buffer_length_particles_y0_send , buffer_length_particles_y1_send, buffer_length_particles_z0_send, buffer_length_particles_z1_send);
 }
 
+
+void Grid3D::Load_and_Send_Particles_X0( int ireq_n_particles, int ireq_particles_transfer ){
+  int buffer_length;
+
+  MPI_Irecv(&Particles.n_recv_x0, 1, MPI_PART_INT, source[0], 0, world, &recv_request_n_particles[ireq_n_particles]);
+  MPI_Isend(&Particles.n_send_x0, 1, MPI_PART_INT, dest[0],   1, world, &send_request_n_particles[0]);
+  // if ( Particles.n_send_x0 > 0 ){
+  //   if ( Particles.n_send_x0 > 0 ) std::cout << " Sent X0:  " << Particles.n_send_x0 <<  "  " << procID <<  "  to  "  <<  dest[0] <<  std::endl;
+    buffer_length = Particles.n_send_x0 * N_DATA_PER_PARTICLE_TRANSFER;
+    Check_and_Grow_Particles_Buffer( &send_buffer_x0_particles , &buffer_length_particles_x0_send, buffer_length );
+    Particles.Load_Particles_to_Buffer( 0, 0, send_buffer_x0_particles,  buffer_length_particles_x0_send );
+    MPI_Isend(send_buffer_x0_particles, buffer_length, MPI_CHREAL, dest[0],   1, world, &send_request_particles_transfer[ireq_particles_transfer]);
+  // }
+}
+
+void Grid3D::Load_and_Send_Particles_X1( int ireq_n_particles, int ireq_particles_transfer ){
+  int buffer_length;
+  MPI_Irecv(&Particles.n_recv_x1, 1, MPI_PART_INT, source[1], 1, world, &recv_request_n_particles[ireq_n_particles]);
+  MPI_Isend(&Particles.n_send_x1, 1, MPI_PART_INT, dest[1],   0, world, &send_request_n_particles[1]);
+  // if ( Particles.n_send_x1 > 0 ){
+  //   std::cout << " Sent X1: " << Particles.n_send_x1 << std::endl;
+    buffer_length = Particles.n_send_x1 * N_DATA_PER_PARTICLE_TRANSFER;
+    Check_and_Grow_Particles_Buffer( &send_buffer_x1_particles , &buffer_length_particles_x1_send, buffer_length );
+    Particles.Load_Particles_to_Buffer( 0, 1, send_buffer_x1_particles,  buffer_length_particles_x1_send  );
+    MPI_Isend(send_buffer_x1_particles, buffer_length, MPI_CHREAL, dest[1],   0, world, &send_request_particles_transfer[ireq_particles_transfer]);\
+  // }
+}
+
+void Grid3D::Load_and_Send_Particles_Y0( int ireq_n_particles, int ireq_particles_transfer ){
+  int buffer_length;
+  MPI_Isend(&Particles.n_send_y0, 1, MPI_PART_INT, dest[2],   3, world, &send_request_n_particles[0]);
+  MPI_Irecv(&Particles.n_recv_y0, 1, MPI_PART_INT, source[2], 2, world, &recv_request_n_particles[ireq_n_particles]);
+  // if ( Particles.n_send_y0 > 0 ){
+  //   std::cout << " Sent Y0: " << Particles.n_send_y0 << std::endl;
+    buffer_length = Particles.n_send_y0 * N_DATA_PER_PARTICLE_TRANSFER;
+    Check_and_Grow_Particles_Buffer( &send_buffer_y0_particles , &buffer_length_particles_y0_send, buffer_length );
+    Particles.Load_Particles_to_Buffer( 1, 0, send_buffer_y0_particles,  buffer_length_particles_y0_send  );
+    MPI_Isend(send_buffer_y0_particles, buffer_length, MPI_CHREAL, dest[2],   3, world, &send_request_particles_transfer[ireq_particles_transfer]);
+  // }
+
+}
+void Grid3D::Load_and_Send_Particles_Y1( int ireq_n_particles, int ireq_particles_transfer ){
+  int buffer_length;
+  MPI_Isend(&Particles.n_send_y1, 1, MPI_PART_INT, dest[3],   2, world, &send_request_n_particles[1]);
+  MPI_Irecv(&Particles.n_recv_y1, 1, MPI_PART_INT, source[3], 3, world, &recv_request_n_particles[ireq_n_particles]);
+  // if ( Particles.n_send_y1 > 0 ){
+  //   std::cout << " Sent Y1: " << Particles.n_send_y1 << std::endl;
+    buffer_length = Particles.n_send_y1 * N_DATA_PER_PARTICLE_TRANSFER;
+    Check_and_Grow_Particles_Buffer( &send_buffer_y1_particles , &buffer_length_particles_y1_send, buffer_length );
+    Particles.Load_Particles_to_Buffer( 1, 1, send_buffer_y1_particles,  buffer_length_particles_y1_send  );
+    MPI_Isend(send_buffer_y1_particles, buffer_length, MPI_CHREAL, dest[3],   2, world, &send_request_particles_transfer[ireq_particles_transfer]);
+  // }
+
+}
+void Grid3D::Load_and_Send_Particles_Z0( int ireq_n_particles, int ireq_particles_transfer ){
+  int buffer_length;
+  MPI_Isend(&Particles.n_send_z0, 1, MPI_PART_INT, dest[4],   5, world, &send_request_n_particles[0]);
+  MPI_Irecv(&Particles.n_recv_z0, 1, MPI_PART_INT, source[4], 4, world, &recv_request_n_particles[ireq_n_particles]);
+  // if ( Particles.n_send_z0 > 0 ){
+  //   std::cout << " Sent Z0: " << Particles.n_send_z0 << std::endl;
+    buffer_length = Particles.n_send_z0 * N_DATA_PER_PARTICLE_TRANSFER;
+    Check_and_Grow_Particles_Buffer( &send_buffer_z0_particles , &buffer_length_particles_z0_send, buffer_length );
+    Particles.Load_Particles_to_Buffer( 2, 0, send_buffer_z0_particles,  buffer_length_particles_z0_send  );
+    MPI_Isend(send_buffer_z0_particles, buffer_length, MPI_CHREAL, dest[4],   5, world, &send_request_particles_transfer[ireq_particles_transfer]);
+  // }
+
+}
+void Grid3D::Load_and_Send_Particles_Z1( int ireq_n_particles, int ireq_particles_transfer ){
+  int buffer_length;
+  MPI_Isend(&Particles.n_send_z1, 1, MPI_CHREAL, dest[5],   4, world, &send_request_n_particles[1]);
+  MPI_Irecv(&Particles.n_recv_z1, 1, MPI_CHREAL, source[5], 5, world, &recv_request_n_particles[ireq_n_particles]);
+  // if ( Particles.n_send_z1 > 0 ){
+  //   std::cout << " Sent Z1: " << Particles.n_send_z1 << std::endl;
+    buffer_length = Particles.n_send_z1 * N_DATA_PER_PARTICLE_TRANSFER;
+    Check_and_Grow_Particles_Buffer( &send_buffer_z1_particles , &buffer_length_particles_z1_send, buffer_length );
+    Particles.Load_Particles_to_Buffer( 2, 1, send_buffer_z1_particles,  buffer_length_particles_z1_send  );
+    MPI_Isend(send_buffer_z1_particles, buffer_length, MPI_CHREAL, dest[5],   4, world, &send_request_particles_transfer[ireq_particles_transfer]);
+  // }
+}
 #endif
 
 int Grid3D::Load_Hydro_Buffer_X0(){
@@ -1049,18 +1128,10 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
         buffer_length = Load_Particles_Density_Boundary_to_Buffer( 0, 0, send_buffer_x0  );
       }
       else if ( Particles.TRANSFER_PARTICLES_BOUNDARIES ){
+        Load_and_Send_Particles_X0( ireq_n_particles, ireq_particles_transfer );
         transfer_buffer = false;
-        MPI_Irecv(&Particles.n_recv_x0, 1, MPI_PART_INT, source[0], 0, world, &recv_request_n_particles[ireq_n_particles]);
-        MPI_Isend(&Particles.n_send_x0, 1, MPI_PART_INT, dest[0],   1, world, &send_request_n_particles[0]);
         ireq_n_particles ++;
-        // if ( Particles.n_send_x0 > 0 ){
-        //   if ( Particles.n_send_x0 > 0 ) std::cout << " Sent X0:  " << Particles.n_send_x0 <<  "  " << procID <<  "  to  "  <<  dest[0] <<  std::endl;
-          buffer_length = Particles.n_send_x0 * N_DATA_PER_PARTICLE_TRANSFER;
-          Check_and_Grow_Particles_Buffer( &send_buffer_x0_particles , &buffer_length_particles_x0_send, buffer_length );
-          Particles.Load_Particles_to_Buffer( 0, 0, send_buffer_x0_particles,  buffer_length_particles_x0_send );
-          MPI_Isend(send_buffer_x0_particles, buffer_length, MPI_CHREAL, dest[0],   1, world, &send_request_particles_transfer[ireq_particles_transfer]);
-          ireq_particles_transfer ++;
-        // }
+        ireq_particles_transfer ++;
       }
       #endif
 
@@ -1090,18 +1161,10 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
         buffer_length = Load_Particles_Density_Boundary_to_Buffer( 0, 1, send_buffer_x1  );
       }
       else if ( Particles.TRANSFER_PARTICLES_BOUNDARIES ){
+        Load_and_Send_Particles_X1(  ireq_n_particles, ireq_particles_transfer );
         transfer_buffer = false;
-        MPI_Irecv(&Particles.n_recv_x1, 1, MPI_PART_INT, source[1], 1, world, &recv_request_n_particles[ireq_n_particles]);
-        MPI_Isend(&Particles.n_send_x1, 1, MPI_PART_INT, dest[1],   0, world, &send_request_n_particles[1]);
         ireq_n_particles++;
-        // if ( Particles.n_send_x1 > 0 ){
-        //   std::cout << " Sent X1: " << Particles.n_send_x1 << std::endl;
-          buffer_length = Particles.n_send_x1 * N_DATA_PER_PARTICLE_TRANSFER;
-          Check_and_Grow_Particles_Buffer( &send_buffer_x1_particles , &buffer_length_particles_x1_send, buffer_length );
-          Particles.Load_Particles_to_Buffer( 0, 1, send_buffer_x1_particles,  buffer_length_particles_x1_send  );
-          MPI_Isend(send_buffer_x1_particles, buffer_length, MPI_CHREAL, dest[1],   0, world, &send_request_particles_transfer[ireq_particles_transfer]);\
-          ireq_particles_transfer ++;
-        // }
+        ireq_particles_transfer ++;
       }
       #endif
 
@@ -1142,18 +1205,11 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
        buffer_length = Load_Particles_Density_Boundary_to_Buffer( 1, 0, send_buffer_y0  );
       }
       else if ( Particles.TRANSFER_PARTICLES_BOUNDARIES ){
+        Load_and_Send_Particles_Y0( ireq_n_particles, ireq_particles_transfer );
         transfer_buffer = false;
-        MPI_Isend(&Particles.n_send_y0, 1, MPI_PART_INT, dest[2],   3, world, &send_request_n_particles[0]);
-        MPI_Irecv(&Particles.n_recv_y0, 1, MPI_PART_INT, source[2], 2, world, &recv_request_n_particles[ireq_n_particles]);
         ireq_n_particles++;
-        // if ( Particles.n_send_y0 > 0 ){
-        //   std::cout << " Sent Y0: " << Particles.n_send_y0 << std::endl;
-          buffer_length = Particles.n_send_y0 * N_DATA_PER_PARTICLE_TRANSFER;
-          Check_and_Grow_Particles_Buffer( &send_buffer_y0_particles , &buffer_length_particles_y0_send, buffer_length );
-          Particles.Load_Particles_to_Buffer( 1, 0, send_buffer_y0_particles,  buffer_length_particles_y0_send  );
-          MPI_Isend(send_buffer_y0_particles, buffer_length, MPI_CHREAL, dest[2],   3, world, &send_request_particles_transfer[ireq_particles_transfer]);
-          ireq_particles_transfer ++;
-        // }
+        ireq_particles_transfer ++;
+
       }
       #endif
 
@@ -1183,18 +1239,11 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
         buffer_length = Load_Particles_Density_Boundary_to_Buffer( 1, 1, send_buffer_y1  );
       }
       else if ( Particles.TRANSFER_PARTICLES_BOUNDARIES ){
+        Load_and_Send_Particles_Y1( ireq_n_particles, ireq_particles_transfer );
         transfer_buffer = false;
-        MPI_Isend(&Particles.n_send_y1, 1, MPI_PART_INT, dest[3],   2, world, &send_request_n_particles[1]);
-        MPI_Irecv(&Particles.n_recv_y1, 1, MPI_PART_INT, source[3], 3, world, &recv_request_n_particles[ireq_n_particles]);
         ireq_n_particles++;
-        // if ( Particles.n_send_y1 > 0 ){
-        //   std::cout << " Sent Y1: " << Particles.n_send_y1 << std::endl;
-          buffer_length = Particles.n_send_y1 * N_DATA_PER_PARTICLE_TRANSFER;
-          Check_and_Grow_Particles_Buffer( &send_buffer_y1_particles , &buffer_length_particles_y1_send, buffer_length );
-          Particles.Load_Particles_to_Buffer( 1, 1, send_buffer_y1_particles,  buffer_length_particles_y1_send  );
-          MPI_Isend(send_buffer_y1_particles, buffer_length, MPI_CHREAL, dest[3],   2, world, &send_request_particles_transfer[ireq_particles_transfer]);
-          ireq_particles_transfer ++;
-        // }
+        ireq_particles_transfer ++;
+
       }
       #endif
 
@@ -1234,18 +1283,11 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
         buffer_length = Load_Particles_Density_Boundary_to_Buffer( 2, 0, send_buffer_z0  );
       }
       else if ( Particles.TRANSFER_PARTICLES_BOUNDARIES ){
+        Load_and_Send_Particles_Z0(  ireq_n_particles,  ireq_particles_transfer );
         transfer_buffer = false;
-        MPI_Isend(&Particles.n_send_z0, 1, MPI_PART_INT, dest[4],   5, world, &send_request_n_particles[0]);
-        MPI_Irecv(&Particles.n_recv_z0, 1, MPI_PART_INT, source[4], 4, world, &recv_request_n_particles[ireq_n_particles]);
         ireq_n_particles++;
-        // if ( Particles.n_send_z0 > 0 ){
-        //   std::cout << " Sent Z0: " << Particles.n_send_z0 << std::endl;
-          buffer_length = Particles.n_send_z0 * N_DATA_PER_PARTICLE_TRANSFER;
-          Check_and_Grow_Particles_Buffer( &send_buffer_z0_particles , &buffer_length_particles_z0_send, buffer_length );
-          Particles.Load_Particles_to_Buffer( 2, 0, send_buffer_z0_particles,  buffer_length_particles_z0_send  );
-          MPI_Isend(send_buffer_z0_particles, buffer_length, MPI_CHREAL, dest[4],   5, world, &send_request_particles_transfer[ireq_particles_transfer]);
-          ireq_particles_transfer ++;
-        // }
+        ireq_particles_transfer ++;
+
       }
       #endif
 
@@ -1275,18 +1317,11 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_BLOCK(int dir, int *flags)
         buffer_length = Load_Particles_Density_Boundary_to_Buffer( 2, 1, send_buffer_z1  );
       }
       else if ( Particles.TRANSFER_PARTICLES_BOUNDARIES ){
+        Load_and_Send_Particles_Z1(  ireq_n_particles,  ireq_particles_transfer );
         transfer_buffer = false;
-        MPI_Isend(&Particles.n_send_z1, 1, MPI_CHREAL, dest[5],   4, world, &send_request_n_particles[1]);
-        MPI_Irecv(&Particles.n_recv_z1, 1, MPI_CHREAL, source[5], 5, world, &recv_request_n_particles[ireq_n_particles]);
         ireq_n_particles++;
-        // if ( Particles.n_send_z1 > 0 ){
-        //   std::cout << " Sent Z1: " << Particles.n_send_z1 << std::endl;
-          buffer_length = Particles.n_send_z1 * N_DATA_PER_PARTICLE_TRANSFER;
-          Check_and_Grow_Particles_Buffer( &send_buffer_z1_particles , &buffer_length_particles_z1_send, buffer_length );
-          Particles.Load_Particles_to_Buffer( 2, 1, send_buffer_z1_particles,  buffer_length_particles_z1_send  );
-          MPI_Isend(send_buffer_z1_particles, buffer_length, MPI_CHREAL, dest[5],   4, world, &send_request_particles_transfer[ireq_particles_transfer]);
-          ireq_particles_transfer ++;
-        // }
+        ireq_particles_transfer ++;
+
       }
       #endif
 
@@ -1423,10 +1458,7 @@ void Grid3D::Wait_and_Recv_Particles_Transfer_BLOCK(int dir, int *flags)
   {
     //wait for recv completion
     MPI_Waitany(wait_max,recv_request_n_particles,&index,&status);
-    //if (procID==1) MPI_Get_count(&status, MPI_CHREAL, &count);
-    //if (procID==1) printf("Process 1 unloading direction %d, source %d, index %d, length %d.\n", status.MPI_TAG, status.MPI_SOURCE, index, count);
     //depending on which face arrived, load the buffer into the ghost grid
-    // Unload_MPI_Comm_Buffers(status.MPI_TAG);
     Load_N_Particles_Transfer(status.MPI_TAG, &ireq_particles_transfer);
   }
 
@@ -1466,13 +1498,8 @@ void Grid3D::Wait_and_Unload_MPI_Comm_Particles_Buffers_BLOCK(int dir, int *flag
   {
     //wait for recv completion
     MPI_Waitany(wait_max,recv_request_particles_transfer,&index,&status);
-    //if (procID==1) MPI_Get_count(&status, MPI_CHREAL, &count);
-    //if (procID==1) printf("Process 1 unloading direction %d, source %d, index %d, length %d.\n", status.MPI_TAG, status.MPI_SOURCE, index, count);
     //depending on which face arrived, load the buffer into the ghost grid
-    // Unload_MPI_Comm_Buffers(status.MPI_TAG);
-    // Load_N_Particles_Transfer(status.MPI_TAG, &ireq_particles_transfer);
-    // std::cout << " Unloading Particles :  " << status.MPI_TAG <<  std::endl;
-    Unload_Particles_From_Buffers_BLOCK(status.MPI_TAG);
+      Unload_Particles_From_Buffers_BLOCK(status.MPI_TAG);
   }
 
 }
