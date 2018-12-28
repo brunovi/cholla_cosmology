@@ -511,9 +511,9 @@ void Load_Particles_Data_HDF5(hid_t file_id, int nfile, Particles_3D &Particles 
   chprintf( "  Pos X   Min: %f   Max: %f   [ kpc/h]\n", px_min_g, px_max_g);
   chprintf( "  Pos Y   Min: %f   Max: %f   [ kpc/h]\n", py_min_g, py_max_g);
   chprintf( "  Pos Z   Min: %f   Max: %f   [ kpc/h]\n", pz_min_g, pz_max_g);
-  chprintf( "  Vel X   Min: %f   Max: %f   [ kpc/h]\n", vx_min_g, vx_max_g);
-  chprintf( "  Vel Y   Min: %f   Max: %f   [ kpc/h]\n", vy_min_g, vy_max_g);
-  chprintf( "  Vel Z   Min: %f   Max: %f   [ kpc/h]\n", vz_min_g, vz_max_g);
+  chprintf( "  Vel X   Min: %f   Max: %f   [ km/s]\n", vx_min_g, vx_max_g);
+  chprintf( "  Vel Y   Min: %f   Max: %f   [ km/s]\n", vy_min_g, vy_max_g);
+  chprintf( "  Vel Z   Min: %f   Max: %f   [ km/s]\n", vz_min_g, vz_max_g);
 
   #endif
 
