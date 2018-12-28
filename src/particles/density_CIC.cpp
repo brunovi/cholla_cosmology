@@ -121,29 +121,31 @@ void Get_Density_CIC( Particles_3D &Parts ){
 #ifdef GRAVITY_OMP
 void Get_Density_CIC_OMP( Particles_3D &Parts ){
 
-  int nGHST = Parts.G.n_ghost_particles_grid;
-  int nx_g = Parts.G.nx_local + 2*nGHST;
-  int ny_g = Parts.G.ny_local + 2*nGHST;
-  int nz_g = Parts.G.nz_local + 2*nGHST;
 
-  Real xMin, yMin, zMin, dx, dy, dz;
-  xMin = Parts.G.xMin;
-  yMin = Parts.G.yMin;
-  zMin = Parts.G.zMin;
-  dx = Parts.G.dx;
-  dy = Parts.G.dy;
-  dz = Parts.G.dz;
-  Real dV_inv = 1./(Parts.G.dx*Parts.G.dy*Parts.G.dz);
-
-  int n_omp_procs;
 
   #pragma omp parallel num_threads( N_OMP_GRAVITY_THREADS )
   {
     int omp_id;
     int g_start, g_end;
+    int n_omp_procs;
 
     omp_id = omp_get_thread_num();
     n_omp_procs = omp_get_num_threads();
+
+    int nGHST = Parts.G.n_ghost_particles_grid;
+    int nx_g = Parts.G.nx_local + 2*nGHST;
+    int ny_g = Parts.G.ny_local + 2*nGHST;
+    int nz_g = Parts.G.nz_local + 2*nGHST;
+
+    Real xMin, yMin, zMin, dx, dy, dz;
+    xMin = Parts.G.xMin;
+    yMin = Parts.G.yMin;
+    zMin = Parts.G.zMin;
+    dx = Parts.G.dx;
+    dy = Parts.G.dy;
+    dz = Parts.G.dz;
+    Real dV_inv = 1./(Parts.G.dx*Parts.G.dy*Parts.G.dz);
+
 
     Get_OMP_Grid_Indxs( n_omp_procs, omp_id, nz_g,  &g_start, &g_end );
     // g_start -= nGHST;
