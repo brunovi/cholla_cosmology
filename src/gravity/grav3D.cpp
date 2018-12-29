@@ -7,7 +7,9 @@
 #include"grav3D.h"
 #include "../io.h"
 
-// #include"self_gravity_functions.h"
+#ifdef GRAVITY_OMP
+#include "gravity_omp.h"
+#endif
 
 
 Grav3D::Grav3D( void ){}
