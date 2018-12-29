@@ -1,3 +1,5 @@
+#ifdef GRAVITY_CORRECTOR
+
 #include "correction_functions.h"
 
 
@@ -292,3 +294,5 @@ void Get_Delta_Conserved( Grid3D &G ){
 
 }
 // #endif
+
+#endif
