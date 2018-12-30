@@ -200,7 +200,7 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
   int imo, jmo, kmo;
   #if defined (DE) || defined(STATIC_GRAV) || defined(GRAVITY)
   Real d, d_inv, vx, vy, vz;
-  Real E, GE, E_n, GE_n, delta_E;
+  // Real E, GE;
   #endif
   #ifdef DE
   Real vx_imo, vx_ipo, vy_jmo, vy_jpo, vz_kmo, vz_kpo, P;
@@ -254,8 +254,8 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
     vx =  dev_conserved[1*n_cells + id] * d_inv;
     vy =  dev_conserved[2*n_cells + id] * d_inv;
     vz =  dev_conserved[3*n_cells + id] * d_inv;
-    E = dev_conserved[4*n_cells + id];
-    GE = fmin(dev_conserved[(n_fields-1)*n_cells + id], 1e-6);
+    // E = dev_conserved[4*n_cells + id];
+    // GE = fmin(dev_conserved[(n_fields-1)*n_cells + id], 1e-6);
     #endif
     #ifdef DE
     P  = (dev_conserved[4*n_cells + id] - 0.5*d*(vx*vx + vy*vy + vz*vz)) * (gamma - 1.0);
@@ -353,7 +353,7 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
     pot_r = dev_conserved[field_pot*n_cells + id_r];
     gz = -0.5*( pot_r - pot_l ) / dz;
 
-    Real Ek_0 = 0.5*d_n*( vx_n*vx_n + vy_n*vy_n + vz_n*vz_n );
+    // Real Ek_0 = 0.5*d_n*( vx_n*vx_n + vy_n*vy_n + vz_n*vz_n );
 
     // dev_conserved[4*n_cells + id] += 0.25*dt*gx*(d + d_n)*(vx + vx_n)
     // +  0.25*dt*gy*(d + d_n)*(vy + vy_n)
@@ -411,9 +411,10 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
 
 
     #endif
-
-    // Real phi_0_gas = 0.01;                           //Unit Conversion
     Real u, u_floor, delta_u, E;
+
+    #ifdef DE
+    // Real phi_0_gas = 0.01;                           //Unit Conversion
     u = dev_conserved[(n_fields-1)*n_cells + id];
     // u = u / current_a / current_a * phi_0_gas;  //convert to physical km^2/s^2
     // u_floor = 0.00001;
@@ -428,14 +429,17 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
       dev_conserved[(n_fields-1)*n_cells + id] = u;
       dev_conserved[4*n_cells + id] += delta_u ;
     }
+    #endif
 
     // #ifndef GRAVITY_CORRECTOR
-    u_floor = 0;
+    u_floor = 1e-5;
     E = dev_conserved[4*n_cells + id];
     if ( E < u_floor ){
-      delta_u += u_floor - E;
+      delta_u = u_floor - E;
       printf("###Thread Energy change  %f -> %f \n", E, u_floor );
+      #ifdef DE
       dev_conserved[(n_fields-1)*n_cells + id] += delta_u;
+      #endif
       dev_conserved[4*n_cells + id] += delta_u;
     }
     // #endif
