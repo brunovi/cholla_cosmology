@@ -49,7 +49,7 @@ void Tranfer_Particles_Boundaries( Particles_3D &Particles ){
 int real_to_int( Real inVal ){
   int outVal = (int) inVal;
   if ( (inVal - outVal) > 0.1 ) outVal += 1;
-  if ( abs(outVal - inVal) > 0.5 ) outVal -= 1;
+  if ( fabs(outVal - inVal) > 0.5 ) outVal -= 1;
   return outVal;
 }
 
@@ -57,7 +57,7 @@ int real_to_int( Real inVal ){
 part_int_t real_to_part_int( Real inVal ){
   part_int_t outVal = (part_int_t) inVal;
   if ( (inVal - outVal) > 0.1 ) outVal += 1;
-  if ( abs(outVal - inVal) > 0.5 ) outVal -= 1;
+  if ( fabs(outVal - inVal) > 0.5 ) outVal -= 1;
   return outVal;
 }
 

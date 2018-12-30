@@ -167,23 +167,29 @@ Real Get_Particles_dt( Particles_3D &Particles ){
   dt_min = 1e100;
 
   for ( pID=0; pID<Particles.n_local; pID++ ){
-    vel = abs(Particles.vel_x[pID]);
+    vel = fabs(Particles.vel_x[pID]);
     if ( vel > 0){
       dt = Particles.G.dx / vel;
       dt_min = std::min( dt_min, dt);
     }
-    vel = abs(Particles.vel_y[pID]);
+    vel = fabs(Particles.vel_y[pID]);
     if ( vel > 0){
       dt = Particles.G.dy / vel;
       dt_min = std::min( dt_min, dt);
     }
-    vel = abs(Particles.vel_z[pID]);
+    vel = fabs(Particles.vel_z[pID]);
     if ( vel > 0){
       dt = Particles.G.dz / vel;
       dt_min = std::min( dt_min, dt);
     }
   }
-  return C_cfl * dt_min;
+
+  #ifdef MPI_CHOLLA
+  Real dt_min_global = ReduceRealMin(dt_min);
+  dt_min = dt_min_global;
+  #endif
+
+  return Particles.C_cfl * dt_min;
 }
 
 #ifdef COSMOLOGY
@@ -197,17 +203,17 @@ Real Get_Particles_da_cosmo( Grid3D &G ){
 
 
   for ( pID=0; pID<G.Particles.n_local; pID++ ){
-    vel = abs(G.Particles.vel_x[pID]);
+    vel = fabs(G.Particles.vel_x[pID]);
     if ( vel > 0){
       da = G.Particles.G.dx * vel_factor / vel;
       da_min = std::min( da_min, da);
     }
-    vel = abs(G.Particles.vel_y[pID]);
+    vel = fabs(G.Particles.vel_y[pID]);
     if ( vel > 0){
       da = G.Particles.G.dy * vel_factor / vel;
       da_min = std::min( da_min, da);
     }
-    vel = abs(G.Particles.vel_z[pID]);
+    vel = fabs(G.Particles.vel_z[pID]);
     if ( vel > 0){
       da = G.Particles.G.dz * vel_factor / vel;
       da_min = std::min( da_min, da);
@@ -231,17 +237,17 @@ Real Get_Particles_dt_cosmo( Grid3D &G ){
 
 
   for ( pID=0; pID<G.Particles.n_local; pID++ ){
-    vel = abs(G.Particles.vel_x[pID]);
+    vel = fabs(G.Particles.vel_x[pID]);
     if ( vel > 0){
       da = G.Particles.G.dx * vel_factor / vel;
       da_min = std::min( da_min, da);
     }
-    vel = abs(G.Particles.vel_y[pID]);
+    vel = fabs(G.Particles.vel_y[pID]);
     if ( vel > 0){
       da = G.Particles.G.dy * vel_factor / vel;
       da_min = std::min( da_min, da);
     }
-    vel = abs(G.Particles.vel_z[pID]);
+    vel = fabs(G.Particles.vel_z[pID]);
     if ( vel > 0){
       da = G.Particles.G.dz * vel_factor / vel;
       da_min = std::min( da_min, da);
