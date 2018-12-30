@@ -150,20 +150,14 @@ int main(int argc, char *argv[])
   Copy_Potential_To_Hydro_Grid( G );
   #endif
 
+  #ifdef CPU_TIME
+  G.Timer.Initialize();
+  #endif
 
   // set boundary conditions (assign appropriate values to ghost cells)
   chprintf("\nSetting boundary conditions...\n");
-  G.H.TRANSFER_HYDRO_BOUNDARIES = true;
-  G.Set_Boundary_Conditions(P);
-  G.H.TRANSFER_HYDRO_BOUNDARIES = false;
+  G.Set_Boundary_Conditions_All( P );
   chprintf("Boundary conditions set.\n");
-
-  #ifdef PARTICLES
-  //Transfer Particles Boundaries
-  G.Particles.TRANSFER_PARTICLES_BOUNDARIES = true;
-  G.Set_Boundary_Conditions(P);
-  G.Particles.TRANSFER_PARTICLES_BOUNDARIES = false;
-  #endif
 
   #ifdef COOLING_GRACKLE
   Initialize_Grackle( G.Cool, P, G.Grav, G.Cosmo );
@@ -209,9 +203,6 @@ int main(int argc, char *argv[])
   #endif //MPI_CHOLLA
   #endif //CPU_TIME
 
-  #ifdef CPU_TIME
-  G.Timer.Initialize();
-  #endif
 
   bool output_now = false;
   // Evolve the grid, one timestep at a time
@@ -247,16 +238,8 @@ int main(int argc, char *argv[])
     Extrapolate_Grav_Potential( G );
     #endif
 
-
     // Advance the grid by one timestep
-    #ifdef CPU_TIME
-    G.Timer.Start_Timer();
-    dti = G.Update_Grid();
-    G.Timer.End_and_Record_Time( 1 );
-    #else
-    dti = G.Update_Grid();
-    #endif //CPU_TIME
-
+    dti = G.Update_Hydro_Grid();
 
     #ifdef PARTICLES
     //Advance the particles ( first step )
@@ -284,24 +267,7 @@ int main(int argc, char *argv[])
     #endif
 
     // set boundary conditions for next time step
-    #ifdef CPU_TIME
-    G.Timer.Start_Timer();
-    G.H.TRANSFER_HYDRO_BOUNDARIES = true;
-    G.Set_Boundary_Conditions(P);
-    G.H.TRANSFER_HYDRO_BOUNDARIES = false;
-    G.Timer.End_and_Record_Time( 2 );
-    #else
-    G.Set_Boundary_Conditions(P);
-    #endif //CPU_TIME
-
-    #ifdef PARTICLES
-    //Transfer Particles Boundaries
-    G.Particles.TRANSFER_PARTICLES_BOUNDARIES = true;
-    G.Timer.Start_Timer();
-    G.Set_Boundary_Conditions(P);
-    G.Timer.End_and_Record_Time( 8 );
-    G.Particles.TRANSFER_PARTICLES_BOUNDARIES = false;
-    #endif
+    G.Set_Boundary_Conditions_All( P );
 
     #ifdef PARTICLES
     //Advance the particles ( second step )
@@ -342,13 +308,10 @@ int main(int argc, char *argv[])
       #endif //OUTPUT
       // update to the next output time
       outtime += P.outstep;
-
       output_now = false;
-
     }
 
-
-    // if (G.H.n_step == 1) break;
+    if (G.H.n_step == 10) break;
 
     #ifdef COSMOLOGY
     if ( G.Cosmo.current_a >= G.Cosmo.scale_outputs[G.Cosmo.n_outputs-1] ) {
@@ -376,6 +339,11 @@ int main(int argc, char *argv[])
 */
 
   } /*end loop over timesteps*/
+
+  #ifdef CPU_TIME
+  G.Timer.Get_Average_Times();
+
+  #endif
 
   //
   // #ifdef CPU_TIME
