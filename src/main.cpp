@@ -263,7 +263,7 @@ int main(int argc, char *argv[])
     Update_Particles( G, 1 );
     #endif
 
-    // update the time
+    // update the simulation time ( t += dt )
     G.Update_Time();
 
     // add one to the timestep count
