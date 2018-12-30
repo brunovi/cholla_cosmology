@@ -373,6 +373,8 @@ class Grid3D
      *  \brief Update the conserved quantities in each cell. */
     Real Update_Grid(void);
 
+    Real Update_Hydro_Grid(void);
+
     void Update_Time(void);
 
     /*! \fn void Write_Header_Binary(FILE *fp)
@@ -495,6 +497,8 @@ class Grid3D
     /*! \fn void Disk_3D(parameters P)
      *  \brief Initialize the grid with a 3D disk following a Miyamoto-Nagai profile. */
     void Disk_3D(parameters P);
+
+    void Set_Boundary_Conditions_All(parameters P);
 
     /*! \fn void Set_Boundary_Conditions(parameters P)
      *  \brief Set the boundary conditions based on info in the parameters structure. */

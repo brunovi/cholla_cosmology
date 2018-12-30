@@ -603,6 +603,21 @@ Real Grid3D::Update_Grid(void)
 
 }
 
+Real Grid3D::Update_Hydro_Grid( void ){
+
+  Real dti;
+  
+  #ifdef CPU_TIME
+  Timer.Start_Timer();
+  dti = Update_Grid();
+  Timer.End_and_Record_Time( 1 );
+  #else
+  dti = Update_Grid();
+  #endif //CPU_TIME
+
+  return dti;
+}
+
 void Grid3D::Update_Time(void){
   H.t += H.dt;
   #ifdef PARTICLES
@@ -616,6 +631,7 @@ void Grid3D::Update_Time(void){
   #endif
   #endif
 }
+
 
 
 /*! \fn void Reset(void)
