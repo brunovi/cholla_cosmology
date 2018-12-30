@@ -142,7 +142,7 @@ void Particles_3D::Initialize( struct parameters P, Grav3D &Grav, Real xblocal, 
   chprintf( " N_Particles Boundaries Buffer Size: %d\n", N_PARTICLES_TRANSFER);
   chprintf( " N_Data per Particle Transfer: %d\n", N_DATA_PER_PARTICLE_TRANSFER);
   #endif
-  
+
   TRANSFER_DENSITY_BOUNDARIES = false;
   TRANSFER_PARTICLES_BOUNDARIES = false;
 
@@ -267,6 +267,11 @@ void Particles_3D::Initialize_Sphere( void ){
   Real M_sphere = 4./3 * M_PI* rho_start * sphereR*sphereR*sphereR;
   Real Mparticle = M_sphere / n_particles_total;
 
+  #ifdef SINGLE_PARTICLE_MASS
+  particle_mass = Mparticle;
+  #endif
+
+
   part_int_t pID = 0;
   Real pPos_x, pPos_y, pPos_z, r;
   while ( pID < n_particles_local ){
@@ -295,6 +300,7 @@ void Particles_3D::Initialize_Sphere( void ){
   }
 
   n_local = pos_x.size();
+  n_total_0 = n_particles_total;
 
   chprintf( " Particles Uniform Sphere Initialized, n_local: %lu\n", n_local);
 

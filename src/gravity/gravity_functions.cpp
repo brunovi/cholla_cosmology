@@ -3,7 +3,7 @@
 #include "gravity_functions.h"
 #include "../universal_constants.h"
 
-#ifdef COSMOLOGY
+#ifdef PARTICLES
 #include"../particles/particles_dynamics.h"
 #endif
 
@@ -131,7 +131,6 @@ void Compute_Gravitational_Potential( Grid3D &G, Potential_PFFT_3D &p_solver, st
   Copy_Particles_Density_to_Gravity( G );
   #endif
 
-  #ifdef COSMOLOGY
   Real dens_avrg;
   dens_avrg = Get_Density_Average( G );
   #ifdef MPI_CHOLLA
@@ -140,7 +139,6 @@ void Compute_Gravitational_Potential( Grid3D &G, Potential_PFFT_3D &p_solver, st
 
   G.Grav.dens_avrg = dens_avrg;
   chprintf( " Density Average:  %f\n", dens_avrg);
-  #endif
 
   #ifdef CPU_TIME
   G.Timer.Start_Timer();
@@ -459,30 +457,28 @@ void Apply_Gavity_Corrector( Grid3D &G, struct parameters P ){
 void Set_dt( Grid3D &G, bool &output_now, int n_step ){
 
   #ifdef COSMOLOGY
-  Real delta_a_part;
-  Real dt_courant, dt_gas, da_courant;
+  Real da_particles;
+  Real dt_hydro, da_hydro, dt_courant, da_courant;
 
 
   #ifdef ONLY_PM
-  delta_a_part = Get_Particles_da_cosmo( G );
-  chprintf( " Delta_a particles: %f\n", delta_a_part );
-  da_courant = delta_a_part;
+  da_particles = Get_Particles_da_cosmo( G );
+  chprintf( " Delta_a particles: %f\n", da_particles );
+  da_courant = da_particles;
   #else
-  delta_a_part = Get_Particles_da_cosmo( G );
-  dt_courant = G.H.dt;
-  da_courant = G.Cosmo.Get_da_courant( dt_courant);
-  chprintf( " Delta_a particles: %f   Delta_a gas: %f\n", delta_a_part, da_courant);
-  da_courant = std::min(delta_a_part, da_courant);
+  da_particles = Get_Particles_da_cosmo( G );
+  dt_hydro = G.H.dt;
+  da_hydro = G.Cosmo.Get_da_courant( dt_hydro);
+  chprintf( " Delta_a particles: %f   Delta_a gas: %f\n", da_particles, da_hydro);
+  da_courant = std::min(da_particles, da_hydro);
   #endif
 
-
-  // Real delta_a_part = G.Cosmo.max_delta_a;
   if( da_courant > G.Cosmo.max_delta_a){
     da_courant = G.Cosmo.max_delta_a;
     chprintf( " Seting max delta_a: %f\n", da_courant );
   }
 
-  Real da_min = delta_a_part / 100;
+  Real da_min = da_particles / 50;
   if ( da_courant < da_min ){
     da_courant = da_min;
     chprintf( " Seting min delta_a: %f\n", da_courant );
@@ -499,20 +495,36 @@ void Set_dt( Grid3D &G, bool &output_now, int n_step ){
   Real dt = G.Cosmo.Get_dt_from_da( G.Cosmo.delta_a );
   G.Cosmo.dt_secs = dt * G.Cosmo.time_conversion;
   G.Cosmo.t_secs += G.Cosmo.dt_secs;
-
-
   G.Particles.dt = dt;
 
-  dt_gas = G.Cosmo.Get_Cosmology_dt( G.Cosmo.delta_a );
-  G.H.dt = dt_gas;
+  dt_hydro = G.Cosmo.Get_Cosmology_dt( G.Cosmo.delta_a );
+  G.H.dt = dt_hydro;
 
   chprintf( " Current_a: %f    delta_a: %f     da_courant: %f  dt:  %f\n", G.Cosmo.current_a, G.Cosmo.delta_a, da_courant, dt  );
   chprintf( " t_physical: %f Myr   dt_physical: %f Myr\n", G.Cosmo.t_secs/MYR, G.Cosmo.dt_secs/MYR );
 
-
+  #else //COSMOLOGY
+  Real dt_hydro, dt_courant;
+  dt_hydro = G.H.dt;
+  #ifndef PARTICLES
+  chprintf( " Delta_t hydro: %f\n", dt_hydro);
   #endif
 
+  #ifdef PARTICLES
+  Real dt_particles;
+  dt_particles = Get_Particles_dt( G.Particles );
+  chprintf( " Delta_t hydro: %f    Delta_t particles: %f \n", dt_hydro, dt_particles );
+  dt_courant = std::min( dt_hydro, dt_particles );
+  chprintf( " Delta_t courant: %f\n", dt_courant);
+  G.H.dt = dt_courant;
+  G.Particles.dt = dt_courant;
 
+  #endif //PARTICLES
+  #endif //COSMOLOGY
+
+
+
+  // Set times for potential extrapolation
   if ( G.Grav.INITIAL ){
     G.Grav.dt_prev = G.H.dt;
     G.Grav.dt_now = G.H.dt;
@@ -523,11 +535,7 @@ void Set_dt( Grid3D &G, bool &output_now, int n_step ){
 
 
   // #ifdef PARTICLES
-  // dt_particles = Get_Particles_dt( G.Particles );
-  // dt_min = std::min( G.H.dt, dt_particles );
-  // G.H.dt = dt_min;
-  // G.Particles.dt = dt_min;
-  // // G.Particles.dt = 0;
+
   // #endif
 
 }
