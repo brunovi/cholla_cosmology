@@ -17,22 +17,26 @@
 
 void Grid3D::Set_Boundary_Conditions_All( parameters P){
   // Set hydro boundary conditions
+  H.TRANSFER_HYDRO_BOUNDARIES = true;
   #ifdef CPU_TIME
   Timer.Start_Timer();
-  H.TRANSFER_HYDRO_BOUNDARIES = true;
   Set_Boundary_Conditions(P);
-  H.TRANSFER_HYDRO_BOUNDARIES = false;
   Timer.End_and_Record_Time( 2 );
   #else
   Set_Boundary_Conditions(P);
   #endif //CPU_TIME
+  H.TRANSFER_HYDRO_BOUNDARIES = false;
 
   #ifdef PARTICLES
   //Transfer Particles Boundaries
   Particles.TRANSFER_PARTICLES_BOUNDARIES = true;
+  #ifdef CPU_TIME
   Timer.Start_Timer();
   Set_Boundary_Conditions(P);
   Timer.End_and_Record_Time( 8 );
+  #else
+  Set_Boundary_Conditions(P);
+  #endif
   Particles.TRANSFER_PARTICLES_BOUNDARIES = false;
   #endif
 }
