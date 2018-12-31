@@ -5,12 +5,8 @@
 void Change_DM_Frame_System( Grid3D &G, bool forward ){
   part_int_t pIndx;
   Real vel_factor;
-  #ifdef PECULIAR_VEL
-  vel_factor = 1;
-  #else
   if (forward ) vel_factor = G.Cosmo.current_a ;
   else vel_factor =  1./G.Cosmo.current_a;
-  #endif
   for ( pIndx=0; pIndx<G.Particles.n_local; pIndx++ ){
     G.Particles.vel_x[pIndx] *= vel_factor;
     G.Particles.vel_y[pIndx] *= vel_factor;
