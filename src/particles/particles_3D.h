@@ -11,8 +11,8 @@
 #include"../global.h"
 #include "../gravity/grav3D.h"
 
-#ifdef GRAVITY_OMP
-#include "../gravity/gravity_omp.h"
+#ifdef PARALLEL_OMP
+#include "../parallel_omp.h"
 #endif
 
 /*! \class Part3D

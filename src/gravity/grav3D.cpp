@@ -7,8 +7,8 @@
 #include"grav3D.h"
 #include "../io.h"
 
-#ifdef GRAVITY_OMP
-#include "gravity_omp.h"
+#ifdef PARALLEL_OMP
+#include "../parallel_omp.h"
 #endif
 
 
@@ -74,11 +74,11 @@ void Grav3D::Initialize( Real x_min, Real y_min, Real z_min, Real Lx, Real Ly, R
   // std::cout << xMin << std::endl;
   // chprintf( "\n" );
 
-  #ifdef GRAVITY_OMP
+  #ifdef PARALLEL_OMP
   chprintf(" Using OMP for gravity calculations\n");
   int n_omp_max = omp_get_max_threads();
   chprintf("  MAX OMP Threads: %d\n", n_omp_max);
-  chprintf("  N OMP Threads per MPI process: %d\n", N_OMP_GRAVITY_THREADS);
+  chprintf("  N OMP Threads per MPI process: %d\n", N_OMP_THREADS);
   #endif
 }
 

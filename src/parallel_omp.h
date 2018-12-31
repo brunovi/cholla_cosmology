@@ -1,12 +1,12 @@
-#ifdef GRAVITY_OMP
+#ifdef PARALLEL_OMP
 
-#ifndef GRAVITY_OMP_H
-#define GRAVITY_OMP_H
+#ifndef PARALLEL_OMP_H
+#define PARALLEL_OMP_H
 
 #include<stdio.h>
 #include<stdlib.h>
 #include"math.h"
-#include"../global.h"
+#include"global.h"
 #include <iostream>
 #include <omp.h>
 

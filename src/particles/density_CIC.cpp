@@ -118,12 +118,12 @@ void Get_Density_CIC( Particles_3D &Parts ){
   // std::cout << "           Dens Avg: " << dens_avrg << std::endl;
 }
 
-#ifdef GRAVITY_OMP
+#ifdef PARALLEL_OMP
 void Get_Density_CIC_OMP( Particles_3D &Parts ){
 
 
 
-  #pragma omp parallel num_threads( N_OMP_GRAVITY_THREADS )
+  #pragma omp parallel num_threads( N_OMP_THREADS )
   {
     int omp_id;
     int g_start, g_end;
@@ -285,7 +285,7 @@ void Get_Particles_Density_CIC( Grid3D &G, struct parameters P ){
   G.Timer.Start_Timer();
   #endif
   Clear_Density( G.Particles );
-  #ifdef GRAVITY_OMP
+  #ifdef PARALLEL_OMP
   Get_Density_CIC_OMP( G.Particles );
   // Get_Density_CIC( G.Particles );
   #else

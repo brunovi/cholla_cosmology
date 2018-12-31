@@ -277,7 +277,7 @@ void Update_Particles( Grid3D &G, int step ){
   G.Timer.Start_Timer();
   #endif
 
-  #ifndef GRAVITY_OMP
+  #ifndef PARALLEL_OMP
   if ( step == 1 ){
     #ifndef COSMOLOGY
     Advance_Particles_step1( G.Particles, 0, G.Particles.n_local );
@@ -295,9 +295,9 @@ void Update_Particles( Grid3D &G, int step ){
   }
   #endif
 
-  #ifdef GRAVITY_OMP
+  #ifdef PARALLEL_OMP
 
-  #pragma omp parallel num_threads( N_OMP_GRAVITY_THREADS )
+  #pragma omp parallel num_threads( N_OMP_THREADS )
   {
     int omp_id, n_omp_procs;
     part_int_t p_start, p_end;
@@ -306,7 +306,7 @@ void Update_Particles( Grid3D &G, int step ){
     omp_id = omp_get_thread_num();
     n_omp_procs = omp_get_num_threads();
 
-    Get_OMP_Indxs( G.Particles.n_local, N_OMP_GRAVITY_THREADS, omp_id, G.Particles.G.nz_local + 2*G.Particles.G.n_ghost_particles_grid, &p_start, &p_end, &g_start, &g_end );
+    Get_OMP_Indxs( G.Particles.n_local, N_OMP_THREADS, omp_id, G.Particles.G.nz_local + 2*G.Particles.G.n_ghost_particles_grid, &p_start, &p_end, &g_start, &g_end );
 
     if ( step == 1 ){
       #ifndef COSMOLOGY
