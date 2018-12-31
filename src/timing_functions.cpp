@@ -79,20 +79,20 @@ void Time::End_and_Record_Time( int time_var ){
     time_hydro_min = t_min;
     time_hydro_max = t_max;
     time_hydro_mean = t_avg;
-    if (n_steps > 0) time_hydro_all += t_avg;
+    if (n_steps > 0) time_hydro_all += t_max;
   }
   if( time_var == 2 ){
     time_bound_min = t_min;
     time_bound_max = t_max;
     time_bound_mean = t_avg;
-    if (n_steps > 0) time_bound_all += t_avg;
+    if (n_steps > 0) time_bound_all += t_max;
   }
   #ifdef GRAVITY
   if( time_var == 3 ){
     time_potential_min = t_min;
     time_potential_max = t_max;
     time_potential_mean = t_avg;
-    if (n_steps > 0) time_potential_all += t_avg;
+    if (n_steps > 0) time_potential_all += t_max;
   }
 
   #ifdef PARTICLES
@@ -100,35 +100,35 @@ void Time::End_and_Record_Time( int time_var ){
     time_part_dens_min = t_min;
     time_part_dens_max = t_max;
     time_part_dens_mean = t_avg;
-    if (n_steps > 0) time_part_dens_all += t_avg;
+    if (n_steps > 0) time_part_dens_all += t_max;
   }
 
   if( time_var == 5 ){
     time_part_dens_transf_min = t_min;
     time_part_dens_transf_max = t_max;
     time_part_dens_transf_mean = t_avg;
-    if (n_steps > 0) time_part_dens_transf_all += t_avg;
+    if (n_steps > 0) time_part_dens_transf_all += t_max;
   }
 
   if( time_var == 6 ){
     time_advance_particles_1_min = t_min;
     time_advance_particles_1_max = t_max;
     time_advance_particles_1_mean = t_avg;
-    if (n_steps > 0) time_advance_particles_1_all += t_avg;
+    if (n_steps > 0) time_advance_particles_1_all += t_max;
   }
 
   if( time_var == 7 ){
     time_advance_particles_2_min = t_min;
     time_advance_particles_2_max = t_max;
     time_advance_particles_2_mean = t_avg;
-    if (n_steps > 0) time_advance_particles_2_all += t_avg;
+    if (n_steps > 0) time_advance_particles_2_all += t_max;
   }
 
   if( time_var == 8 ){
     time_part_tranf_min = t_min;
     time_part_tranf_max = t_max;
     time_part_tranf_mean = t_avg;
-    if (n_steps > 0) time_part_tranf_all += t_avg;
+    if (n_steps > 0) time_part_tranf_all += t_max;
   }
   #endif
   #endif
@@ -137,19 +137,73 @@ void Time::End_and_Record_Time( int time_var ){
 }
 
 void Time::Print_Times(){
-  chprintf(" Time Hydro             min: %9.4f  max: %9.4f  avg: %9.4f\n", time_hydro_min, time_hydro_max, time_hydro_mean);
-  chprintf(" Time Boundaries        min: %9.4f  max: %9.4f  avg: %9.4f\n", time_bound_min, time_bound_max, time_bound_mean);
+  chprintf(" Time Hydro             min: %9.4f  max: %9.4f  avg: %9.4f   ms\n", time_hydro_min, time_hydro_max, time_hydro_mean);
+  chprintf(" Time Boundaries        min: %9.4f  max: %9.4f  avg: %9.4f   ms\n", time_bound_min, time_bound_max, time_bound_mean);
   #ifdef GRAVITY
-  chprintf(" Time Potential         min: %9.4f  max: %9.4f  avg: %9.4f\n", time_potential_min, time_potential_max, time_potential_mean);
+  chprintf(" Time Grav Potential    min: %9.4f  max: %9.4f  avg: %9.4f   ms\n", time_potential_min, time_potential_max, time_potential_mean);
   #ifdef PARTICLES
-  chprintf(" Time Part Density      min: %9.4f  max: %9.4f  avg: %9.4f\n", time_part_dens_min, time_part_dens_max, time_part_dens_mean);
-  chprintf(" Time Part Boundaries   min: %9.4f  max: %9.4f  avg: %9.4f\n", time_part_tranf_min, time_part_tranf_max, time_part_tranf_mean);
-  chprintf(" Time Part Dens Transf  min: %9.4f  max: %9.4f  avg: %9.4f\n", time_part_dens_transf_min, time_part_dens_transf_max, time_part_dens_transf_mean);
-  chprintf(" Time Advance Part 1    min: %9.4f  max: %9.4f  avg: %9.4f\n", time_advance_particles_1_min, time_advance_particles_1_max, time_advance_particles_1_mean);
-  chprintf(" Time Advance Part 2    min: %9.4f  max: %9.4f  avg: %9.4f\n", time_advance_particles_2_min, time_advance_particles_2_max, time_advance_particles_2_mean);
+  chprintf(" Time Part Density      min: %9.4f  max: %9.4f  avg: %9.4f   ms\n", time_part_dens_min, time_part_dens_max, time_part_dens_mean);
+  chprintf(" Time Part Boundaries   min: %9.4f  max: %9.4f  avg: %9.4f   ms\n", time_part_tranf_min, time_part_tranf_max, time_part_tranf_mean);
+  chprintf(" Time Part Dens Transf  min: %9.4f  max: %9.4f  avg: %9.4f   ms\n", time_part_dens_transf_min, time_part_dens_transf_max, time_part_dens_transf_mean);
+  chprintf(" Time Advance Part 1    min: %9.4f  max: %9.4f  avg: %9.4f   ms\n", time_advance_particles_1_min, time_advance_particles_1_max, time_advance_particles_1_mean);
+  chprintf(" Time Advance Part 2    min: %9.4f  max: %9.4f  avg: %9.4f   ms\n", time_advance_particles_2_min, time_advance_particles_2_max, time_advance_particles_2_mean);
   #endif
   #endif
 
 }
+
+void Time::Get_Average_Times(){
+
+  n_steps -= 1; //Ignore the first timestep
+
+  time_hydro_all /= n_steps;
+  time_bound_all /= n_steps;
+
+  #ifdef GRAVITY
+  time_potential_all /= n_steps;
+  #ifdef PARTICLES
+  time_part_dens_all  /= n_steps;
+  time_part_tranf_all /= n_steps;
+  time_part_dens_transf_all /= n_steps;
+  time_advance_particles_1_all /= n_steps;
+  time_advance_particles_2_all /= n_steps;
+  #endif
+  #endif
+
+}
+
+void Time::Print_Average_Times(){
+
+  Real time_total;
+  time_total = time_hydro_all + time_bound_all;
+
+  #ifdef GRAVITY
+  time_total += time_potential_all;
+  #ifdef PARTICLES
+  time_total += time_part_dens_all;
+  time_total += time_part_tranf_all;
+  time_total += time_part_dens_transf_all;
+  time_total += time_advance_particles_1_all;
+  time_total += time_advance_particles_2_all;
+  #endif
+  #endif
+
+  chprintf("\nAverage Times      n_steps:%d\n", n_steps);
+  chprintf(" Time Hydro             avg: %9.4f   ms\n", time_hydro_all);
+  chprintf(" Time Boundaries        avg: %9.4f   ms\n", time_bound_all);
+  #ifdef GRAVITY
+  chprintf(" Time Grav Potential    avg: %9.4f   ms\n", time_potential_all);
+  #ifdef PARTICLES
+  chprintf(" Time Part Density      avg: %9.4f   ms\n", time_part_dens_all);
+  chprintf(" Time Part Boundaries   avg: %9.4f   ms\n", time_part_tranf_all);
+  chprintf(" Time Part Dens Transf  avg: %9.4f   ms\n", time_part_dens_transf_all);
+  chprintf(" Time Advance Part 1    avg: %9.4f   ms\n", time_advance_particles_1_all);
+  chprintf(" Time Advance Part 2    avg: %9.4f   ms\n", time_advance_particles_2_all);
+  chprintf(" Time Total             avg: %9.4f   ms\n", time_total);
+  #endif
+  #endif
+
+}
+
 
 #endif

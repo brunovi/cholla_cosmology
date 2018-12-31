@@ -342,6 +342,7 @@ int main(int argc, char *argv[])
 
   #ifdef CPU_TIME
   G.Timer.Get_Average_Times();
+  G.Timer.Print_Average_Times();
 
   #endif
 

@@ -73,6 +73,8 @@ public:
   void Start_Timer();
   void End_and_Record_Time( int time_var );
   void Print_Times();
+  void Get_Average_Times();
+  void Print_Average_Times();
 };
 
 
