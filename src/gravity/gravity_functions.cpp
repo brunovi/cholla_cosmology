@@ -242,6 +242,159 @@ void Copy_Potential_To_Hydro_Grid( Grid3D &G ){
   }
 }
 
+
+#ifdef GRAVITY_CPU
+void Get_Gavity_Field_Function( Grid3D &G, int g_start, int g_end ){
+
+  int nx_grav, ny_grav, nz_grav;
+  // nGHST_grav = G.Particles.G.n_ghost_particles_grid;
+  nx_grav = G.Grav.nx_local;
+  ny_grav = G.Grav.ny_local;
+  nz_grav = G.Grav.nz_local;
+
+  int nx_grid, ny_grid, nz_grid, nGHST_grid;
+  nGHST_grid = G.H.n_ghost;
+  nx_grid = G.Grav.nx_local + 2*nGHST_grid;
+  ny_grid = G.Grav.ny_local + 2*nGHST_grid;
+  nz_grid = G.Grav.nz_local + 2*nGHST_grid;
+
+  int nGHST = nGHST_grid ;
+
+  Real dx, dy, dz;
+  dx = G.Grav.dx;
+  dy = G.Grav.dy;
+  dz = G.Grav.dz;
+
+  Real pot_factor;
+  // Real pot_factor = 1. / G.Cosmo.phi_0_gas * (G.Cosmo.current_a - G.Cosmo.delta_a) * (G.Cosmo.current_a - G.Cosmo.delta_a) ;
+  pot_factor = 1;
+
+  Real phi_l, phi_r;
+  int k, j, i, id_l, id_r, id;
+  for ( k=g_start; k<g_end; k++ ){
+    for ( j=0; j<ny_grav; j++ ){
+      for ( i=0; i<nx_grav; i++ ){
+        id   = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
+        id_l = (i-1 + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
+        id_r = (i+1 + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
+        phi_l = G.C.Grav_potential[id_l] * pot_factor;
+        phi_r = G.C.Grav_potential[id_r] * pot_factor;
+        G.Grav.F.gravity_x_h[id] = -0.5 * ( phi_r - phi_l ) / dx;
+      }
+    }
+  }
+
+  for ( k=g_start; k<g_end; k++ ){
+    for ( j=0; j<ny_grav; j++ ){
+      for ( i=0; i<nx_grav; i++ ){
+        id   = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
+        id_l = (i + nGHST) + (j-1 + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
+        id_r = (i + nGHST) + (j+1 + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
+        phi_l = G.C.Grav_potential[id_l] * pot_factor;
+        phi_r = G.C.Grav_potential[id_r] * pot_factor;
+        G.Grav.F.gravity_y_h[id] = -0.5 * ( phi_r - phi_l ) / dy;
+      }
+    }
+  }
+
+  for ( k=g_start; k<g_end; k++ ){
+    for ( j=0; j<ny_grav; j++ ){
+      for ( i=0; i<nx_grav; i++ ){
+        id   = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
+        id_l = (i + nGHST) + (j + nGHST)*nx_grid + (k-1 + nGHST)*ny_grid*nz_grid;
+        id_r = (i + nGHST) + (j + nGHST)*nx_grid + (k+1 + nGHST)*ny_grid*nz_grid;
+        phi_l = G.C.Grav_potential[id_l] * pot_factor;
+        phi_r = G.C.Grav_potential[id_r] * pot_factor;
+        G.Grav.F.gravity_z_h[id] = -0.5 * ( phi_r - phi_l ) / dz;
+      }
+    }
+  }
+}
+
+void Add_Gavity_To_Hydro_Function( Grid3D &G, int g_start, int g_end ){
+
+  int nx_grav, ny_grav, nz_grav;
+  nx_grav = G.Grav.nx_local;
+  ny_grav = G.Grav.ny_local;
+  nz_grav = G.Grav.nz_local;
+
+  int nx_grid, ny_grid, nz_grid, nGHST_grid;
+  nGHST_grid = G.H.n_ghost;
+  nx_grid = G.Grav.nx_local + 2*nGHST_grid;
+  ny_grid = G.Grav.ny_local + 2*nGHST_grid;
+  nz_grid = G.Grav.nz_local + 2*nGHST_grid;
+
+  int nGHST = nGHST_grid ;
+
+  Real d, vx, vy, vz, gx, gy, gz;
+  Real d_0, vx_0, vy_0, vz_0;
+
+  int k, j, i, id_grav, id_grid;
+  for ( k=g_start; k<g_end; k++ ){
+    for ( j=0; j<ny_grav; j++ ){
+      for ( i=0; i<nx_grav; i++ ){
+        id_grav = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
+        id_grid = (i + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
+
+        d_0 = G.C.density_0[id_grid];
+        vx_0 = G.C.momentum_x_0[id_grid] / d_0;
+        vy_0 = G.C.momentum_y_0[id_grid] / d_0;
+        vz_0 = G.C.momentum_z_0[id_grid] / d_0;
+
+        d = G.C.density[id_grid];
+        vx = G.C.momentum_x[id_grid] / d;
+        vy = G.C.momentum_y[id_grid] / d;
+        vz = G.C.momentum_z[id_grid] / d;
+
+        gx = G.Grav.F.gravity_x_h[id_grav];
+        gy = G.Grav.F.gravity_y_h[id_grav];
+        gz = G.Grav.F.gravity_z_h[id_grav];
+
+
+        G.C.momentum_x[id_grid] += 0.5 *  G.H.dt * gx * ( d_0 + d );
+        G.C.momentum_y[id_grid] += 0.5 *  G.H.dt * gy * ( d_0 + d );
+        G.C.momentum_z[id_grid] += 0.5 *  G.H.dt * gz * ( d_0 + d );
+        G.C.Energy[id_grid] += 0.5 * G.H.dt * ( gx*(d_0*vx_0 + d*vx) + gy*(d_0*vy_0 + d*vy) + gz*(d_0*vz_0 + d*vz)   );
+      }
+    }
+  }
+
+}
+
+void Add_Gavity_To_Hydro( Grid3D &G ){
+
+  #ifndef PARALLEL_OMP
+  Get_Gavity_Field_Function( G, 0, G.Grav.nz_local );
+  Add_Gavity_To_Hydro_Function( G, 0, G.Grav.nz_local );
+  #else
+  #pragma omp parallel num_threads( N_OMP_THREADS )
+  {
+    int omp_id, n_omp_procs;
+    part_int_t p_start, p_end;
+    int g_start, g_end;
+
+    omp_id = omp_get_thread_num();
+    n_omp_procs = omp_get_num_threads();
+    Get_OMP_Grid_Indxs( n_omp_procs, omp_id, G.Grav.nz_local,  &g_start, &g_end  );
+
+    Get_Gavity_Field_Function( G, g_start, g_end );
+    #pragma omp barrier
+    Add_Gavity_To_Hydro_Function( G, g_start, g_end );
+  }
+  #endif
+}
+
+
+
+
+#endif
+
+
+
+
+
+
+
 #ifdef GRAVITY_CORRECTOR
 void Get_Gavity_Corrector( Grid3D &G, int g_start, int g_end ){
 

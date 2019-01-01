@@ -44,6 +44,10 @@ void Copy_Potential_To_Hydro_Grid( Grid3D &G );
 
 // void Copy_Potential_From_Hydro_Grid( Grid3D &G );
 
+#ifdef GRAVITY_CPU
+void Add_Gavity_To_Hydro( Grid3D &G );
+#endif
+
 
 #ifdef GRAVITY_CORRECTOR
 void Get_Gavity_Corrector( Grid3D &G, int g_start, int g_end);

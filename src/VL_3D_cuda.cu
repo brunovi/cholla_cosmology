@@ -242,17 +242,17 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
     CudaCheckError();
 
     #ifdef DE
-    #ifndef GRAVITY_CORRECTOR
+    #ifndef GRAVITY_CPU
     Sync_Energies_3D<<<dim1dGrid,dim1dBlock>>>(dev_conserved, nx_s, ny_s, nz_s, n_ghost, gama, n_fields);
     CudaCheckError();
-    #endif
-    #endif
+    #endif //GRAVITY_CPU
+    #endif //DE
 
     #ifdef COSMOLOGY
-    #ifndef GRAVITY_CORRECTOR
+    #ifdef GRAVITY_CPU
     Apply_Internal_Energy_Floor<<<dim1dGrid,dim1dBlock>>>(dev_conserved, nx_s, ny_s, nz_s, n_ghost, n_fields, dens_0, vel_0, current_a);
-    #endif
-    #endif
+    #endif //GRAVITY_CPU
+    #endif //DE
 
     // Apply cooling
     #ifdef COOLING_GPU
@@ -350,7 +350,7 @@ __global__ void Update_Conserved_Variables_3D_half(Real *dev_conserved, Real *de
   #ifdef DE
   Real d, d_inv, vx, vy, vz;
   Real vx_imo, vx_ipo, vy_jmo, vy_jpo, vz_kmo, vz_kpo, P;
-  Real GE;
+  // Real GE;
   int ipo, jpo, kpo;
   #endif
 
@@ -364,7 +364,7 @@ __global__ void Update_Conserved_Variables_3D_half(Real *dev_conserved, Real *de
     vy =  dev_conserved[2*n_cells + id] * d_inv;
     vz =  dev_conserved[3*n_cells + id] * d_inv;
     P  = (dev_conserved[4*n_cells + id] - 0.5*d*(vx*vx + vy*vy + vz*vz)) * (gamma - 1.0);
-    GE = fmin(dev_conserved[(n_fields-1)*n_cells + id], 1e-6);
+    // GE = fmin(dev_conserved[(n_fields-1)*n_cells + id], 1e-6);
     // if (d < 0.0 || d != d) printf("Negative density before half step update.\n");
     if (P < 0.0) P  = dev_conserved[(n_fields-1)*n_cells + id] * (gamma - 1.0);
     if (P < 0.0) printf("%d Negative pressure before final update.\n", id);

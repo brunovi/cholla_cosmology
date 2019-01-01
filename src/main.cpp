@@ -228,6 +228,7 @@ int main(int argc, char *argv[])
     }
 
     #ifdef MPI_CHOLLA
+    // NOTE: This global reduction is done in G.set_dt(dti);
     G.H.dt = ReduceRealMin(G.H.dt);
     #endif
     #endif
@@ -311,7 +312,7 @@ int main(int argc, char *argv[])
       output_now = false;
     }
 
-    if (G.H.n_step == 10) break;
+    // if (G.H.n_step == 10) break;
 
     #ifdef COSMOLOGY
     if ( G.Cosmo.current_a >= G.Cosmo.scale_outputs[G.Cosmo.n_outputs-1] ) {

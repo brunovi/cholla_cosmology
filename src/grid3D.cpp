@@ -34,9 +34,10 @@
 #include "cooling_wrapper.h"
 #endif
 
-// #ifdef GRAVITY
-// #include "grav3D.h"
-// #endif
+#ifdef GRAVITY_CPU
+#include "gravity/gravity_functions.h"
+#include "dual_energy_CPU.h"
+#endif
 
 #ifdef COSMOLOGY
 #include "particles/particles_dynamics.h"
@@ -292,7 +293,7 @@ void Grid3D::AllocateMemory(void)
   return;
   #else
 
-  #ifdef GRAVITY_CORRECTOR
+  #ifdef GRAVITY_CPU
   max_dti = calc_dti_CPU();
   #else
   if (H.n_step == 0) {
@@ -306,7 +307,7 @@ void Grid3D::AllocateMemory(void)
     max_dti = dti;
     #endif /*CUDA*/
   }
-  #endif
+  #endif //GRAVITY_CPU
 
   // #ifdef COSMOLOGY
   // Real dt_cosmo, dt_hydro, min_dt;
@@ -557,44 +558,21 @@ Real Grid3D::Update_Grid(void)
   #endif
 
 
+  #ifdef GRAVITY_CPU
   C.density_0  = &g0[0];
   C.momentum_x_0 = &g0[H.n_cells];
   C.momentum_y_0 = &g0[2*H.n_cells];
   C.momentum_z_0 = &g0[3*H.n_cells];
   C.Energy_0   = &g0[4*H.n_cells];
 
-  #ifdef GRAVITY
   #ifndef DE
   C.Grav_potential_0 = &g0[(H.n_fields-1)*H.n_cells];
   #endif
   #ifdef DE
   C.Grav_potential_0 = &g0[(H.n_fields-2)*H.n_cells];
-  #endif
-  #endif
-
-  #ifdef DE
   C.GasEnergy_0 = &g0[(H.n_fields-1)*H.n_cells];
   #endif
-  // #ifdef GRAVITY_CORRECTOR
-  // Grav.F.density_prev = &g0[0];
-  // Grav.F.momentum_x_prev = &g0[H.n_cells];
-  // Grav.F.momentum_y_prev = &g0[2*H.n_cells];
-  // Grav.F.momentum_z_prev = &g0[3*H.n_cells];
-  // Grav.F.Energy_prev = &g0[4*H.n_cells];
-  //
-  // #ifndef DE
-  // Grav.F.Grav_potential_prev = &g0[(H.n_fields-1)*H.n_cells];
-  // #endif
-  // #ifdef DE
-  // Grav.F.Grav_potential_prev = &g0[(H.n_fields-2)*H.n_cells];
-  // #endif
-  //
-  // #ifdef DE
-  // Grav.F.GasEnergy_prev = &g0[(H.n_fields-1)*H.n_cells];
-  // #endif
-
-  // #endif
-
+  #endif
 
   // reset the grid flag to swap buffers
   gflag = (gflag+1)%2;
@@ -606,14 +584,21 @@ Real Grid3D::Update_Grid(void)
 Real Grid3D::Update_Hydro_Grid( void ){
 
   Real dti;
-  
+
   #ifdef CPU_TIME
   Timer.Start_Timer();
-  dti = Update_Grid();
-  Timer.End_and_Record_Time( 1 );
-  #else
-  dti = Update_Grid();
   #endif //CPU_TIME
+
+  dti = Update_Grid();
+  #ifdef GRAVITY_CPU
+  Add_Gavity_To_Hydro( *this );
+  Sync_Energies_3D_Host( *this );
+  #endif
+
+  #ifdef CPU_TIME
+  Timer.End_and_Record_Time( 1 );
+  #endif //CPU_TIME
+
 
   return dti;
 }

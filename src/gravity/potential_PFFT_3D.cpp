@@ -33,7 +33,7 @@ void Potential_PFFT_3D::Initialize( Grav3D Grav){
   n_cells_local = nx_local*ny_local*nz_local;
   n_cells_total = nx_total*ny_total*nz_total;
   chprintf( " Using Poisson Solver: PFFT\n");
-  chprintf( "  Index 0: %d\n", index_0);
+  // chprintf( "  Index 0: %d\n", index_0);
 
   nproc_pfft = nproc;
 
@@ -154,7 +154,7 @@ void Potential_PFFT_3D::Get_K_for_Green_function( void){
         if ( k_0==0 && k_1==0 && k_2 == 0 ){
           index_0 = m ;
           G = 1;
-          std::cout << " ###########  K=0   index: " << index_0 << std::endl;
+          std::cout << "  K=0   index: " << index_0 << std::endl;
         }
         F.G[m] = G;
         m += 1;

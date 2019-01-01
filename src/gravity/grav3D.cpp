@@ -80,6 +80,10 @@ void Grav3D::Initialize( Real x_min, Real y_min, Real z_min, Real Lx, Real Ly, R
   chprintf("  MAX OMP Threads: %d\n", n_omp_max);
   chprintf("  N OMP Threads per MPI process: %d\n", N_OMP_THREADS);
   #endif
+
+  #ifdef GRAVITY_CPU
+  chprintf(" Gravity-Hydro coupling in CPU\n");
+  #endif
 }
 
 void Grav3D::AllocateMemory_CPU(void)
@@ -96,7 +100,13 @@ void Grav3D::AllocateMemory_CPU(void)
   F.gravity_x_h_prev  = (Real *) malloc(n_cells*sizeof(Real));
   F.gravity_y_h_prev  = (Real *) malloc(n_cells*sizeof(Real));
   F.gravity_z_h_prev  = (Real *) malloc(n_cells*sizeof(Real));
-  #endif
+  #else
+  #ifdef GRAVITY_CPU
+  F.gravity_x_h  = (Real *) malloc(n_cells*sizeof(Real));
+  F.gravity_y_h  = (Real *) malloc(n_cells*sizeof(Real));
+  F.gravity_z_h  = (Real *) malloc(n_cells*sizeof(Real));
+  #endif //GRAVITY_CPU
+  #endif //GRAVITY_CORRECTOR
 
   #ifdef EXTRA_FIELD
   F.extra_field  = (Real *) malloc(n_cells*sizeof(Real));
@@ -115,7 +125,15 @@ void Grav3D::Initialize_values_CPU(void){
     F.gravity_x_h_prev[id] = 0;
     F.gravity_y_h_prev[id] = 0;
     F.gravity_z_h_prev[id] = 0;
-    #endif
+    #else
+    #ifdef GRAVITY_CPU
+    F.gravity_x_h[id] = 0;
+    F.gravity_y_h[id] = 0;
+    F.gravity_z_h[id] = 0;
+    #endif //GRAVITY_CPU
+    #endif //GRAVITY_CORRECTOR
+
+
     #ifdef EXTRA_FIELD
     F.extra_field[id] = 0;
     #endif
@@ -140,7 +158,14 @@ void Grav3D::FreeMemory_CPU(void)
   free(F.gravity_x_h_prev);
   free(F.gravity_y_h_prev);
   free(F.gravity_z_h_prev);
-  #endif
+  #else
+  #ifdef GRAVITY_CPU
+  free(F.gravity_x_h);
+  free(F.gravity_y_h);
+  free(F.gravity_z_h);
+  #endif //GRAVITY_CPU
+  #endif //GRAVITY_CORRECTOR
+
 
   #ifdef EXTRA_FIELD
   free(F.extra_field);
