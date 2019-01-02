@@ -592,6 +592,9 @@ Real Grid3D::Update_Hydro_Grid( void ){
   dti = Update_Grid();
   #ifdef GRAVITY_CPU
   Add_Gavity_To_Hydro( *this );
+  #ifdef DE_EKINETIC_LIMIT
+  Get_Mean_Kinetic_Energy( *this );
+  #endif
   Sync_Energies_3D_Host( *this );
   #endif
 

@@ -214,6 +214,10 @@ struct Header
 
   bool TRANSFER_HYDRO_BOUNDARIES;
 
+  #ifdef DE_EKINETIC_LIMIT
+  Real Ekin_mean;
+  #endif
+
   #ifdef GRAVITY
   /*! \var n_ghost
   *  \brief Number of offset betewen hydro_ghost_cells and potential_ghost_cells */

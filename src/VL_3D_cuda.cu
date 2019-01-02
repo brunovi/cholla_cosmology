@@ -249,7 +249,7 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
     #endif //DE
 
     #ifdef COSMOLOGY
-    #ifdef GRAVITY_CPU
+    #ifndef GRAVITY_CPU
     Apply_Internal_Energy_Floor<<<dim1dGrid,dim1dBlock>>>(dev_conserved, nx_s, ny_s, nz_s, n_ghost, n_fields, dens_0, vel_0, current_a);
     #endif //GRAVITY_CPU
     #endif //DE
