@@ -176,32 +176,19 @@ void Extrapolate_Grav_Potential_function( Grid3D &G, int g_start, int g_end ){
         pot_now = G.C.Grav_potential[id_grid]  ;
         if ( G.Grav.INITIAL ){
           pot_prev = pot_now;
-          #ifdef COSMOLOGY
-          pot_extrp = pot_now *  G.Cosmo.current_a * G.Cosmo.current_a ;
-          #else //COSMOLOGY
           pot_extrp = pot_now;
-          #endif //COSMOLOGY
         } else{
           pot_prev = G.Grav.F.potential_1_h[id_pot] ;
           #ifdef GRAVITY_CORRECTOR
-          #ifdef COSMOLOGY
-          pot_extrp = pot_now * G.Cosmo.current_a * G.Cosmo.current_a;
-          #else //COSMOLOGY
           pot_extrp = pot_now;
-          #endif //COSMOLOGY
           #else //GRAVITY_CORRECTOR
-          // pot_extrp = pot_now * G.Cosmo.current_a * G.Cosmo.current_a + 0.5 * G.Grav.dt_now * ( pot_now * G.Cosmo.current_a * G.Cosmo.current_a - pot_prev * (G.Cosmo.current_a - G.Cosmo.delta_a ) * (G.Cosmo.current_a - G.Cosmo.delta_a ) ) / G.Grav.dt_prev;
-          #ifdef COSMOLOGY
-          pot_extrp = pot_now * G.Cosmo.current_a * G.Cosmo.current_a + 0.5 * G.Grav.dt_now * ( pot_now * G.Cosmo.current_a * G.Cosmo.current_a - pot_prev * (G.Cosmo.current_a ) * (G.Cosmo.current_a ) ) / G.Grav.dt_prev;
-          #else
           pot_extrp = pot_now  + 0.5 * G.Grav.dt_now * ( pot_now - pot_prev  ) / G.Grav.dt_prev;
-          #endif //COSMOLOGY
           #endif //GRAVITY_CORRECTOR
         }
 
         #ifdef COSMOLOGY
         // pot_extrp *= 1 / G.Cosmo.phi_0_gas * G.Cosmo.current_a * G.Cosmo.current_a;
-        pot_extrp *= 1 / G.Cosmo.phi_0_gas ;
+        pot_extrp *= G.Cosmo.current_a * G.Cosmo.current_a / G.Cosmo.phi_0_gas ;
         #endif
 
         G.C.Grav_potential[id_grid] = pot_extrp;
