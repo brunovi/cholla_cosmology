@@ -34,9 +34,11 @@
 #include "cooling_wrapper.h"
 #endif
 
-#ifdef GRAVITY_CPU
+#ifdef GRAVITY
 #include "gravity/gravity_functions.h"
+#ifdef GRAVITY_CPU
 #include "dual_energy_CPU.h"
+#endif
 #endif
 
 #ifdef COSMOLOGY
@@ -294,7 +296,13 @@ void Grid3D::AllocateMemory(void)
   #else
 
   #ifdef GRAVITY_CPU
+  #ifdef CPU_TIME
+  Timer.Start_Timer();
+  #endif
   max_dti = calc_dti_CPU();
+  #ifdef CPU_TIME
+  Timer.End_and_Record_Time(0);
+  #endif
   #else
   if (H.n_step == 0) {
     max_dti = calc_dti_CPU();
@@ -588,6 +596,11 @@ Real Grid3D::Update_Hydro_Grid( void ){
   #ifdef CPU_TIME
   Timer.Start_Timer();
   #endif //CPU_TIME
+
+  #ifdef GRAVITY
+  // Extrapolate gravitational potential for hydro step
+  Extrapolate_Grav_Potential( *this );
+  #endif
 
   dti = Update_Grid();
   #ifdef GRAVITY_CPU

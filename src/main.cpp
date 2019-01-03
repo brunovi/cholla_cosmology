@@ -120,6 +120,9 @@ int main(int argc, char *argv[])
     nfile = P.nfile*P.nfull;
   }
 
+  #ifdef CPU_TIME
+  G.Timer.Initialize();
+  #endif
 
   #ifdef GRAVITY
   G.Grav.Initialize( G.H.xblocal, G.H.yblocal, G.H.zblocal, G.H.xdglobal, G.H.ydglobal, G.H.zdglobal, P.nx, P.ny, P.nz, G.H.nx_real, G.H.ny_real, G.H.nz_real, G.H.dx, G.H.dy, G.H.dz, G.H.n_ghost_pot_offset  );
@@ -147,12 +150,8 @@ int main(int argc, char *argv[])
 
   #ifdef GRAVITY
   Compute_Gravitational_Potential( G, p_solver,  P );
-  Copy_Potential_To_Hydro_Grid( G );
   #endif
 
-  #ifdef CPU_TIME
-  G.Timer.Initialize();
-  #endif
 
   // set boundary conditions (assign appropriate values to ghost cells)
   chprintf("\nSetting boundary conditions...\n");
@@ -235,8 +234,6 @@ int main(int argc, char *argv[])
 
     #ifdef GRAVITY
     Set_dt( G, output_now, G.H.n_step + 1 );
-    // Extrapolate gravitational potential for hydro step
-    Extrapolate_Grav_Potential( G );
     #endif
 
     // Advance the grid by one timestep
@@ -256,7 +253,6 @@ int main(int argc, char *argv[])
     //Compute Gravitational potential for next step
     #ifdef GRAVITY
     Compute_Gravitational_Potential( G, p_solver, P );
-    Copy_Potential_To_Hydro_Grid( G );
     #endif
 
     #ifdef GRAVITY_CORRECTOR
@@ -312,7 +308,11 @@ int main(int argc, char *argv[])
       output_now = false;
     }
 
-    // if (G.H.n_step == 10) break;
+    #ifdef CPU_TIME
+    G.Timer.n_steps += 1;
+    #endif
+
+    if (G.H.n_step == 2) break;
 
     #ifdef COSMOLOGY
     if ( G.Cosmo.current_a >= G.Cosmo.scale_outputs[G.Cosmo.n_outputs-1] ) {
@@ -347,20 +347,6 @@ int main(int argc, char *argv[])
 
   #endif
 
-  //
-  // #ifdef CPU_TIME
-  // time_hydro_total /= ( step_counter -1 );
-  // time_boundaries_total /= ( step_counter -1 );
-  // time_all_total /= ( step_counter -1 );
-  // time_potential_total /= ( step_counter -1 );
-  // time_particles_total /= ( step_counter -1 );
-  // chprintf("\n\nSimulation Finished\n");
-  // chprintf(" N Steps: %d\n", step_counter);
-  // chprintf(" Time Average Hydro: %f\n", time_hydro_total);
-  // chprintf(" Time Average Boundaries: %f\n", time_boundaries_total);
-  // chprintf(" Time Average Potential: %f\n", time_potential_total);
-  // chprintf(" Time Average Particles: %f\n", time_particles_total);
-  // chprintf(" Time Average Total: %f\n", time_all_total);
   //
   //
   // // Output timing values

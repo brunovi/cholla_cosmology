@@ -21,6 +21,13 @@ public:
   Real time_end;
   Real time;
 
+  #ifdef GRAVITY_CPU
+  Real time_dt_min;
+  Real time_dt_max;
+  Real time_dt_mean;
+  Real time_dt_all;
+  #endif
+
   Real time_hydro_min;
   Real time_hydro_max;
   Real time_hydro_mean;

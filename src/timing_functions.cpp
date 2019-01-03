@@ -16,6 +16,10 @@ void Time::Initialize(){
 
   n_steps = 0;
 
+  #ifdef GRAVITY_CPU
+  time_dt_all = 0;
+  #endif
+
   time_hydro_all = 0;
   time_bound_all = 0;
 
@@ -51,6 +55,15 @@ void Time::End_and_Record_Time( int time_var ){
   t_min = ReduceRealMin(time);
   t_max = ReduceRealMax(time);
   t_avg = ReduceRealAvg(time);
+  #endif
+
+  #ifdef GRAVITY_CPU
+  if( time_var == 0 ){
+    time_dt_min = t_min;
+    time_dt_max = t_max;
+    time_dt_mean = t_avg;
+    if (n_steps > 0) time_dt_all += t_max;
+  }
   #endif
 
 
@@ -112,10 +125,15 @@ void Time::End_and_Record_Time( int time_var ){
   #endif
   #endif
 
-  if ( time_var == 1 ) n_steps += 1;
+  // if ( time_var == 1 ) n_steps += 1;
+  // chprintf("n_steps: %d\n", n_steps);
+
 }
 
 void Time::Print_Times(){
+  #ifdef GRAVITY_CPU
+  chprintf(" Time Calc dt           min: %9.4f  max: %9.4f  avg: %9.4f   ms\n", time_dt_min, time_dt_max, time_dt_mean);
+  #endif
   chprintf(" Time Hydro             min: %9.4f  max: %9.4f  avg: %9.4f   ms\n", time_hydro_min, time_hydro_max, time_hydro_mean);
   chprintf(" Time Boundaries        min: %9.4f  max: %9.4f  avg: %9.4f   ms\n", time_bound_min, time_bound_max, time_bound_mean);
   #ifdef GRAVITY
@@ -138,6 +156,10 @@ void Time::Get_Average_Times(){
   time_hydro_all /= n_steps;
   time_bound_all /= n_steps;
 
+  #ifdef GRAVITY_CPU
+  time_dt_all /= n_steps;
+  #endif
+
   #ifdef GRAVITY
   time_potential_all /= n_steps;
   #ifdef PARTICLES
@@ -156,6 +178,10 @@ void Time::Print_Average_Times(){
   Real time_total;
   time_total = time_hydro_all + time_bound_all;
 
+  #ifdef GRAVITY_CPU
+  time_total += time_dt_all;
+  #endif
+
   #ifdef GRAVITY
   time_total += time_potential_all;
   #ifdef PARTICLES
@@ -168,6 +194,9 @@ void Time::Print_Average_Times(){
   #endif
 
   chprintf("\nAverage Times      n_steps:%d\n", n_steps);
+  #ifdef GRAVITY_CPU
+  chprintf(" Time Calc dt           avg: %9.4f   ms\n", time_dt_all);
+  #endif
   chprintf(" Time Hydro             avg: %9.4f   ms\n", time_hydro_all);
   chprintf(" Time Boundaries        avg: %9.4f   ms\n", time_bound_all);
   #ifdef GRAVITY
