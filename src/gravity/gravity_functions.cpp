@@ -142,10 +142,11 @@ void Compute_Gravitational_Potential( Grid3D &G, Potential_PFFT_3D &p_solver, st
 
   #ifdef CPU_TIME
   G.Timer.Start_Timer();
+  #endif
   p_solver.Get_Potential( G.Grav );
+  Copy_Potential_To_Hydro_Grid( G );
+  #ifdef CPU_TIME
   G.Timer.End_and_Record_Time( 3 );
-  #else
-  p_solver.Get_Potential( G.Grav );
   #endif
 
 }
@@ -155,7 +156,7 @@ void Compute_Gravitational_Potential( Grid3D &G, Potential_PFFT_3D &p_solver, st
 
 
 
-void Extrapolate_Grav_Potential( Grid3D &G ){
+void Extrapolate_Grav_Potential_function( Grid3D &G, int g_start, int g_end ){
   int n_ghost_pot = N_GHOST_POTENTIAL;
   int nx_pot = G.Grav.nx_local + 2*n_ghost_pot;
   int ny_pot = G.Grav.ny_local + 2*n_ghost_pot;
@@ -167,7 +168,7 @@ void Extrapolate_Grav_Potential( Grid3D &G ){
   int nGHST = n_ghost_grid - n_ghost_pot;
   Real pot_now, pot_prev, pot_extrp;
   int k, j, i, id_pot, id_grid;
-  for ( k=0; k<nz_pot; k++ ){
+  for ( k=g_start; k<g_end; k++ ){
     for ( j=0; j<ny_pot; j++ ){
       for ( i=0; i<nx_pot; i++ ){
         id_pot = i + j*nx_pot + k*nx_pot*ny_pot;
@@ -208,13 +209,36 @@ void Extrapolate_Grav_Potential( Grid3D &G ){
       }
     }
   }
+}
+
+void Extrapolate_Grav_Potential( Grid3D &G ){
+
+  #ifndef PARALLEL_OMP
+
+  Extrapolate_Grav_Potential_function( G, 0, G.Grav.nz_local + 2*N_GHOST_POTENTIAL );
+
+  #else
+
+  #pragma omp parallel num_threads( N_OMP_THREADS )
+  {
+    int omp_id, n_omp_procs;
+    int g_start, g_end;
+
+    omp_id = omp_get_thread_num();
+    n_omp_procs = omp_get_num_threads();
+    Get_OMP_Grid_Indxs( n_omp_procs, omp_id, G.Grav.nz_local + 2*N_GHOST_POTENTIAL,  &g_start, &g_end  );
+
+    Extrapolate_Grav_Potential_function( G, g_start, g_end );
+  }
+  #endif
+
+
   G.Grav.INITIAL = false;
+
 }
 
 
-
-
-void Copy_Potential_To_Hydro_Grid( Grid3D &G ){
+void Copy_Potential_To_Hydro_Grid_function( Grid3D &G, int g_start, int g_end ){
   int n_ghost_pot = N_GHOST_POTENTIAL;
   int nx_pot = G.Grav.nx_local + 2*n_ghost_pot;
   int ny_pot = G.Grav.ny_local + 2*n_ghost_pot;
@@ -225,7 +249,7 @@ void Copy_Potential_To_Hydro_Grid( Grid3D &G ){
   int nz_grid = G.Grav.nz_local + 2*n_ghost_grid;
   Real pot;
   int k, j, i, id_pot, id_grid;
-  for ( k=0; k<G.Grav.nz_local; k++ ){
+  for ( k=g_start; k<g_end; k++ ){
     for ( j=0; j<G.Grav.ny_local; j++ ){
       for ( i=0; i<G.Grav.nx_local; i++ ){
         id_pot = (i+n_ghost_pot) + (j+n_ghost_pot)*nx_pot + (k+n_ghost_pot)*nx_pot*ny_pot;
@@ -242,6 +266,31 @@ void Copy_Potential_To_Hydro_Grid( Grid3D &G ){
   }
 }
 
+
+void Copy_Potential_To_Hydro_Grid( Grid3D &G ){
+
+
+  #ifndef PARALLEL_OMP
+
+  Copy_Potential_To_Hydro_Grid_function( G, 0, G.Grav.nz_local );
+
+  #else
+
+  #pragma omp parallel num_threads( N_OMP_THREADS )
+  {
+    int omp_id, n_omp_procs;
+    int g_start, g_end;
+
+    omp_id = omp_get_thread_num();
+    n_omp_procs = omp_get_num_threads();
+    Get_OMP_Grid_Indxs( n_omp_procs, omp_id, G.Grav.nz_local,  &g_start, &g_end  );
+
+    Copy_Potential_To_Hydro_Grid_function( G, g_start, g_end );
+  }
+  #endif
+
+
+}
 
 #ifdef GRAVITY_CPU
 void Get_Gavity_Field_Function( Grid3D &G, int g_start, int g_end ){
@@ -580,7 +629,6 @@ void Apply_Gavity_Corrector( Grid3D &G, struct parameters P ){
   #pragma omp parallel num_threads( N_OMP_THREADS )
   {
     int omp_id, n_omp_procs;
-    part_int_t p_start, p_end;
     int g_start, g_end;
 
     omp_id = omp_get_thread_num();
