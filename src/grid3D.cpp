@@ -347,6 +347,68 @@ void Grid3D::AllocateMemory(void)
   #endif
 }
 
+Real Grid3D::calc_dti_3D_CPU_function( int g_start, int g_end ){
+  int i, j, k, id;
+  Real d_inv, vx, vy, vz, P, cs;
+  Real max_vx, max_vy, max_vz;
+  Real max_dti = 0.0;
+  max_vx = max_vy = max_vz = 0.0;
+
+  // Find the maximum wave speed in the grid
+  for (k=g_start; k<g_end; k++) {
+      for (j=0; j<H.ny-H.n_ghost; j++) {
+        for (i=0; i<H.nx-H.n_ghost; i++) {
+        id = i + j*H.nx + k*H.nx*H.ny;
+        d_inv = 1.0 / C.density[id];
+        vx = d_inv * C.momentum_x[id];
+        vy = d_inv * C.momentum_y[id];
+        vz = d_inv * C.momentum_z[id];
+        P = fmax((C.Energy[id] - 0.5*C.density[id]*(vx*vx + vy*vy + vz*vz) )*(gama-1.0), TINY_NUMBER);
+        cs = sqrt(d_inv * gama * P);
+        // compute maximum cfl velocity
+        max_vx = fmax(max_vx, fabs(vx) + cs);
+        max_vy = fmax(max_vy, fabs(vy) + cs);
+        max_vz = fmax(max_vz, fabs(vz) + cs);
+      }
+    }
+  }
+  // compute max inverse of dt
+  max_dti = max_vx / H.dx;
+  max_dti = fmax(max_dti, max_vy / H.dy);
+  max_dti = fmax(max_dti, max_vz / H.dy);
+
+  return max_dti;
+}
+
+Real Grid3D::calc_dti_3D_CPU(){
+
+  Real max_dti;
+
+  #ifndef PARALLEL_OMP
+  max_dti = calc_dti_3D_CPU_function( 0, H.nz-H.n_ghost );
+  return max_dti;
+  #else
+  max_dti = 0;
+  Real max_dti_all[N_OMP_THREADS];
+  #pragma omp parallel num_threads( N_OMP_THREADS )
+  {
+    int omp_id, n_omp_procs;
+    int g_start, g_end;
+
+    omp_id = omp_get_thread_num();
+    n_omp_procs = omp_get_num_threads();
+    Get_OMP_Grid_Indxs( n_omp_procs, omp_id, H.nz-H.n_ghost,  &g_start, &g_end  );
+    max_dti_all[omp_id] = calc_dti_3D_CPU_function( g_start, g_end );
+
+  }
+  for ( int i=0; i<N_OMP_THREADS; i++ ){
+    max_dti = fmax( max_dti, max_dti_all[i]);
+  }
+
+  return max_dti;
+  #endif
+
+}
 /*! \fn Real calc_dti_CPU()
  *  \brief Calculate the maximum inverse timestep, according to the CFL condition (Toro 6.17). */
 Real Grid3D::calc_dti_CPU()
@@ -397,28 +459,7 @@ Real Grid3D::calc_dti_CPU()
   }
   // 3D
   else if (H.nx > 1 && H.ny > 1 && H.nz > 1) {
-    // Find the maximum wave speed in the grid
-    for (i=0; i<H.nx-H.n_ghost; i++) {
-      for (j=0; j<H.ny-H.n_ghost; j++) {
-        for (k=0; k<H.nz-H.n_ghost; k++) {
-          id = i + j*H.nx + k*H.nx*H.ny;
-          d_inv = 1.0 / C.density[id];
-          vx = d_inv * C.momentum_x[id];
-          vy = d_inv * C.momentum_y[id];
-          vz = d_inv * C.momentum_z[id];
-          P = fmax((C.Energy[id] - 0.5*C.density[id]*(vx*vx + vy*vy + vz*vz) )*(gama-1.0), TINY_NUMBER);
-          cs = sqrt(d_inv * gama * P);
-          // compute maximum cfl velocity
-          max_vx = fmax(max_vx, fabs(vx) + cs);
-          max_vy = fmax(max_vy, fabs(vy) + cs);
-          max_vz = fmax(max_vz, fabs(vz) + cs);
-        }
-      }
-    }
-    // compute max inverse of dt
-    max_dti = max_vx / H.dx;
-    max_dti = fmax(max_dti, max_vy / H.dy);
-    max_dti = fmax(max_dti, max_vz / H.dy);
+    max_dti = calc_dti_3D_CPU();
   }
   else {
     chprintf("Invalid grid dimensions. Failed to compute dt.\n");

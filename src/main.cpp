@@ -312,7 +312,7 @@ int main(int argc, char *argv[])
     G.Timer.n_steps += 1;
     #endif
 
-    if (G.H.n_step == 2) break;
+    // if (G.H.n_step == 2) break;
 
     #ifdef COSMOLOGY
     if ( G.Cosmo.current_a >= G.Cosmo.scale_outputs[G.Cosmo.n_outputs-1] ) {
