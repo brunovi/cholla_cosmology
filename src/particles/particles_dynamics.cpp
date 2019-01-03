@@ -316,7 +316,11 @@ void Update_Particles( Grid3D &G, int step ){
       #endif
     }
     else if ( step == 2 ){
-      Get_Particles_Acceleration( G, p_start, p_end, g_start, g_end );
+      // Get_Particles_Acceleration( G, p_start, p_end, g_start, g_end );
+      //Note: omp barrier needed, thats why Get_Particles_Acceleration is not used
+      Get_Gravity_Field( G, g_start, g_end );
+      #pragma omp barrier
+      Get_Gravity_CIC( G.Particles, p_start, p_end );
       #pragma omp barrier
       #ifndef COSMOLOGY
       Advance_Particles_step2( G.Particles, p_start, p_end );
