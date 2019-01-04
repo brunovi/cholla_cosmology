@@ -26,6 +26,11 @@ public:
   Real time_dt_max;
   Real time_dt_mean;
   Real time_dt_all;
+
+  Real time_bound_pot_min;
+  Real time_bound_pot_max;
+  Real time_bound_pot_mean;
+  Real time_bound_pot_all;
   #endif
 
   Real time_hydro_min;

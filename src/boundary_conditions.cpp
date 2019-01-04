@@ -20,22 +20,34 @@ void Grid3D::Set_Boundary_Conditions_All( parameters P){
   H.TRANSFER_HYDRO_BOUNDARIES = true;
   #ifdef CPU_TIME
   Timer.Start_Timer();
+  #endif //CPU_TIME
   Set_Boundary_Conditions(P);
+  #ifdef CPU_TIME
   Timer.End_and_Record_Time( 2 );
-  #else
-  Set_Boundary_Conditions(P);
   #endif //CPU_TIME
   H.TRANSFER_HYDRO_BOUNDARIES = false;
+
+  #ifdef GRAVITY_CPU
+  Grav.TRANSFER_POTENTIAL_BOUNDARIES = true;
+  #ifdef CPU_TIME
+  Timer.Start_Timer();
+  #endif
+  Set_Boundary_Conditions(P);
+  #ifdef CPU_TIME
+  Timer.End_and_Record_Time( 9 );
+  #endif
+  Grav.TRANSFER_POTENTIAL_BOUNDARIES = false;
+  #endif
 
   #ifdef PARTICLES
   //Transfer Particles Boundaries
   Particles.TRANSFER_PARTICLES_BOUNDARIES = true;
   #ifdef CPU_TIME
   Timer.Start_Timer();
+  #endif
   Set_Boundary_Conditions(P);
+  #ifdef CPU_TIME
   Timer.End_and_Record_Time( 8 );
-  #else
-  Set_Boundary_Conditions(P);
   #endif
   Particles.TRANSFER_PARTICLES_BOUNDARIES = false;
   #endif

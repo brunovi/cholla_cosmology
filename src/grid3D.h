@@ -597,6 +597,10 @@ class Grid3D
     #endif
 
     #ifdef GRAVITY
+    int Load_Potential_To_Buffer_Gravity( int direction, int side, Real *buffer, int buffer_start  );
+    void Unload_Potential_from_Buffer_Gravity( int direction, int side, Real *buffer, int buffer_start  );
+    int Load_Potential_To_Buffer_Conserved( int direction, int side, Real *buffer, int buffer_start  );
+    void Unload_Potential_from_Buffer_Conserved( int direction, int side, Real *buffer, int buffer_start  );
     int Load_Potential_To_Buffer( int direction, int side, Real *buffer, int buffer_start  );
     void Unload_Potential_from_Buffer( int direction, int side, Real *buffer, int buffer_start  );
 

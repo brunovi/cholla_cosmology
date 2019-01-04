@@ -494,7 +494,118 @@ void Grid3D::Load_and_Send_MPI_Comm_Buffers_SLAB(int *flags)
 }
 
 #ifdef GRAVITY
-int Grid3D::Load_Potential_To_Buffer( int direction, int side, Real *buffer, int buffer_start  ){
+int Grid3D::Load_Potential_To_Buffer_Gravity( int direction, int side, Real *buffer, int buffer_start  ){
+
+
+  int i, j, k, indx, indx_buff, length;
+  int nGHST,  nx, ny, nz;
+  nGHST = N_GHOST_POTENTIAL;
+  nx = Grav.nx_local;
+  ny = Grav.ny_local;
+  nz = Grav.nz_local;
+  //
+  //Load X boundaries
+  if (direction == 0){
+    for ( k=nGHST; k<nz+nGHST; k++ ){
+      for ( j=nGHST; j<ny+nGHST; j++ ){
+        for ( i=0; i<nGHST; i++ ){
+          if ( side == 0 ) indx = (i+nGHST) + (j)*nx + (k)*nx*ny;
+          if ( side == 1 ) indx = (nx - 2*nGHST + i) + (j)*nx + (k)*nx*ny;
+          indx_buff = (j-nGHST) + (k-nGHST)*ny + i*ny*nz ;
+          buffer[buffer_start+indx_buff] = Grav.F.potential_h[indx];
+          length = nGHST * nz * ny;
+        }
+      }
+    }
+  }
+
+  //Load Y boundaries
+  if (direction == 1){
+    for ( k=nGHST; k<nz+nGHST; k++ ){
+      for ( j=0; j<nGHST; j++ ){
+        for ( i=nGHST; i<nx+nGHST; i++ ){
+          if ( side == 0 ) indx = (i) + (j+nGHST)*nx + (k)*nx*ny;
+          if ( side == 1 ) indx = (i) + (ny - 2*nGHST + j)*nx + (k)*nx*ny;
+          indx_buff = (i-nGHST) + (k-nGHST)*nx + j*nx*nz ;
+          buffer[buffer_start+indx_buff] = Grav.F.potential_h[indx];
+          length = nGHST * nz * nx;
+        }
+      }
+    }
+  }
+
+  //Load Z boundaries
+  if (direction == 2){
+    for ( k=0; k<nGHST; k++ ){
+      for ( j=nGHST; j<ny+nGHST; j++ ){
+        for ( i=nGHST; i<nx+nGHST; i++ ){
+          if ( side == 0 ) indx = (i) + (j)*nx + (k+nGHST)*nx*ny;
+          if ( side == 1 ) indx = (i) + (j)*nx + (nz - 2*nGHST + k)*nx*ny;
+          indx_buff = (i-nGHST) + (j-nGHST)*nx + k*nx*ny ;
+          buffer[buffer_start+indx_buff] = Grav.F.potential_h[indx];
+          length = nGHST * nx * ny;
+        }
+      }
+    }
+  }
+  return length;
+}
+
+
+void Grid3D::Unload_Potential_from_Buffer_Gravity( int direction, int side, Real *buffer, int buffer_start  ){
+
+
+  int i, j, k, indx, indx_buff;
+  int nGHST, nx, ny, nz;
+  nGHST = N_GHOST_POTENTIAL;
+  nx = Grav.nx_local;
+  ny = Grav.ny_local;
+  nz = Grav.nz_local;
+
+  //Load X boundaries
+  if (direction == 0){
+    for ( k=nGHST; k<nz+nGHST; k++ ){
+      for ( j=nGHST; j<ny+nGHST; j++ ){
+        for ( i=0; i<nGHST; i++ ){
+          if ( side == 0 ) indx = (i) + (j)*nx + (k)*nx*ny;
+          if ( side == 1 ) indx = (nx - nGHST + i) + (j)*nx + (k)*nx*ny;
+          indx_buff = (j-nGHST) + (k-nGHST)*ny + i*ny*nz ;
+          Grav.F.potential_h[indx] = buffer[buffer_start+indx_buff];
+        }
+      }
+    }
+  }
+
+  //Load Y boundaries
+  if (direction == 1){
+    for ( k=nGHST; k<nz+nGHST; k++ ){
+      for ( j=0; j<nGHST; j++ ){
+        for ( i=nGHST; i<nx+nGHST; i++ ){
+          if ( side == 0 ) indx = (i) + (j)*nx + (k)*nx*ny;
+          if ( side == 1 ) indx = (i) + (ny - nGHST + j)*nx + (k)*nx*ny;
+          indx_buff = (i-nGHST) + (k-nGHST)*nx + j*nx*nz ;
+          Grav.F.potential_h[indx] = buffer[buffer_start+indx_buff];
+        }
+      }
+    }
+  }
+
+  //Load Z boundaries
+  if (direction == 2){
+    for ( k=0; k<nGHST; k++ ){
+      for ( j=nGHST; j<ny+nGHST; j++ ){
+        for ( i=nGHST; i<nx+nGHST; i++ ){
+          if ( side == 0 ) indx = (i) + (j)*nx + (k)*nx*ny;
+          if ( side == 1 ) indx = (i) + (j)*nx + (nz - nGHST + k)*nx*ny;
+          indx_buff = (i-nGHST) + (j-nGHST)*nx + k*nx*ny ;
+          Grav.F.potential_h[indx] = buffer[buffer_start+indx_buff];
+        }
+      }
+    }
+  }
+}
+
+int Grid3D::Load_Potential_To_Buffer_Conserved( int direction, int side, Real *buffer, int buffer_start  ){
 
 
   int i, j, k, indx, indx_buff, length;
@@ -558,7 +669,7 @@ int Grid3D::Load_Potential_To_Buffer( int direction, int side, Real *buffer, int
 }
 
 
-void Grid3D::Unload_Potential_from_Buffer( int direction, int side, Real *buffer, int buffer_start  ){
+void Grid3D::Unload_Potential_from_Buffer_Conserved( int direction, int side, Real *buffer, int buffer_start  ){
 
 
   int i, j, k, indx, indx_buff;
@@ -614,6 +725,19 @@ void Grid3D::Unload_Potential_from_Buffer( int direction, int side, Real *buffer
   }
 }
 
+int Grid3D::Load_Potential_To_Buffer( int direction, int side, Real *buffer, int buffer_start  ){
+
+  int buffer_length = Load_Potential_To_Buffer_Gravity( direction, side, buffer, buffer_start  );
+  return x_buffer_length;
+
+}
+
+void Grid3D::Unload_Potential_from_Buffer( int direction, int side, Real *buffer, int buffer_start  ){
+
+}
+
+
+
 
 
 
@@ -627,11 +751,8 @@ void Grid3D::Unload_Potential_from_Buffer( int direction, int side, Real *buffer
 int Grid3D::Load_Particles_Density_Boundary_to_Buffer( int direction, int side, Real *buffer  ){
 
   int i, j, k, indx, indx_buff, buffer_length;
-  int nGHST, nx_g, ny_g, nz_g, nx, ny, nz;
+  int nGHST, nx_g, ny_g, nz_g;
   nGHST = Particles.G.n_ghost_particles_grid;
-  nx = Particles.G.nx_local;
-  ny = Particles.G.ny_local;
-  nz = Particles.G.nz_local;
   nx_g = Particles.G.nx_local + 2*nGHST;
   ny_g = Particles.G.ny_local + 2*nGHST;
   nz_g = Particles.G.nz_local + 2*nGHST;
@@ -688,11 +809,8 @@ int Grid3D::Load_Particles_Density_Boundary_to_Buffer( int direction, int side, 
 void Grid3D::Unload_Particles_Density_Boundary_From_Buffer( int direction, int side, Real *buffer  ){
 
   int i, j, k, indx, indx_buff, buffer_length;
-  int nGHST, nx_g, ny_g, nz_g, nx, ny, nz;
+  int nGHST, nx_g, ny_g, nz_g;
   nGHST = Particles.G.n_ghost_particles_grid;
-  nx = Particles.G.nx_local;
-  ny = Particles.G.ny_local;
-  nz = Particles.G.nz_local;
   nx_g = Particles.G.nx_local + 2*nGHST;
   ny_g = Particles.G.ny_local + 2*nGHST;
   nz_g = Particles.G.nz_local + 2*nGHST;

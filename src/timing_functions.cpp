@@ -18,6 +18,7 @@ void Time::Initialize(){
 
   #ifdef GRAVITY_CPU
   time_dt_all = 0;
+  time_bound_pot_all = 0;
   #endif
 
   time_hydro_all = 0;
@@ -123,6 +124,16 @@ void Time::End_and_Record_Time( int time_var ){
     if (n_steps > 0) time_part_tranf_all += t_max;
   }
   #endif
+
+  #ifdef GRAVITY_CPU
+  if( time_var == 9 ){
+    time_bound_pot_min = t_min;
+    time_bound_pot_max = t_max;
+    time_bound_pot_mean = t_avg;
+    if (n_steps > 0) time_bound_pot_all += t_max;
+  }
+  #endif
+
   #endif
 
   // if ( time_var == 1 ) n_steps += 1;
@@ -138,6 +149,9 @@ void Time::Print_Times(){
   chprintf(" Time Boundaries        min: %9.4f  max: %9.4f  avg: %9.4f   ms\n", time_bound_min, time_bound_max, time_bound_mean);
   #ifdef GRAVITY
   chprintf(" Time Grav Potential    min: %9.4f  max: %9.4f  avg: %9.4f   ms\n", time_potential_min, time_potential_max, time_potential_mean);
+  #ifdef GRAVITY_CPU
+  chprintf(" Time Pot Boundaries    min: %9.4f  max: %9.4f  avg: %9.4f   ms\n", time_bound_pot_min, time_bound_pot_max, time_bound_pot_mean);
+  #endif
   #ifdef PARTICLES
   chprintf(" Time Part Density      min: %9.4f  max: %9.4f  avg: %9.4f   ms\n", time_part_dens_min, time_part_dens_max, time_part_dens_mean);
   chprintf(" Time Part Boundaries   min: %9.4f  max: %9.4f  avg: %9.4f   ms\n", time_part_tranf_min, time_part_tranf_max, time_part_tranf_mean);
@@ -158,6 +172,7 @@ void Time::Get_Average_Times(){
 
   #ifdef GRAVITY_CPU
   time_dt_all /= n_steps;
+  time_bound_pot_all /= n_steps;
   #endif
 
   #ifdef GRAVITY
@@ -180,6 +195,7 @@ void Time::Print_Average_Times(){
 
   #ifdef GRAVITY_CPU
   time_total += time_dt_all;
+  time_total += time_bound_pot_all;
   #endif
 
   #ifdef GRAVITY
@@ -201,6 +217,7 @@ void Time::Print_Average_Times(){
   chprintf(" Time Boundaries        avg: %9.4f   ms\n", time_bound_all);
   #ifdef GRAVITY
   chprintf(" Time Grav Potential    avg: %9.4f   ms\n", time_potential_all);
+  chprintf(" Time Pot Boundaries    avg: %9.4f   ms\n", time_bound_pot_all);
   #ifdef PARTICLES
   chprintf(" Time Part Density      avg: %9.4f   ms\n", time_part_dens_all);
   chprintf(" Time Part Boundaries   avg: %9.4f   ms\n", time_part_tranf_all);
