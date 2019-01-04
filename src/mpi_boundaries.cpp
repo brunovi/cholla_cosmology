@@ -726,14 +726,12 @@ void Grid3D::Unload_Potential_from_Buffer_Conserved( int direction, int side, Re
 }
 
 int Grid3D::Load_Potential_To_Buffer( int direction, int side, Real *buffer, int buffer_start  ){
-
   int buffer_length = Load_Potential_To_Buffer_Gravity( direction, side, buffer, buffer_start  );
   return x_buffer_length;
-
 }
 
 void Grid3D::Unload_Potential_from_Buffer( int direction, int side, Real *buffer, int buffer_start  ){
-
+  Unload_Potential_from_Buffer_Gravity(  direction, side, buffer, buffer_start  );
 }
 
 
