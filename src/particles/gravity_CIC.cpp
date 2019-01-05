@@ -13,7 +13,16 @@ void Get_Gravity_Field( Grid3D &G, int g_start, int g_end ){
   nz_grav = G.Particles.G.nz_local + 2*nGHST_grav;
 
   int nx_grid, ny_grid, nz_grid, nGHST_grid;
+  Real *potential;
+
+  #ifdef GRAVITY_CPU
+  potential = G.Grav.F.potential_h;
+  nGHST_grid = N_GHOST_POTENTIAL;
+  #else
+  potential = G.C.Grav_potential;
   nGHST_grid = G.H.n_ghost;
+  #endif
+
   nx_grid = G.Grav.nx_local + 2*nGHST_grid;
   ny_grid = G.Grav.ny_local + 2*nGHST_grid;
   nz_grid = G.Grav.nz_local + 2*nGHST_grid;
@@ -32,10 +41,10 @@ void Get_Gravity_Field( Grid3D &G, int g_start, int g_end ){
     for ( j=0; j<ny_grav; j++ ){
       for ( i=0; i<nx_grav; i++ ){
         id   = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
-        id_l = (i-1 + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
-        id_r = (i+1 + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
-        phi_l = G.C.Grav_potential[id_l];
-        phi_r = G.C.Grav_potential[id_r];
+        id_l = (i-1 + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nx_grid;
+        id_r = (i+1 + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nx_grid;
+        phi_l = potential[id_l];
+        phi_r = potential[id_r];
         G.Particles.G.gravity_x[id] = -0.5 * ( phi_r - phi_l ) / dx;
       }
     }
@@ -45,10 +54,10 @@ void Get_Gravity_Field( Grid3D &G, int g_start, int g_end ){
     for ( j=0; j<ny_grav; j++ ){
       for ( i=0; i<nx_grav; i++ ){
         id   = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
-        id_l = (i + nGHST) + (j-1 + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
-        id_r = (i + nGHST) + (j+1 + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
-        phi_l = G.C.Grav_potential[id_l];
-        phi_r = G.C.Grav_potential[id_r];
+        id_l = (i + nGHST) + (j-1 + nGHST)*nx_grid + (k + nGHST)*ny_grid*nx_grid;
+        id_r = (i + nGHST) + (j+1 + nGHST)*nx_grid + (k + nGHST)*ny_grid*nx_grid;
+        phi_l = potential[id_l];
+        phi_r = potential[id_r];
         G.Particles.G.gravity_y[id] = -0.5 * ( phi_r - phi_l ) / dy;
       }
     }
@@ -58,10 +67,10 @@ void Get_Gravity_Field( Grid3D &G, int g_start, int g_end ){
     for ( j=0; j<ny_grav; j++ ){
       for ( i=0; i<nx_grav; i++ ){
         id   = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
-        id_l = (i + nGHST) + (j + nGHST)*nx_grid + (k-1 + nGHST)*ny_grid*nz_grid;
-        id_r = (i + nGHST) + (j + nGHST)*nx_grid + (k+1 + nGHST)*ny_grid*nz_grid;
-        phi_l = G.C.Grav_potential[id_l];
-        phi_r = G.C.Grav_potential[id_r];
+        id_l = (i + nGHST) + (j + nGHST)*nx_grid + (k-1 + nGHST)*ny_grid*nx_grid;
+        id_r = (i + nGHST) + (j + nGHST)*nx_grid + (k+1 + nGHST)*ny_grid*nx_grid;
+        phi_l = potential[id_l];
+        phi_r = potential[id_r];
         G.Particles.G.gravity_z[id] = -0.5 * ( phi_r - phi_l ) / dz;
       }
     }
@@ -99,10 +108,10 @@ void Get_Gravity_Field_order4( Grid3D &G, int g_start, int g_end ){
     for ( j=0; j<ny_grav; j++ ){
       for ( i=0; i<nx_grav; i++ ){
         id   = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
-        id_l_1 = (i-1 + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
-        id_l_2 = (i-2 + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
-        id_r_1 = (i+1 + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
-        id_r_2 = (i+2 + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
+        id_l_1 = (i-1 + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nx_grid;
+        id_l_2 = (i-2 + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nx_grid;
+        id_r_1 = (i+1 + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nx_grid;
+        id_r_2 = (i+2 + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nx_grid;
         phi_l_1 = G.C.Grav_potential[id_l_1];
         phi_r_1 = G.C.Grav_potential[id_r_1];
         phi_l_2 = G.C.Grav_potential[id_l_2];
@@ -117,10 +126,10 @@ void Get_Gravity_Field_order4( Grid3D &G, int g_start, int g_end ){
     for ( j=0; j<ny_grav; j++ ){
       for ( i=0; i<nx_grav; i++ ){
         id   = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
-        id_l_1 = (i + nGHST) + (j-1 + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
-        id_l_2 = (i + nGHST) + (j-2 + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
-        id_r_1 = (i + nGHST) + (j+1 + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
-        id_r_2 = (i + nGHST) + (j+2 + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
+        id_l_1 = (i + nGHST) + (j-1 + nGHST)*nx_grid + (k + nGHST)*ny_grid*nx_grid;
+        id_l_2 = (i + nGHST) + (j-2 + nGHST)*nx_grid + (k + nGHST)*ny_grid*nx_grid;
+        id_r_1 = (i + nGHST) + (j+1 + nGHST)*nx_grid + (k + nGHST)*ny_grid*nx_grid;
+        id_r_2 = (i + nGHST) + (j+2 + nGHST)*nx_grid + (k + nGHST)*ny_grid*nx_grid;
         phi_l_1 = G.C.Grav_potential[id_l_1];
         phi_r_1 = G.C.Grav_potential[id_r_1];
         phi_l_2 = G.C.Grav_potential[id_l_2];
@@ -135,10 +144,10 @@ void Get_Gravity_Field_order4( Grid3D &G, int g_start, int g_end ){
     for ( j=0; j<ny_grav; j++ ){
       for ( i=0; i<nx_grav; i++ ){
         id   = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
-        id_l_1 = (i + nGHST) + (j + nGHST)*nx_grid + (k-1 + nGHST)*ny_grid*nz_grid;
-        id_l_2 = (i + nGHST) + (j + nGHST)*nx_grid + (k-2 + nGHST)*ny_grid*nz_grid;
-        id_r_1 = (i + nGHST) + (j + nGHST)*nx_grid + (k+1 + nGHST)*ny_grid*nz_grid;
-        id_r_2 = (i + nGHST) + (j + nGHST)*nx_grid + (k+2 + nGHST)*ny_grid*nz_grid;
+        id_l_1 = (i + nGHST) + (j + nGHST)*nx_grid + (k-1 + nGHST)*ny_grid*nx_grid;
+        id_l_2 = (i + nGHST) + (j + nGHST)*nx_grid + (k-2 + nGHST)*ny_grid*nx_grid;
+        id_r_1 = (i + nGHST) + (j + nGHST)*nx_grid + (k+1 + nGHST)*ny_grid*nx_grid;
+        id_r_2 = (i + nGHST) + (j + nGHST)*nx_grid + (k+2 + nGHST)*ny_grid*nx_grid;
         phi_l_1 = G.C.Grav_potential[id_l_1];
         phi_r_1 = G.C.Grav_potential[id_r_1];
         phi_l_2 = G.C.Grav_potential[id_l_2];

@@ -476,9 +476,6 @@ Real Grid3D::calc_dti_CPU()
  *  \brief Update the conserved quantities in each cell. */
 Real Grid3D::Update_Grid(void)
 {
-  #ifdef ONLY_PM
-  return 1e-10;
-  #endif
 
   Real *g0, *g1;
   if (gflag == 0) {
@@ -631,6 +628,10 @@ Real Grid3D::Update_Grid(void)
 }
 
 Real Grid3D::Update_Hydro_Grid( void ){
+
+  #ifdef ONLY_PM
+  return 1e-10;
+  #endif
 
   Real dti;
 
