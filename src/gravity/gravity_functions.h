@@ -62,5 +62,7 @@ void Extrapolate_Grav_Potential( Grid3D &G  );
 
 void Set_dt( Grid3D &G, bool &output_now, int n_step );
 
+void Get_Potential_Difference( Grid3D &G );
+
 #endif //SELF_GRAV_FUNC_H
 #endif //SELF_GRAVITY

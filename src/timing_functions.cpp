@@ -217,7 +217,9 @@ void Time::Print_Average_Times(){
   chprintf(" Time Boundaries        avg: %9.4f   ms\n", time_bound_all);
   #ifdef GRAVITY
   chprintf(" Time Grav Potential    avg: %9.4f   ms\n", time_potential_all);
+  #ifdef GRAVITY_CPU
   chprintf(" Time Pot Boundaries    avg: %9.4f   ms\n", time_bound_pot_all);
+  #endif
   #ifdef PARTICLES
   chprintf(" Time Part Density      avg: %9.4f   ms\n", time_part_dens_all);
   chprintf(" Time Part Boundaries   avg: %9.4f   ms\n", time_part_tranf_all);
