@@ -146,7 +146,7 @@ void Compute_Gravitational_Potential( Grid3D &G, Potential_PFFT_3D &p_solver, st
   G.Timer.Start_Timer();
   #endif
   p_solver.Get_Potential( G.Grav );
-  #ifndef ONLY_PM
+  #ifndef GRAVITY_CPU
   Copy_Potential_To_Hydro_Grid( G );
   #endif
   #ifdef CPU_TIME
@@ -165,10 +165,21 @@ void Extrapolate_Grav_Potential_function( Grid3D &G, int g_start, int g_end ){
   int nx_pot = G.Grav.nx_local + 2*n_ghost_pot;
   int ny_pot = G.Grav.ny_local + 2*n_ghost_pot;
   int nz_pot = G.Grav.nz_local + 2*n_ghost_pot;
-  int n_ghost_grid = G.H.n_ghost;
-  int nx_grid = G.Grav.nx_local + 2*n_ghost_grid;
-  int ny_grid = G.Grav.ny_local + 2*n_ghost_grid;
-  int nz_grid = G.Grav.nz_local + 2*n_ghost_grid;
+
+  Real *potential;
+  int n_ghost_grid, nx_grid, ny_grid, nz_grid;
+  #ifdef GRAVITY_CPU
+  potential = G.Grav.F.potential_h;
+  n_ghost_grid = N_GHOST_POTENTIAL;
+  #else
+  potential = G.C.Grav_potential;
+  n_ghost_grid = G.H.n_ghost;
+  #endif
+
+  nx_grid = G.Grav.nx_local + 2*n_ghost_grid;
+  ny_grid = G.Grav.ny_local + 2*n_ghost_grid;
+  nz_grid = G.Grav.nz_local + 2*n_ghost_grid;
+
   int nGHST = n_ghost_grid - n_ghost_pot;
   Real pot_now, pot_prev, pot_extrp;
   int k, j, i, id_pot, id_grid;
@@ -177,7 +188,7 @@ void Extrapolate_Grav_Potential_function( Grid3D &G, int g_start, int g_end ){
       for ( i=0; i<nx_pot; i++ ){
         id_pot = i + j*nx_pot + k*nx_pot*ny_pot;
         id_grid = (i+nGHST) + (j+nGHST)*nx_grid + (k+nGHST)*nx_grid*ny_grid;
-        pot_now = G.C.Grav_potential[id_grid]  ;
+        pot_now = potential[id_grid]  ;
         if ( G.Grav.INITIAL ){
           pot_prev = pot_now;
           pot_extrp = pot_now;
@@ -194,7 +205,7 @@ void Extrapolate_Grav_Potential_function( Grid3D &G, int g_start, int g_end ){
         pot_extrp *= G.Cosmo.current_a * G.Cosmo.current_a / G.Cosmo.phi_0_gas ;
         #endif
 
-        G.C.Grav_potential[id_grid] = pot_extrp;
+        potential[id_grid] = pot_extrp;
         G.Grav.F.potential_1_h[id_pot] = pot_now;
       }
     }
@@ -227,7 +238,7 @@ void Extrapolate_Grav_Potential( Grid3D &G ){
 
 }
 
-
+#ifndef GRAVITY_CPU
 void Copy_Potential_To_Hydro_Grid_function( Grid3D &G, int g_start, int g_end ){
   int n_ghost_pot = N_GHOST_POTENTIAL;
   int nx_pot = G.Grav.nx_local + 2*n_ghost_pot;
@@ -278,45 +289,46 @@ void Copy_Potential_To_Hydro_Grid( Grid3D &G ){
   }
   #endif
 }
+#endif
 
 
-void Get_Potential_Difference( Grid3D &G ){
-
-  int nx_grav, ny_grav, nz_grav, nGHST_grav;
-  nGHST_grav = N_GHOST_POTENTIAL;
-  nx_grav = G.Grav.nx_local + 2*nGHST_grav;
-  ny_grav = G.Grav.ny_local + 2*nGHST_grav;
-  nz_grav = G.Grav.nz_local + 2*nGHST_grav;
-
-  int nx_grid, ny_grid, nz_grid, nGHST_grid;
-  nGHST_grid = G.H.n_ghost;
-  nx_grid = G.Grav.nx_local + 2*nGHST_grid;
-  ny_grid = G.Grav.ny_local + 2*nGHST_grid;
-  nz_grid = G.Grav.nz_local + 2*nGHST_grid;
-
-  Real pot_grid, pot_grav, error;
-
-  int nGHST = nGHST_grid - nGHST_grav;
-
-  int i, j, k, id_grid, id_grav;
-  for( k=0; k<nz_grav; k++){
-    for( j=0; j<ny_grav; j++){
-      for( i=0; i<nx_grav; i++){
-        // if ( i < nGHST_grav || i >= nx_grav - 2*nGHST_grav - 1) continue;
-        // if ( j < nGHST_grav || j >= ny_grav - 2*nGHST_grav - 1) continue;
-        // if ( k < nGHST_grav || k >= nz_grav - 2*nGHST_grav - 1) continue;
-
-        id_grav = (i) + (j)*nx_grav + (k)*nx_grav*ny_grav;
-        id_grid = (i+nGHST) + (j+nGHST)*nx_grid + (k+nGHST)*nx_grid*ny_grid;
-        pot_grid = G.C.Grav_potential[id_grid];
-        pot_grav = G.Grav.F.potential_h[id_grav];
-        // if( pot_grid == 0 ) std::cout << i << " "<< j << " "<< k << " "<< std::endl;
-        error = fabs( ( pot_grid - pot_grav ) / pot_grid );
-        if ( error>0.01) chprintf( " %f %f %f %d %d %d \n", pot_grav, pot_grid, error, i,j,k);
-      }
-    }
-  }
-}
+// void Get_Potential_Difference( Grid3D &G ){
+//
+//   int nx_grav, ny_grav, nz_grav, nGHST_grav;
+//   nGHST_grav = N_GHOST_POTENTIAL;
+//   nx_grav = G.Grav.nx_local + 2*nGHST_grav;
+//   ny_grav = G.Grav.ny_local + 2*nGHST_grav;
+//   nz_grav = G.Grav.nz_local + 2*nGHST_grav;
+//
+//   int nx_grid, ny_grid, nz_grid, nGHST_grid;
+//   nGHST_grid = G.H.n_ghost;
+//   nx_grid = G.Grav.nx_local + 2*nGHST_grid;
+//   ny_grid = G.Grav.ny_local + 2*nGHST_grid;
+//   nz_grid = G.Grav.nz_local + 2*nGHST_grid;
+//
+//   Real pot_grid, pot_grav, error;
+//
+//   int nGHST = nGHST_grid - nGHST_grav;
+//
+//   int i, j, k, id_grid, id_grav;
+//   for( k=0; k<nz_grav; k++){
+//     for( j=0; j<ny_grav; j++){
+//       for( i=0; i<nx_grav; i++){
+//         // if ( i < nGHST_grav || i >= nx_grav - 2*nGHST_grav - 1) continue;
+//         // if ( j < nGHST_grav || j >= ny_grav - 2*nGHST_grav - 1) continue;
+//         // if ( k < nGHST_grav || k >= nz_grav - 2*nGHST_grav - 1) continue;
+//
+//         id_grav = (i) + (j)*nx_grav + (k)*nx_grav*ny_grav;
+//         id_grid = (i+nGHST) + (j+nGHST)*nx_grid + (k+nGHST)*nx_grid*ny_grid;
+//         pot_grid = G.C.Grav_potential[id_grid];
+//         pot_grav = G.Grav.F.potential_h[id_grav];
+//         // if( pot_grid == 0 ) std::cout << i << " "<< j << " "<< k << " "<< std::endl;
+//         error = fabs( ( pot_grid - pot_grav ) / pot_grid );
+//         if ( error>0.01) chprintf( " %f %f %f %d %d %d \n", pot_grav, pot_grid, error, i,j,k);
+//       }
+//     }
+//   }
+// }
 
 #ifdef GRAVITY_CPU
 void Get_Gavity_Field_Function( Grid3D &G, int g_start, int g_end ){
@@ -328,7 +340,16 @@ void Get_Gavity_Field_Function( Grid3D &G, int g_start, int g_end ){
   nz_grav = G.Grav.nz_local;
 
   int nx_grid, ny_grid, nz_grid, nGHST_grid;
+  Real *potential;
+
+  #ifdef GRAVITY_CPU
+  potential = G.Grav.F.potential_h;
+  nGHST_grid = N_GHOST_POTENTIAL;
+  #else
+  potential = G.C.Grav_potential;
   nGHST_grid = G.H.n_ghost;
+  #endif
+
   nx_grid = G.Grav.nx_local + 2*nGHST_grid;
   ny_grid = G.Grav.ny_local + 2*nGHST_grid;
   nz_grid = G.Grav.nz_local + 2*nGHST_grid;
@@ -341,7 +362,6 @@ void Get_Gavity_Field_Function( Grid3D &G, int g_start, int g_end ){
   dz = G.Grav.dz;
 
   Real pot_factor;
-  // Real pot_factor = 1. / G.Cosmo.phi_0_gas * (G.Cosmo.current_a - G.Cosmo.delta_a) * (G.Cosmo.current_a - G.Cosmo.delta_a) ;
   pot_factor = 1;
 
   Real phi_l, phi_r;
@@ -352,8 +372,8 @@ void Get_Gavity_Field_Function( Grid3D &G, int g_start, int g_end ){
         id   = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
         id_l = (i-1 + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
         id_r = (i+1 + nGHST) + (j + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
-        phi_l = G.C.Grav_potential[id_l] * pot_factor;
-        phi_r = G.C.Grav_potential[id_r] * pot_factor;
+        phi_l = potential[id_l] * pot_factor;
+        phi_r = potential[id_r] * pot_factor;
         G.Grav.F.gravity_x_h[id] = -0.5 * ( phi_r - phi_l ) / dx;
       }
     }
@@ -365,8 +385,8 @@ void Get_Gavity_Field_Function( Grid3D &G, int g_start, int g_end ){
         id   = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
         id_l = (i + nGHST) + (j-1 + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
         id_r = (i + nGHST) + (j+1 + nGHST)*nx_grid + (k + nGHST)*ny_grid*nz_grid;
-        phi_l = G.C.Grav_potential[id_l] * pot_factor;
-        phi_r = G.C.Grav_potential[id_r] * pot_factor;
+        phi_l = potential[id_l] * pot_factor;
+        phi_r = potential[id_r] * pot_factor;
         G.Grav.F.gravity_y_h[id] = -0.5 * ( phi_r - phi_l ) / dy;
       }
     }
@@ -378,8 +398,8 @@ void Get_Gavity_Field_Function( Grid3D &G, int g_start, int g_end ){
         id   = (i) + (j)*nx_grav + (k)*ny_grav*nz_grav;
         id_l = (i + nGHST) + (j + nGHST)*nx_grid + (k-1 + nGHST)*ny_grid*nz_grid;
         id_r = (i + nGHST) + (j + nGHST)*nx_grid + (k+1 + nGHST)*ny_grid*nz_grid;
-        phi_l = G.C.Grav_potential[id_l] * pot_factor;
-        phi_r = G.C.Grav_potential[id_r] * pot_factor;
+        phi_l = potential[id_l] * pot_factor;
+        phi_r = potential[id_r] * pot_factor;
         G.Grav.F.gravity_z_h[id] = -0.5 * ( phi_r - phi_l ) / dz;
       }
     }

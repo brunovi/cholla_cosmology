@@ -113,7 +113,9 @@ void Grid3D::Initialize(struct parameters *P)
 
   // if using Gravity must track potential
   #ifdef GRAVITY
+  #ifndef GRAVITY_CPU
   H.n_fields++;
+  #endif
   #endif
 
   // if using dual energy formalism must track internal energy - always the last field!
@@ -257,11 +259,13 @@ void Grid3D::AllocateMemory(void)
   #endif
 
   #ifdef GRAVITY
+  #ifndef GRAVITY_CPU
   #ifndef DE
   C.Grav_potential = &(buffer0[(H.n_fields-1)*H.n_cells]);
   #endif
   #ifdef DE
   C.Grav_potential = &(buffer0[(H.n_fields-2)*H.n_cells]);
+  #endif
   #endif
   #endif
 
@@ -591,11 +595,13 @@ Real Grid3D::Update_Grid(void)
   #endif
 
   #ifdef GRAVITY
+  #ifndef GRAVITY_CPU
   #ifndef DE
   C.Grav_potential = &g1[(H.n_fields-1)*H.n_cells];
   #endif
   #ifdef DE
   C.Grav_potential = &g1[(H.n_fields-2)*H.n_cells];
+  #endif
   #endif
   #endif
 
@@ -611,11 +617,7 @@ Real Grid3D::Update_Grid(void)
   C.momentum_z_0 = &g0[3*H.n_cells];
   C.Energy_0   = &g0[4*H.n_cells];
 
-  #ifndef DE
-  C.Grav_potential_0 = &g0[(H.n_fields-1)*H.n_cells];
-  #endif
   #ifdef DE
-  C.Grav_potential_0 = &g0[(H.n_fields-2)*H.n_cells];
   C.GasEnergy_0 = &g0[(H.n_fields-1)*H.n_cells];
   #endif
   #endif

@@ -202,7 +202,9 @@ void Grid3D::Set_Boundaries(int dir, int flags[])
           #endif
 
           #ifdef GRAVITY
+          #ifndef GRAVITY_CPU
           C.Grav_potential[gidx]  = C.Grav_potential[idx];
+          #endif
           #endif
 
           //for outflow boundaries, set momentum to restrict inflow

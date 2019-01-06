@@ -317,10 +317,12 @@ class Grid3D
       #endif
 
       #ifdef GRAVITY
-      /*! \var GasEnergy
+      #ifndef GRAVITY_CPU
+      /*! \var Grav_potential
        *  \brief Array containing the gravitational potential of each cell, only tracked separately when using
-           the GRAVITY. */
+            GRAVITY. */
       Real *Grav_potential;
+      #endif
       #endif
 
       #ifdef GRAVITY_CPU
@@ -335,8 +337,7 @@ class Grid3D
       Real *GasEnergy_0;
       #endif
 
-      Real *Grav_potential_0;
-      #endif
+      #endif //GRAVITY_CPU
 
     } C;
 
