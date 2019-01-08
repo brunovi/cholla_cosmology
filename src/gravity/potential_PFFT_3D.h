@@ -5,7 +5,6 @@
 #define POTENTIAL_PFFT_3D_H
 
 #include "../global.h"
-#include "../io.h"
 #include "grav3D.h"
 #include "poisson_solver_3D.h"
 #include <stdlib.h>

@@ -137,6 +137,7 @@ void Sync_Energies_3D_Host_Function(Grid3D &G, int g_start, int g_end ){
 
         // if ( ge2 < 0 ) G.C.Energy[id] = 0.5*d*(vx*vx + vy*vy + vz*vz) + ge1;
 
+        #ifdef COSMOLOGY
         //InternalEnergy Floor at u=0.2
         Real dens, u, u_physical;
         // Real phi_0_gas = 0.01;                           //Unit Conversion
@@ -164,6 +165,8 @@ void Sync_Energies_3D_Host_Function(Grid3D &G, int g_start, int g_end ){
           G.C.GasEnergy[id] += delta_u;
           G.C.Energy[id] += delta_u;
         }
+
+        #endif
       }
     }
   }
@@ -177,7 +180,6 @@ void Sync_Energies_3D_Host(Grid3D &G ){
   #pragma omp parallel num_threads( N_OMP_THREADS )
   {
     int omp_id, n_omp_procs;
-    part_int_t p_start, p_end;
     int g_start, g_end;
 
     omp_id = omp_get_thread_num();

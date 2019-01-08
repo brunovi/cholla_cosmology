@@ -4,6 +4,10 @@
 #include"grid3D.h"
 #include"global.h"
 
+#ifdef PARALLEL_OMP
+#include"parallel_omp.h"
+#endif
+
 #ifdef DE_EKINETIC_LIMIT
 void Get_Mean_Kinetic_Energy( Grid3D &G );
 #endif

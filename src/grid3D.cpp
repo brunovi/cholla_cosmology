@@ -41,6 +41,10 @@
 #endif
 #endif
 
+#ifdef PARALLEL_OMP
+#include"parallel_omp.h"
+#endif
+
 #ifdef COSMOLOGY
 #include "particles/particles_dynamics.h"
 #endif
@@ -683,6 +687,10 @@ void Grid3D::Update_Time(void){
  *  \brief Reset the Grid3D class. */
 void Grid3D::Reset(void)
 {
+  #ifdef GRAVITY
+  p_solver.Reset();
+  #endif
+
   // free the memory
   FreeMemory();
 

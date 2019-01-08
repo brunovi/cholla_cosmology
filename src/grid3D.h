@@ -17,6 +17,15 @@
 
 #ifdef GRAVITY
 #include"gravity/grav3D.h"
+#ifdef POTENTIAL_CUFFT
+#include "gravity/potential_CUFFT_3D.h"
+#endif
+#ifdef POTENTIAL_FFTW
+#include "gravity/potential_FFTW_3D.h"
+#endif
+#ifdef POTENTIAL_PFFT
+#include "gravity/potential_PFFT_3D.h"
+#endif
 #endif
 
 #ifdef PARTICLES
@@ -263,6 +272,16 @@ class Grid3D
 
     #ifdef GRAVITY
     Grav3D Grav;
+
+    #ifdef POTENTIAL_CUFFT
+    Potential_CUFFT_3D p_solver;
+    #endif
+    #ifdef POTENTIAL_FFTW
+    Potential_FFTW_3D p_solver;
+    #endif
+    #ifdef POTENTIAL_PFFT
+    Potential_PFFT_3D p_solver;
+    #endif
     #endif
 
     #ifdef PARTICLES

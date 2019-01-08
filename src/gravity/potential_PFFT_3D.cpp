@@ -3,6 +3,7 @@
 
 #include "potential_PFFT_3D.h"
 #include<iostream>
+#include "../io.h"
 
 Potential_PFFT_3D::Potential_PFFT_3D( void ){}
 

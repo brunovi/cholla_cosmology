@@ -20,15 +20,6 @@ using namespace std;
 
 #ifdef GRAVITY
 #include "gravity/gravity_functions.h"
-#ifdef POTENTIAL_CUFFT
-#include "gravity/potential_CUFFT_3D.h"
-#endif
-#ifdef POTENTIAL_FFTW
-#include "gravity/potential_FFTW_3D.h"
-#endif
-#ifdef POTENTIAL_PFFT
-#include "gravity/potential_PFFT_3D.h"
-#endif
 
 #ifdef PARTICLES
 #include "particles/particles_dynamics.h"
@@ -40,6 +31,14 @@ using namespace std;
 #include "cosmology/io_cosmology.h"
 #endif
 
+#ifdef OVERLAP_HYDRO_GRAV
+#include "dual_energy_CPU.h"
+#endif
+
+#endif
+
+#ifdef PARALLEL_OMP
+#include"parallel_omp.h"
 #endif
 
 #ifdef COOLING_GRACKLE
@@ -126,17 +125,7 @@ int main(int argc, char *argv[])
 
   #ifdef GRAVITY
   G.Grav.Initialize( G.H.xblocal, G.H.yblocal, G.H.zblocal, G.H.xdglobal, G.H.ydglobal, G.H.zdglobal, P.nx, P.ny, P.nz, G.H.nx_real, G.H.ny_real, G.H.nz_real, G.H.dx, G.H.dy, G.H.dz, G.H.n_ghost_pot_offset  );
-
-  #ifdef POTENTIAL_CUFFT
-  Potential_CUFFT_3D p_solver;
-  #endif
-  #ifdef POTENTIAL_FFTW
-  Potential_FFTW_3D p_solver;
-  #endif
-  #ifdef POTENTIAL_PFFT
-  Potential_PFFT_3D p_solver;
-  #endif
-  p_solver.Initialize( G.Grav );
+  G.p_solver.Initialize( G.Grav );
   #endif
 
   #ifdef PARTICLES
@@ -149,7 +138,7 @@ int main(int argc, char *argv[])
   #endif
 
   #ifdef GRAVITY
-  Compute_Gravitational_Potential( G, p_solver,  P );
+  Compute_Gravitational_Potential( G, G.p_solver,  P );
   #endif
 
 
@@ -238,41 +227,94 @@ int main(int argc, char *argv[])
     Set_dt( G, output_now, G.H.n_step + 1 );
     #endif
 
-    // Advance the grid by one timestep
-    dti = G.Update_Hydro_Grid();
+    #ifndef OVERLAP_HYDRO_GRAV
 
     #ifdef PARTICLES
-    //Advance the particles ( first step )
+    //Advance the particles KDK( first step )
     Update_Particles( G, 1 );
     #endif
+
+    // Advance the grid by one timestep
+    dti = G.Update_Hydro_Grid();
 
     // update the simulation time ( t += dt )
     G.Update_Time();
 
-    // add one to the timestep count
-    G.H.n_step++;
-
     //Compute Gravitational potential for next step
     #ifdef GRAVITY
-    Compute_Gravitational_Potential( G, p_solver, P );
-    #endif
-
-    #ifdef GRAVITY_CORRECTOR
-    Apply_Gavity_Corrector( G, P);
-    #endif
-
-    #ifdef REVERT_STEP
-    Get_Delta_Conserved( G );
+    Compute_Gravitational_Potential( G, G.p_solver, P );
     #endif
 
     // set boundary conditions for next time step
     G.Set_Boundary_Conditions_All( P );
 
-
     #ifdef PARTICLES
-    //Advance the particles ( second step )
+    //Advance the particles KDK( second step )
     Update_Particles( G, 2 );
     #endif
+
+    #else
+
+
+    #ifdef CPU_TIME
+    G.Timer.Start_Timer();
+    #endif
+    #pragma omp parallel num_threads( 2 )
+    {
+        int omp_id;
+        omp_id = omp_get_thread_num();
+
+        if ( omp_id == 0 ) dti = G.Update_Grid();
+        if ( omp_id == 1 ) Compute_Gravitational_Potential( G, G.p_solver, P );
+
+    }
+    #ifdef CPU_TIME
+    G.Timer.End_and_Record_Time(10);
+    #endif
+
+    #ifdef PARTICLES
+    //Advance the particles KDK( first step )
+    Update_Particles( G, 1 );
+    #endif
+
+    // set boundary conditions for next time step
+    G.Set_Boundary_Conditions_All( P );
+
+    // Extrapolate gravitational potential for hydro step
+    Extrapolate_Grav_Potential( G );
+    Add_Gavity_To_Hydro( G );
+    #ifdef DE_EKINETIC_LIMIT
+    Get_Mean_Kinetic_Energy( G );
+    #endif
+    Sync_Energies_3D_Host( G );
+
+    // update the simulation time ( t += dt )
+    G.Update_Time();
+
+
+    #ifdef PARTICLES
+    // Compute_Gravitational_Potential( G, G.p_solver, P );
+    // G.Grav.TRANSFER_POTENTIAL_BOUNDARIES = true;
+    // G.Set_Boundary_Conditions(P);
+    // G.Grav.TRANSFER_POTENTIAL_BOUNDARIES = false;
+    // Extrapolate_Grav_Potential( G, 1 );
+    //Advance the particles KDK( second step )
+    Update_Particles( G, 2 );
+    #endif
+
+
+    #endif
+
+    // #ifdef GRAVITY_CORRECTOR
+    // Apply_Gavity_Corrector( G, P);
+    // #endif
+
+    // #ifdef REVERT_STEP
+    // Get_Delta_Conserved( G );
+    // #endif
+
+    // add one to the timestep count
+    G.H.n_step++;
 
     // #ifdef CPU_TIME
     // #ifdef MPI_CHOLLA
@@ -371,10 +413,6 @@ int main(int argc, char *argv[])
 
   // free the grid
   G.Reset();
-
-  #ifdef GRAVITY
-  p_solver.Reset();
-  #endif
 
   #ifdef Particles_3D
   G.Particles.Reset();

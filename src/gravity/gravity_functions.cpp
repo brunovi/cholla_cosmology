@@ -1,5 +1,6 @@
 #ifdef GRAVITY
 
+#include "../io.h"
 #include "gravity_functions.h"
 #include "../universal_constants.h"
 
@@ -465,7 +466,6 @@ void Add_Gavity_To_Hydro( Grid3D &G ){
   #pragma omp parallel num_threads( N_OMP_THREADS )
   {
     int omp_id, n_omp_procs;
-    part_int_t p_start, p_end;
     int g_start, g_end;
 
     omp_id = omp_get_thread_num();
