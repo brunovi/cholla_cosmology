@@ -623,7 +623,7 @@ __global__ void Sync_Energies_3D(Real *dev_conserved, int nx, int ny, int nz, in
 }
 
 #ifdef COSMOLOGY
-__global__ void Apply_Internal_Energy_Floor(Real *dev_conserved, int nx, int ny, int nz, int n_ghost, int n_fields, Real dens_0, Real vel_0, Real current_a )
+__global__ void Apply_Temperature_Floor(Real *dev_conserved, int nx, int ny, int nz, int n_ghost, int n_fields,  Real temp_floor )
 {
   int id, xid, yid, zid, n_cells;
   // Real d, d_inv, vx, vy, vz, P, E;
@@ -643,30 +643,17 @@ __global__ void Apply_Internal_Energy_Floor(Real *dev_conserved, int nx, int ny,
   {
     // every thread collects the conserved variables it needs from global memory
 
-    //InternalEnergy Floor at u=0.2
-    Real dens, u, u_physical;
-    // Real phi_0_gas = 0.01;                           //Unit Conversion
+    Real dens, u;
     dens  =  dev_conserved[            id];
     u = dev_conserved[(n_fields-1)*n_cells + id];
-    u_physical = u  * vel_0 * vel_0 / current_a / current_a;  //convert to physical km^2/s^2
+    Real temp = u / dens;
 
-    //Boltazman constant
-    Real K_b = 1.38064852e-23; //m2 kg s-2 K-1
-
-    //Mass of proton
-    Real M_p = 1.6726219e-27; //kg
-
-    Real gamma = 1.6666667;
-
-    Real temp = u_physical / dens * 1e6 * (gamma - 1) * M_p / K_b ;
-
-    Real temp_0 = 1.0;
     Real u_new, delta_u;
-    if ( temp < temp_0 ){
-      temp = temp_0;
-      u_new = temp * dens * 1e-6 / (gamma - 1) / M_p * K_b ;
-      delta_u = u_new - u_physical;
-      delta_u = delta_u / vel_0 / vel_0 * current_a * current_a;
+    if ( temp < temp_floor ){
+      temp = temp_floor;
+      u_new = temp * dens  ;
+      delta_u = u_new - u;
+      // delta_u = delta_u / vel_0 / vel_0 * current_a * current_a;
       dev_conserved[(n_fields-1)*n_cells + id] += delta_u;
       dev_conserved[4*n_cells + id] += delta_u;
     }

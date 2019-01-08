@@ -122,7 +122,7 @@ void Compute_Gravitational_Potential( Grid3D &G, Potential_FFTW_3D &p_solver, Re
 
 
 #ifdef POTENTIAL_PFFT
-void Compute_Gravitational_Potential( Grid3D &G, Potential_PFFT_3D &p_solver, struct parameters P ){
+void Compute_Gravitational_Potential( Grid3D &G, struct parameters P ){
   Real time_potential;
 
   #ifndef ONLY_PM
@@ -146,7 +146,7 @@ void Compute_Gravitational_Potential( Grid3D &G, Potential_PFFT_3D &p_solver, st
   #ifdef CPU_TIME
   G.Timer.Start_Timer();
   #endif
-  p_solver.Get_Potential( G.Grav );
+  G.p_solver.Get_Potential( G.Grav );
   #ifndef GRAVITY_CPU
   Copy_Potential_To_Hydro_Grid( G );
   #endif

@@ -49,6 +49,8 @@
 #include "particles/particles_dynamics.h"
 #endif
 
+#include "universal_constants.h"
+
 
 /*! \fn Grid3D(void)
  *  \brief Constructor for the Grid. */
@@ -230,6 +232,21 @@ void Grid3D::Initialize(struct parameters *P)
   //are we outputting multiple rotations(1)? or rotating during a simulation(2)?
   R.flag_delta = P->flag_delta;
 #endif /*ROTATED_PROJECTION*/
+
+
+  #ifdef DENSIY_FLOOR
+  H.density_floor = 1.0;
+  #else
+  H.density_floor = 0;
+  #endif
+
+  #ifdef TEMPERATURE_FLOOR
+  H.temperature_floor = 1.0;
+  #else
+  H.temperature_floor = 0;
+  #endif
+
+
 
   #ifdef REVERT_STEP
   H.revert_step = false;
@@ -507,6 +524,16 @@ Real Grid3D::Update_Grid(void)
   z_off = nz_local_start;
   #endif
 
+  Real temp_floor, dens_floor;
+  dens_floor = H.density_floor;
+  temp_floor = H.temperature_floor;
+
+  #ifdef COSMOLOGY
+  temp_floor *= 1 / (gama - 1) / MASS_HYDROGEN * K_BOLTZ * 1e-10;
+  temp_floor /=  Cosmo.v_0_gas * Cosmo.v_0_gas / Cosmo.current_a / Cosmo.current_a;
+  #endif
+
+
   // Pass the structure of conserved variables to the CTU update functions
   // The function returns the updated variables
   if (H.nx > 1 && H.ny == 1 && H.nz == 1) //1D
@@ -568,17 +595,7 @@ Real Grid3D::Update_Grid(void)
     max_dti = CTU_Algorithm_3D_CUDA(g0, g1, H.nx, H.ny, H.nz, x_off, y_off, z_off, H.n_ghost, H.dx, H.dy, H.dz, H.xbound, H.ybound, H.zbound, H.dt, H.n_fields);
     #endif //not_VL
     #ifdef VL
-    Real dens_0, vel_0, current_a;
-    #ifdef COSMOLOGY
-    dens_0 = Cosmo.rho_0_gas;
-    vel_0 = Cosmo.v_0_gas;
-    current_a = Cosmo.current_a;
-    #else
-    dens_0 = 1;
-    vel_0 = 1;
-    current_a =1;
-    #endif
-    max_dti = VL_Algorithm_3D_CUDA(g0, g1, H.nx, H.ny, H.nz, x_off, y_off, z_off, H.n_ghost, H.dx, H.dy, H.dz, H.xbound, H.ybound, H.zbound, H.dt, H.n_fields, dens_0, vel_0, current_a);
+    max_dti = VL_Algorithm_3D_CUDA(g0, g1, H.nx, H.ny, H.nz, x_off, y_off, z_off, H.n_ghost, H.dx, H.dy, H.dz, H.xbound, H.ybound, H.zbound, H.dt, H.n_fields, dens_floor, temp_floor );
     #endif //VL
     #endif
   }

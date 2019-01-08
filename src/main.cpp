@@ -138,7 +138,7 @@ int main(int argc, char *argv[])
   #endif
 
   #ifdef GRAVITY
-  Compute_Gravitational_Potential( G, G.p_solver,  P );
+  Compute_Gravitational_Potential( G,  P );
   #endif
 
 
@@ -242,7 +242,7 @@ int main(int argc, char *argv[])
 
     //Compute Gravitational potential for next step
     #ifdef GRAVITY
-    Compute_Gravitational_Potential( G, G.p_solver, P );
+    Compute_Gravitational_Potential( G, P );
     #endif
 
     // set boundary conditions for next time step
@@ -265,7 +265,7 @@ int main(int argc, char *argv[])
         omp_id = omp_get_thread_num();
 
         if ( omp_id == 0 ) dti = G.Update_Grid();
-        if ( omp_id == 1 ) Compute_Gravitational_Potential( G, G.p_solver, P );
+        if ( omp_id == 1 ) Compute_Gravitational_Potential( G, P );
 
     }
     #ifdef CPU_TIME

@@ -29,7 +29,7 @@ __global__ void Update_Conserved_Variables_3D_half(Real *dev_conserved, Real *de
 
 
 
-Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, int ny, int nz, int x_off, int y_off, int z_off, int n_ghost, Real dx, Real dy, Real dz, Real xbound, Real ybound, Real zbound, Real dt, int n_fields, Real dens_0, Real vel_0, Real current_a )
+Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, int ny, int nz, int x_off, int y_off, int z_off, int n_ghost, Real dx, Real dy, Real dz, Real xbound, Real ybound, Real zbound, Real dt, int n_fields, Real dens_floor, Real temp_floor )
 {
 
   //Here, *host_conserved contains the entire
@@ -241,18 +241,17 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
     Update_Conserved_Variables_3D<<<dim1dGrid,dim1dBlock>>>(dev_conserved, F_x, F_y, F_z, nx_s, ny_s, nz_s, x_off_s, y_off_s, z_off_s, n_ghost, dx, dy, dz, xbound, ybound, zbound, dt, gama, n_fields);
     CudaCheckError();
 
-    #ifdef DE
     #ifndef GRAVITY_CPU
+    #ifdef DE
     Sync_Energies_3D<<<dim1dGrid,dim1dBlock>>>(dev_conserved, nx_s, ny_s, nz_s, n_ghost, gama, n_fields);
     CudaCheckError();
-    #endif //GRAVITY_CPU
-    #endif //DE
 
-    #ifdef COSMOLOGY
-    #ifndef GRAVITY_CPU
-    Apply_Internal_Energy_Floor<<<dim1dGrid,dim1dBlock>>>(dev_conserved, nx_s, ny_s, nz_s, n_ghost, n_fields, dens_0, vel_0, current_a);
-    #endif //GRAVITY_CPU
+    #ifdef TEMPERATURE_FLOOR
+    Apply_Temperature_Floor<<<dim1dGrid,dim1dBlock>>>(dev_conserved, nx_s, ny_s, nz_s, n_ghost, n_fields, temp_floor );
+    CudaCheckError();
+    #endif //TEMPERATURE_FLOOR
     #endif //DE
+    #endif //GRAVITY_CPU
 
     // Apply cooling
     #ifdef COOLING_GPU

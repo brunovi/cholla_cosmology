@@ -14,4 +14,8 @@ void Get_Mean_Kinetic_Energy( Grid3D &G );
 
 void Sync_Energies_3D_Host(Grid3D &G );
 
+#ifdef TEMPERATURE_FLOOR
+void Apply_Temperature_Floor_Host( Grid3D &G, int g_start, int g_end );
+#endif
+
 #endif

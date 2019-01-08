@@ -35,7 +35,7 @@ void Compute_Gravitational_Potential( Grid3D &G,  Potential_FFTW_3D &p_solver, R
 #endif
 
 #ifdef POTENTIAL_PFFT
-void Compute_Gravitational_Potential( Grid3D &G,  Potential_PFFT_3D &p_solver, struct parameters P);
+void Compute_Gravitational_Potential( Grid3D &G,  struct parameters P);
 #endif
 
 Real Get_Density_Average( Grid3D &G );

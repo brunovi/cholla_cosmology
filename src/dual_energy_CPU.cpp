@@ -2,6 +2,7 @@
 #ifdef DE
 
 #include "dual_energy_CPU.h"
+#include "universal_constants.h"
 
 #ifdef DE_EKINETIC_LIMIT
 
@@ -76,13 +77,13 @@ void Sync_Energies_3D_Host_Function(Grid3D &G, int g_start, int g_end ){
         j = j_g + nGHST;
         k = k_g + nGHST;
 
-        id  = (i) + (j)*nx_grid + (k)*ny_grid*nz_grid;
-        imo = (i-1) + (j)*nx_grid + (k)*ny_grid*nz_grid;
-        ipo = (i+1) + (j)*nx_grid + (k)*ny_grid*nz_grid;
-        jmo = (i) + (j-1)*nx_grid + (k)*ny_grid*nz_grid;
-        jpo = (i) + (j+1)*nx_grid + (k)*ny_grid*nz_grid;
-        kmo = (i) + (j)*nx_grid + (k-1)*ny_grid*nz_grid;
-        kpo = (i) + (j)*nx_grid + (k+1)*ny_grid*nz_grid;
+        id  = (i) + (j)*nx_grid + (k)*ny_grid*nx_grid;
+        imo = (i-1) + (j)*nx_grid + (k)*ny_grid*nx_grid;
+        ipo = (i+1) + (j)*nx_grid + (k)*ny_grid*nx_grid;
+        jmo = (i) + (j-1)*nx_grid + (k)*ny_grid*nx_grid;
+        jpo = (i) + (j+1)*nx_grid + (k)*ny_grid*nx_grid;
+        kmo = (i) + (j)*nx_grid + (k-1)*ny_grid*nx_grid;
+        kpo = (i) + (j)*nx_grid + (k+1)*ny_grid*nx_grid;
 
         d = G.C.density[id];
         d_inv = 1/d;
@@ -136,37 +137,37 @@ void Sync_Energies_3D_Host_Function(Grid3D &G, int g_start, int g_end ){
         }
 
         // if ( ge2 < 0 ) G.C.Energy[id] = 0.5*d*(vx*vx + vy*vy + vz*vz) + ge1;
-
-        #ifdef COSMOLOGY
-        //InternalEnergy Floor at u=0.2
-        Real dens, u, u_physical;
-        // Real phi_0_gas = 0.01;                           //Unit Conversion
-        dens  =  d;
-        u = G.C.GasEnergy[id];
-        u_physical = u  * G.Cosmo.v_0_gas * G.Cosmo.v_0_gas / G.Cosmo.current_a / G.Cosmo.current_a;  //convert to physical km^2/s^2
-
-        //Boltazman constant
-        Real K_b = 1.38064852e-23; //m2 kg s-2 K-1
-
-        //Mass of proton
-        Real M_p = 1.6726219e-27; //kg
-
-        Real gamma = 1.6666667;
-
-        Real temp = u_physical / dens * 1e6 * (gamma - 1) * M_p / K_b ;
-
-        Real temp_0 = 1.0;
-        Real u_new, delta_u;
-        if ( temp < temp_0 ){
-          temp = temp_0;
-          u_new = temp * dens * 1e-6 / (gamma - 1) / M_p * K_b ;
-          delta_u = u_new - u_physical;
-          delta_u = delta_u / G.Cosmo.v_0_gas / G.Cosmo.v_0_gas * G.Cosmo.current_a * G.Cosmo.current_a;
-          G.C.GasEnergy[id] += delta_u;
-          G.C.Energy[id] += delta_u;
-        }
-
-        #endif
+        //
+        // #ifdef COSMOLOGY
+        // //InternalEnergy Floor at u=0.2
+        // Real dens, u, u_physical;
+        // // Real phi_0_gas = 0.01;                           //Unit Conversion
+        // dens  =  d;
+        // u = G.C.GasEnergy[id];
+        // u_physical = u  * G.Cosmo.v_0_gas * G.Cosmo.v_0_gas / G.Cosmo.current_a / G.Cosmo.current_a;  //convert to physical km^2/s^2
+        //
+        // //Boltazman constant
+        // Real K_b = 1.38064852e-23; //m2 kg s-2 K-1
+        //
+        // //Mass of proton
+        // Real M_p = 1.6726219e-27; //kg
+        //
+        // Real gamma = 1.6666667;
+        //
+        // Real temp = u_physical / dens * 1e6 * (gamma - 1) * M_p / K_b ;
+        //
+        // Real temp_0 = 1.0;
+        // Real u_new, delta_u;
+        // if ( temp < temp_0 ){
+        //   temp = temp_0;
+        //   u_new = temp * dens * 1e-6 / (gamma - 1) / M_p * K_b ;
+        //   delta_u = u_new - u_physical;
+        //   delta_u = delta_u / G.Cosmo.v_0_gas / G.Cosmo.v_0_gas * G.Cosmo.current_a * G.Cosmo.current_a;
+        //   G.C.GasEnergy[id] += delta_u;
+        //   G.C.Energy[id] += delta_u;
+        // }
+        //
+        // #endif
       }
     }
   }
@@ -187,13 +188,68 @@ void Sync_Energies_3D_Host(Grid3D &G ){
     Get_OMP_Grid_Indxs( n_omp_procs, omp_id, G.Grav.nz_local,  &g_start, &g_end  );
 
     Sync_Energies_3D_Host_Function( G, g_start, g_end );
-    // #pragma omp barrier
+    #ifdef TEMPERATURE_FLOOR
+    #pragma omp barrier
+    Apply_Temperature_Floor_Host( G, g_start, g_end );
+    #endif
   }
   #endif
 
 }
 
 
+#ifdef TEMPERATURE_FLOOR
+void Apply_Temperature_Floor_Host( Grid3D &G, int g_start, int g_end ){
 
+  Real temp_floor = G.H.temperature_floor;
+
+  #ifdef COSMOLOGY
+  temp_floor *= 1 / (gama - 1) / MASS_HYDROGEN * K_BOLTZ * 1e-10;
+  temp_floor /=  G.Cosmo.v_0_gas * G.Cosmo.v_0_gas / G.Cosmo.current_a / G.Cosmo.current_a;
+  #endif
+
+  int nx_grid, ny_grid, nz_grid, nGHST_grid;
+  nGHST_grid = G.H.n_ghost;
+  nx_grid = G.H.nx;
+  ny_grid = G.H.ny;
+  nz_grid = G.H.nz;
+
+  int nx_grav, ny_grav, nz_grav, id_grav;
+  nx_grav = G.Grav.nx_local;
+  ny_grav = G.Grav.ny_local;
+  nz_grav = G.Grav.nz_local;
+
+  int nGHST = nGHST_grid ;
+
+  Real d, u, temp;
+  Real u_new, delta_u;
+  int k, j, i, id;
+  int k_g, j_g, i_g;
+  for ( k_g=g_start; k_g<g_end; k_g++ ){
+    for ( j_g=0; j_g<ny_grav; j_g++ ){
+      for ( i_g=0; i_g<nx_grav; i_g++ ){
+        i = i_g + nGHST;
+        j = j_g + nGHST;
+        k = k_g + nGHST;
+        id  = (i) + (j)*nx_grid + (k)*ny_grid*nx_grid;
+
+        d = G.C.density[id];
+        u = G.C.GasEnergy[id];
+        temp = u / d;
+
+        if ( temp < temp_floor ){
+          temp = temp_floor;
+          u_new = temp * d  ;
+          delta_u = u_new - u;
+          G.C.GasEnergy[id] += delta_u;
+          G.C.Energy[id] += delta_u;
+        }
+      }
+    }
+  }
+}
+
+
+#endif //TEMPERATURE_FLOOR
 #endif //DE
 #endif //GRAVITY_CPU

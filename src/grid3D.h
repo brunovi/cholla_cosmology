@@ -223,6 +223,9 @@ struct Header
 
   bool TRANSFER_HYDRO_BOUNDARIES;
 
+  Real density_floor;
+  Real temperature_floor;
+
   #ifdef DE_EKINETIC_LIMIT
   Real Ekin_mean;
   #endif
