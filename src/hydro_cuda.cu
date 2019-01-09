@@ -194,7 +194,7 @@ __global__ void Update_Conserved_Variables_2D(Real *dev_conserved, Real *dev_F_x
 __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x, Real *dev_F_y,  Real *dev_F_z,
                                               int nx, int ny, int nz, int x_off, int y_off, int z_off, int n_ghost,
                                               Real dx, Real dy, Real dz, Real xbound, Real ybound, Real zbound, Real dt,
-                                              Real gamma, int n_fields)
+                                              Real gamma, int n_fields, Real dens_floor )
 {
   int id, xid, yid, zid, n_cells;
   int imo, jmo, kmo;
@@ -319,10 +319,9 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
     #endif
 
     #ifdef DENSITY_FLOOR
-    Real d_floor = 1e-5;
-    if ( dev_conserved[            id] < d_floor ){
-      printf("###Thread density change  %f -> %f \n", dev_conserved[            id], d_floor );
-      dev_conserved[            id] = d_floor;
+    if ( dev_conserved[            id] < dens_floor ){
+      printf("###Thread density change  %f -> %f \n", dev_conserved[            id], dens_floor );
+      dev_conserved[            id] = dens_floor;
     }
     #endif
 

@@ -28,11 +28,11 @@
 __global__ void Evolve_Interface_States_3D(Real *dev_conserved, Real *dev_Q_Lx, Real *dev_Q_Rx, Real *dev_F_x,
                                            Real *dev_Q_Ly, Real *dev_Q_Ry, Real *dev_F_y,
                                            Real *dev_Q_Lz, Real *dev_Q_Rz, Real *dev_F_z,
-                                           int nx, int ny, int nz, int n_ghost, 
+                                           int nx, int ny, int nz, int n_ghost,
                                            Real dx, Real dy, Real dz, Real dt, int n_fields);
 
 
-Real CTU_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, int ny, int nz, int x_off, int y_off, int z_off, int n_ghost, Real dx, Real dy, Real dz, Real xbound, Real ybound, Real zbound, Real dt, int n_fields)
+Real CTU_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, int ny, int nz, int x_off, int y_off, int z_off, int n_ghost, Real dx, Real dy, Real dz, Real xbound, Real ybound, Real zbound, Real dt, int n_fields, Real dens_floor, Real temp_floor)
 {
   //Here, *host_conserved contains the entire
   //set of conserved variables on the grid
@@ -41,7 +41,7 @@ Real CTU_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx,
   //host_conserved1 contains the values at time n+1
 
   // dimensions of subgrid blocks
-  int nx_s, ny_s, nz_s; 
+  int nx_s, ny_s, nz_s;
   // x, y, and z offsets for subgrid blocks
   int x_off_s, y_off_s, z_off_s;
   // total number of subgrid blocks needed
@@ -64,10 +64,10 @@ Real CTU_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx,
   // dimensions for the 1D GPU grid
   int  ngrid = (BLOCK_VOL + TPB - 1) / TPB;
 
-  //number of blocks per 1D grid  
+  //number of blocks per 1D grid
   dim3 dim1dGrid(ngrid, 1, 1);
 
-  //number of threads per 1D block   
+  //number of threads per 1D block
   dim3 dim1dBlock(TPB, 1, 1);
 
   // Set up pointers for the location to copy from and to
@@ -144,7 +144,7 @@ Real CTU_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx,
 
     // copy the conserved variables onto the GPU
     CudaSafeCall( cudaMemcpy(dev_conserved, tmp1, n_fields*BLOCK_VOL*sizeof(Real), cudaMemcpyHostToDevice) );
-      
+
 
     // Step 1: Do the reconstruction
     #ifdef PCM
@@ -154,12 +154,12 @@ Real CTU_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx,
     PLMP_cuda<<<dim1dGrid,dim1dBlock>>>(dev_conserved, Q_Lx, Q_Rx, nx_s, ny_s, nz_s, n_ghost, dx, dt, gama, 0, n_fields);
     PLMP_cuda<<<dim1dGrid,dim1dBlock>>>(dev_conserved, Q_Ly, Q_Ry, nx_s, ny_s, nz_s, n_ghost, dy, dt, gama, 1, n_fields);
     PLMP_cuda<<<dim1dGrid,dim1dBlock>>>(dev_conserved, Q_Lz, Q_Rz, nx_s, ny_s, nz_s, n_ghost, dz, dt, gama, 2, n_fields);
-    #endif //PLMP 
+    #endif //PLMP
     #ifdef PLMC
     PLMC_cuda<<<dim1dGrid,dim1dBlock>>>(dev_conserved, Q_Lx, Q_Rx, nx_s, ny_s, nz_s, n_ghost, dx, dt, gama, 0, n_fields);
     PLMC_cuda<<<dim1dGrid,dim1dBlock>>>(dev_conserved, Q_Ly, Q_Ry, nx_s, ny_s, nz_s, n_ghost, dy, dt, gama, 1, n_fields);
     PLMC_cuda<<<dim1dGrid,dim1dBlock>>>(dev_conserved, Q_Lz, Q_Rz, nx_s, ny_s, nz_s, n_ghost, dz, dt, gama, 2, n_fields);
-    #endif //PLMC 
+    #endif //PLMC
     #ifdef PPMP
     PPMP_cuda<<<dim1dGrid,dim1dBlock>>>(dev_conserved, Q_Lx, Q_Rx, nx_s, ny_s, nz_s, n_ghost, dx, dt, gama, 0, n_fields);
     PPMP_cuda<<<dim1dGrid,dim1dBlock>>>(dev_conserved, Q_Ly, Q_Ry, nx_s, ny_s, nz_s, n_ghost, dy, dt, gama, 1, n_fields);
@@ -171,7 +171,7 @@ Real CTU_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx,
     PPMC_cuda<<<dim1dGrid,dim1dBlock>>>(dev_conserved, Q_Lz, Q_Rz, nx_s, ny_s, nz_s, n_ghost, dz, dt, gama, 2, n_fields);
     #endif //PPMC
     CudaCheckError();
-   
+
 
     #ifdef H_CORRECTION
     #ifndef CTU
@@ -247,9 +247,9 @@ Real CTU_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx,
     CudaCheckError();
     #endif //CTU
 
-  
+    Real dens_floor = 1;
     // Step 5: Update the conserved variable array
-    Update_Conserved_Variables_3D<<<dim1dGrid,dim1dBlock>>>(dev_conserved, F_x, F_y, F_z, nx_s, ny_s, nz_s, x_off, y_off, z_off, n_ghost, dx, dy, dz, xbound, ybound, zbound, dt, gama, n_fields);
+    Update_Conserved_Variables_3D<<<dim1dGrid,dim1dBlock>>>(dev_conserved, F_x, F_y, F_z, nx_s, ny_s, nz_s, x_off, y_off, z_off, n_ghost, dx, dy, dz, xbound, ybound, zbound, dt, gama, n_fields, dens_floor);
     CudaCheckError();
 
 
@@ -271,7 +271,7 @@ Real CTU_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx,
     Calc_dt_3D<<<dim1dGrid,dim1dBlock>>>(dev_conserved, nx_s, ny_s, nz_s, n_ghost, dx, dy, dz, dev_dti_array, gama);
     CudaCheckError();
 
-  
+
 
     // copy the updated conserved variable array back to the CPU
     CudaSafeCall( cudaMemcpy(tmp2, dev_conserved, n_fields*BLOCK_VOL*sizeof(Real), cudaMemcpyDeviceToHost) );
@@ -292,7 +292,7 @@ Real CTU_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx,
     // find maximum inverse timestep from cooling time
     for (int i=0; i<ngrid; i++) {
       min_dt = fmin(min_dt, host_dt_array[i]);
-    }  
+    }
     if (min_dt < C_cfl/max_dti) {
       max_dti = C_cfl/min_dt;
     }
@@ -308,7 +308,7 @@ Real CTU_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx,
   free(host_dti_array);
   if (block_tot > 1) free(buffer);
   #ifdef COOLING_GPU
-  free(host_dt_array);  
+  free(host_dt_array);
   #endif
 
   // free the GPU memory
@@ -379,7 +379,7 @@ __global__ void Evolve_Interface_States_3D(Real *dev_conserved, Real *dev_Q_Lx, 
     for (int i=0; i<NSCALARS; i++) {
       dev_Q_Lx[(5+i)*n_cells + id] += 0.5*dtody*(dev_F_y[(5+i)*n_cells + jmo] - dev_F_y[(5+i)*n_cells + id])
                                 + 0.5*dtodz*(dev_F_z[(5+i)*n_cells + kmo] - dev_F_z[(5+i)*n_cells + id]);
-    }                          
+    }
     #endif
     #ifdef DE
     dev_Q_Lx[(n_fields-1)*n_cells + id] += 0.5*dtody*(dev_F_y[(n_fields-1)*n_cells + jmo] - dev_F_y[(n_fields-1)*n_cells + id])
@@ -388,7 +388,7 @@ __global__ void Evolve_Interface_States_3D(Real *dev_conserved, Real *dev_Q_Lx, 
 
     // right
     dev_Q_Rx[            id] += 0.5*dtody*(dev_F_y[            ipojmo] - dev_F_y[            ipo])
-                              + 0.5*dtodz*(dev_F_z[            ipokmo] - dev_F_z[            ipo]); 
+                              + 0.5*dtodz*(dev_F_z[            ipokmo] - dev_F_z[            ipo]);
     dev_Q_Rx[  n_cells + id] += 0.5*dtody*(dev_F_y[  n_cells + ipojmo] - dev_F_y[  n_cells + ipo])
                               + 0.5*dtodz*(dev_F_z[  n_cells + ipokmo] - dev_F_z[  n_cells + ipo]);
     dev_Q_Rx[2*n_cells + id] += 0.5*dtody*(dev_F_y[2*n_cells + ipojmo] - dev_F_y[2*n_cells + ipo])
@@ -401,7 +401,7 @@ __global__ void Evolve_Interface_States_3D(Real *dev_conserved, Real *dev_Q_Lx, 
     for (int i=0; i<NSCALARS; i++) {
       dev_Q_Rx[(5+i)*n_cells + id] += 0.5*dtody*(dev_F_y[(5+i)*n_cells + ipojmo] - dev_F_y[(5+i)*n_cells + ipo])
                                 + 0.5*dtodz*(dev_F_z[(5+i)*n_cells + ipokmo] - dev_F_z[(5+i)*n_cells + ipo]);
-    }                          
+    }
     #endif
     #ifdef DE
     dev_Q_Rx[(n_fields-1)*n_cells + id] += 0.5*dtody*(dev_F_y[(n_fields-1)*n_cells + ipojmo] - dev_F_y[(n_fields-1)*n_cells + ipo])
@@ -440,7 +440,7 @@ __global__ void Evolve_Interface_States_3D(Real *dev_conserved, Real *dev_Q_Lx, 
 
     // right
     dev_Q_Ry[            id] += 0.5*dtodz*(dev_F_z[            jpokmo] - dev_F_z[            jpo])
-                              + 0.5*dtodx*(dev_F_x[            jpoimo] - dev_F_x[            jpo]); 
+                              + 0.5*dtodx*(dev_F_x[            jpoimo] - dev_F_x[            jpo]);
     dev_Q_Ry[  n_cells + id] += 0.5*dtodz*(dev_F_z[  n_cells + jpokmo] - dev_F_z[  n_cells + jpo])
                               + 0.5*dtodx*(dev_F_x[  n_cells + jpoimo] - dev_F_x[  n_cells + jpo]);
     dev_Q_Ry[2*n_cells + id] += 0.5*dtodz*(dev_F_z[2*n_cells + jpokmo] - dev_F_z[2*n_cells + jpo])
@@ -448,16 +448,16 @@ __global__ void Evolve_Interface_States_3D(Real *dev_conserved, Real *dev_Q_Lx, 
     dev_Q_Ry[3*n_cells + id] += 0.5*dtodz*(dev_F_z[3*n_cells + jpokmo] - dev_F_z[3*n_cells + jpo])
                               + 0.5*dtodx*(dev_F_x[3*n_cells + jpoimo] - dev_F_x[3*n_cells + jpo]);
     dev_Q_Ry[4*n_cells + id] += 0.5*dtodz*(dev_F_z[4*n_cells + jpokmo] - dev_F_z[4*n_cells + jpo])
-                              + 0.5*dtodx*(dev_F_x[4*n_cells + jpoimo] - dev_F_x[4*n_cells + jpo]);    
+                              + 0.5*dtodx*(dev_F_x[4*n_cells + jpoimo] - dev_F_x[4*n_cells + jpo]);
     #ifdef SCALAR
     for (int i=0; i<NSCALARS; i++) {
       dev_Q_Ry[(5+i)*n_cells + id] += 0.5*dtodz*(dev_F_z[(5+i)*n_cells + jpokmo] - dev_F_z[(5+i)*n_cells + jpo])
-                                + 0.5*dtodx*(dev_F_x[(5+i)*n_cells + jpoimo] - dev_F_x[(5+i)*n_cells + jpo]);    
-    }                            
+                                + 0.5*dtodx*(dev_F_x[(5+i)*n_cells + jpoimo] - dev_F_x[(5+i)*n_cells + jpo]);
+    }
     #endif
     #ifdef DE
     dev_Q_Ry[(n_fields-1)*n_cells + id] += 0.5*dtodz*(dev_F_z[(n_fields-1)*n_cells + jpokmo] - dev_F_z[(n_fields-1)*n_cells + jpo])
-                              + 0.5*dtodx*(dev_F_x[(n_fields-1)*n_cells + jpoimo] - dev_F_x[(n_fields-1)*n_cells + jpo]);    
+                              + 0.5*dtodx*(dev_F_x[(n_fields-1)*n_cells + jpoimo] - dev_F_x[(n_fields-1)*n_cells + jpo]);
     #endif
   }
   if (zid > n_ghost-3 && zid < nz-n_ghost+1 && xid > n_ghost-2 && xid < nx-n_ghost+1 && yid > n_ghost-2 && yid < ny-n_ghost+1)
@@ -491,7 +491,7 @@ __global__ void Evolve_Interface_States_3D(Real *dev_conserved, Real *dev_Q_Lx, 
     #endif
     // right
     dev_Q_Rz[            id] += 0.5*dtodx*(dev_F_x[            kpoimo] - dev_F_x[            kpo])
-                              + 0.5*dtody*(dev_F_y[            kpojmo] - dev_F_y[            kpo]); 
+                              + 0.5*dtody*(dev_F_y[            kpojmo] - dev_F_y[            kpo]);
     dev_Q_Rz[  n_cells + id] += 0.5*dtodx*(dev_F_x[  n_cells + kpoimo] - dev_F_x[  n_cells + kpo])
                               + 0.5*dtody*(dev_F_y[  n_cells + kpojmo] - dev_F_y[  n_cells + kpo]);
     dev_Q_Rz[2*n_cells + id] += 0.5*dtodx*(dev_F_x[2*n_cells + kpoimo] - dev_F_x[2*n_cells + kpo])
@@ -499,16 +499,16 @@ __global__ void Evolve_Interface_States_3D(Real *dev_conserved, Real *dev_Q_Lx, 
     dev_Q_Rz[3*n_cells + id] += 0.5*dtodx*(dev_F_x[3*n_cells + kpoimo] - dev_F_x[3*n_cells + kpo])
                               + 0.5*dtody*(dev_F_y[3*n_cells + kpojmo] - dev_F_y[3*n_cells + kpo]);
     dev_Q_Rz[4*n_cells + id] += 0.5*dtodx*(dev_F_x[4*n_cells + kpoimo] - dev_F_x[4*n_cells + kpo])
-                              + 0.5*dtody*(dev_F_y[4*n_cells + kpojmo] - dev_F_y[4*n_cells + kpo]);    
+                              + 0.5*dtody*(dev_F_y[4*n_cells + kpojmo] - dev_F_y[4*n_cells + kpo]);
     #ifdef SCALAR
     for (int i=0; i<NSCALARS; i++) {
       dev_Q_Rz[(5+i)*n_cells + id] += 0.5*dtodx*(dev_F_x[(5+i)*n_cells + kpoimo] - dev_F_x[(5+i)*n_cells + kpo])
-                                + 0.5*dtody*(dev_F_y[(5+i)*n_cells + kpojmo] - dev_F_y[(5+i)*n_cells + kpo]);    
-    }                            
+                                + 0.5*dtody*(dev_F_y[(5+i)*n_cells + kpojmo] - dev_F_y[(5+i)*n_cells + kpo]);
+    }
     #endif
     #ifdef DE
     dev_Q_Rz[(n_fields-1)*n_cells + id] += 0.5*dtodx*(dev_F_x[(n_fields-1)*n_cells + kpoimo] - dev_F_x[(n_fields-1)*n_cells + kpo])
-                              + 0.5*dtody*(dev_F_y[(n_fields-1)*n_cells + kpojmo] - dev_F_y[(n_fields-1)*n_cells + kpo]);    
+                              + 0.5*dtody*(dev_F_y[(n_fields-1)*n_cells + kpojmo] - dev_F_y[(n_fields-1)*n_cells + kpo]);
     #endif
   }
 

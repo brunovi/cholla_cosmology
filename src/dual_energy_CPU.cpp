@@ -135,39 +135,6 @@ void Sync_Energies_3D_Host_Function(Grid3D &G, int g_start, int g_end ){
           if (ge1 > 0.0) G.C.Energy[id] += ge1 - ge2;
           else G.C.GasEnergy[id] = ge2;
         }
-
-        // if ( ge2 < 0 ) G.C.Energy[id] = 0.5*d*(vx*vx + vy*vy + vz*vz) + ge1;
-        //
-        // #ifdef COSMOLOGY
-        // //InternalEnergy Floor at u=0.2
-        // Real dens, u, u_physical;
-        // // Real phi_0_gas = 0.01;                           //Unit Conversion
-        // dens  =  d;
-        // u = G.C.GasEnergy[id];
-        // u_physical = u  * G.Cosmo.v_0_gas * G.Cosmo.v_0_gas / G.Cosmo.current_a / G.Cosmo.current_a;  //convert to physical km^2/s^2
-        //
-        // //Boltazman constant
-        // Real K_b = 1.38064852e-23; //m2 kg s-2 K-1
-        //
-        // //Mass of proton
-        // Real M_p = 1.6726219e-27; //kg
-        //
-        // Real gamma = 1.6666667;
-        //
-        // Real temp = u_physical / dens * 1e6 * (gamma - 1) * M_p / K_b ;
-        //
-        // Real temp_0 = 1.0;
-        // Real u_new, delta_u;
-        // if ( temp < temp_0 ){
-        //   temp = temp_0;
-        //   u_new = temp * dens * 1e-6 / (gamma - 1) / M_p * K_b ;
-        //   delta_u = u_new - u_physical;
-        //   delta_u = delta_u / G.Cosmo.v_0_gas / G.Cosmo.v_0_gas * G.Cosmo.current_a * G.Cosmo.current_a;
-        //   G.C.GasEnergy[id] += delta_u;
-        //   G.C.Energy[id] += delta_u;
-        // }
-        //
-        // #endif
       }
     }
   }
