@@ -234,8 +234,8 @@ void Grid3D::Initialize(struct parameters *P)
 #endif /*ROTATED_PROJECTION*/
 
 
-  #ifdef DENSIY_FLOOR
-  H.density_floor = 1.0;
+  #ifdef DENSITY_FLOOR
+  H.density_floor = 1e-5;
   #else
   H.density_floor = 0;
   #endif
