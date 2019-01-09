@@ -52,7 +52,7 @@ void Copy_Hydro_Density_to_Gravity( Grid3D &G ){
   }
 }
 
-Real Get_Density_Average( Grid3D &G ){
+Real Get_Density_Average_function( Grid3D &G, int g_start, int g_end ){
   // int nGHST = G.Parts.G.n_ghost_particles_grid;
   // int nx_g = Parts.G.nx_local + 2*nGHST;
   // int ny_g = Parts.G.ny_local + 2*nGHST;
@@ -62,7 +62,7 @@ Real Get_Density_Average( Grid3D &G ){
   int nz = G.Grav.nz_local;
   int k, j, i, id;
   Real dens_avrg=0;
-  for( k=0; k<nz; k++){
+  for( k=g_start; k<g_end; k++){
     for( j=0; j<ny; j++){
       for( i=0; i<nx; i++){
         // id = (i+nGHST) + (j+nGHST)*nx_g + (k+nGHST)*nx_g*ny_g;
@@ -71,8 +71,36 @@ Real Get_Density_Average( Grid3D &G ){
       }
     }
   }
-  dens_avrg /= (nx*ny*nz);
+  // dens_avrg /= (nx*ny*nz);
   return dens_avrg;
+}
+
+Real Get_Density_Average( Grid3D &G ){
+
+  Real dens_sum;
+
+  #ifndef PARALLEL_OMP
+  dens_sum = Get_Density_Average_function( G, 0, G.Grav.nz_local );
+  #else
+  dens_sum = 0;
+  Real dens_sum_all[N_OMP_THREADS];
+  #pragma omp parallel num_threads( N_OMP_THREADS )
+  {
+    int omp_id, n_omp_procs;
+    int g_start, g_end;
+
+    omp_id = omp_get_thread_num();
+    n_omp_procs = omp_get_num_threads();
+    Get_OMP_Grid_Indxs( n_omp_procs, omp_id, G.Grav.nz_local,  &g_start, &g_end  );
+    dens_sum_all[omp_id] = Get_Density_Average_function( G, g_start, g_end );
+
+  }
+  for ( int i=0; i<N_OMP_THREADS; i++ ){
+    dens_sum += dens_sum_all[i];
+  }
+  #endif
+
+  return dens_sum /  ( G.Grav.nx_local * G.Grav.ny_local * G.Grav.nz_local);
 }
 
 

@@ -6,7 +6,7 @@
 
 #ifdef DE_EKINETIC_LIMIT
 
-void Get_Mean_Kinetic_Energy( Grid3D &G ){
+Real Get_Mean_Kinetic_Energy_function( Grid3D &G, int g_start, int g_end ){
 
   int nx_grid, ny_grid, nz_grid, nGHST;
   nGHST = G.H.n_ghost;
@@ -14,36 +14,69 @@ void Get_Mean_Kinetic_Energy( Grid3D &G ){
   ny_grid = G.H.ny;
   nz_grid = G.H.nz;
 
-  int n_cells = 0;
+  int nx_grav, ny_grav, nz_grav, id_grav;
+  nx_grav = G.Grav.nx_local;
+  ny_grav = G.Grav.ny_local;
+  nz_grav = G.Grav.nz_local;
+
   Real Ek_mean = 0;
+  Real d, d_inv, vx, vy, vz, E, Ek;
 
-  // Real d, d_inv, vx, vy, vz, E, Ek, ge1, ge2, Emax;
-  // int k, j, i, id;
-  // for ( k=0; k<nz_grid; k++ ){
-  //   for ( j=0; j<ny_grid; j++ ){
-  //     for ( i=0; i<nx_grid; i++ ){
-  //       if ( (i < nGHST) || (i > (nx_grid - nGHST - 1) ) ) continue;
-  //       if ( (j < nGHST) || (j > (ny_grid - nGHST - 1) ) ) continue;
-  //       if ( (k < nGHST) || (k > (nz_grid - nGHST - 1) ) ) continue;
-  //
-  //       id  = (i) + (j)*nx_grid + (k)*ny_grid*nz_grid;
-  //       d = G.C.density[id];
-  //       d_inv = 1/d;
-  //       vx = G.C.momentum_x[id] * d_inv;
-  //       vy = G.C.momentum_y[id] * d_inv;
-  //       vz = G.C.momentum_z[id] * d_inv;
-  //       Ek = 0.5*d*(vx*vx + vy*vy + vz*vz);
-  //       Ek_mean += Ek;
-  //       n_cells += 1;
-  //     }
-  //   }
-  // }
-  // Ek_mean /= n_cells;
+  int k, j, i, id;
+  int k_g, j_g, i_g;
 
-  G.H.Ekin_mean = Ek_mean;
+  for ( k_g=g_start; k_g<g_end; k_g++ ){
+    for ( j_g=0; j_g<ny_grav; j_g++ ){
+      for ( i_g=0; i_g<nx_grav; i_g++ ){
 
+        i = i_g + nGHST;
+        j = j_g + nGHST;
+        k = k_g + nGHST;
+
+        id  = (i) + (j)*nx_grid + (k)*ny_grid*nx_grid;
+
+        d = G.C.density[id];
+        d_inv = 1/d;
+        vx = G.C.momentum_x[id] * d_inv;
+        vy = G.C.momentum_y[id] * d_inv;
+        vz = G.C.momentum_z[id] * d_inv;
+        E = G.C.Energy[id];
+        Ek = 0.5*d*(vx*vx + vy*vy + vz*vz);
+        Ek_mean += Ek;
+      }
+    }
+  }
+  return Ek_mean;
 }
 
+void Get_Mean_Kinetic_Energy( Grid3D &G ){
+
+  Real Ek_sum;
+
+  #ifndef PARALLEL_OMP
+  Ek_sum = Get_Mean_Kinetic_Energy_function( G, 0, G.Grav.nz_local );
+  #else
+  Ek_sum = 0;
+  Real Ek_sum_all[N_OMP_THREADS];
+  #pragma omp parallel num_threads( N_OMP_THREADS )
+  {
+    int omp_id, n_omp_procs;
+    int g_start, g_end;
+
+    omp_id = omp_get_thread_num();
+    n_omp_procs = omp_get_num_threads();
+    Get_OMP_Grid_Indxs( n_omp_procs, omp_id, G.Grav.nz_local,  &g_start, &g_end  );
+    Ek_sum_all[omp_id] = Get_Mean_Kinetic_Energy_function( G, g_start, g_end );
+
+  }
+  for ( int i=0; i<N_OMP_THREADS; i++ ){
+    Ek_sum += Ek_sum_all[i];
+  }
+  #endif
+  
+  G.H.Ekin_mean = Ek_sum / ( G.Grav.nx_local * G.Grav.ny_local * G.Grav.nz_local);
+
+}
 
 #endif
 
