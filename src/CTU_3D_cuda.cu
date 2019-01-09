@@ -247,17 +247,23 @@ Real CTU_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx,
     CudaCheckError();
     #endif //CTU
 
-    Real dens_floor = 1;
     // Step 5: Update the conserved variable array
     Update_Conserved_Variables_3D<<<dim1dGrid,dim1dBlock>>>(dev_conserved, F_x, F_y, F_z, nx_s, ny_s, nz_s, x_off, y_off, z_off, n_ghost, dx, dy, dz, xbound, ybound, zbound, dt, gama, n_fields, dens_floor);
     CudaCheckError();
 
 
     // Synchronize the total and internal energies
+    #ifndef GRAVITY_CPU
     #ifdef DE
     Sync_Energies_3D<<<dim1dGrid,dim1dBlock>>>(dev_conserved, nx_s, ny_s, nz_s, n_ghost, gama, n_fields);
     CudaCheckError();
-    #endif
+
+    #ifdef TEMPERATURE_FLOOR
+    Apply_Temperature_Floor<<<dim1dGrid,dim1dBlock>>>(dev_conserved, nx_s, ny_s, nz_s, n_ghost, n_fields, temp_floor );
+    CudaCheckError();
+    #endif //TEMPERATURE_FLOOR
+    #endif //DE
+    #endif //GRAVITY_CPU
 
 
     // Apply cooling
