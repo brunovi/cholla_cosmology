@@ -63,6 +63,12 @@ void Initialize_Grackle_Fields( Grid3D &G ){
   G.Cool.cooling_time = (Real *) malloc(G.Cool.field_size * sizeof(Real));
   Set_Initial_Fields_Grackle( G );
 
+  #ifdef OUTPUT_COOLING_RATE
+  G.Cool.cooling_rate = (Real *) malloc(G.Cool.field_size * sizeof(Real));
+  #endif
+
+  Set_Initial_Fields_Grackle( G );
+
   chprintf( "GRACKLE initialized.\n\n");
 };
 
@@ -97,42 +103,17 @@ void Set_Initial_Fields_Grackle( Grid3D &G ){
 
 void Copy_Fields_to_Grackle( Grid3D &G ){
 
-  // set temperature units
-  // double temperature_units = MASS_HYDROGEN * pow(G.Cool.units.a_units * G.Cool.units.length_units / G.Cool.units.time_units, 2) / K_BOLTZ;
-
-
   for (int i = 0;i < G.Cool.field_size;i++) {
     G.Cool.fields.density[i] = G.C.density[i] * G.Cool.dens_conv ;
     G.Cool.fields.internal_energy[i] = G.C.GasEnergy[i]  / G.Cool.fields.density[i] * G.Cool.energy_conv * G.Cool.dens_conv / G.Cosmo.current_a / G.Cosmo.current_a ;
     // initilize internal energy (here 1000 K for no reason)
     // G.Cool.fields.internal_energy[i] = 1000./ ( G.Cool.gamma -1 ) / temperature_units;
   }
-  //
-  // int nx, ny, nz, nx_real, ny_real, nz_real, nGHST;
-  // nx = G.H.nx;
-  // ny = G.H.ny;
-  // nz = G.H.nz;
-  // nx_real = G.H.nx_real;
-  // ny_real = G.H.ny_real;
-  // nz_real = G.H.nz_real;
-  // nGHST = G.H.n_ghost;
-  // int i, j, k, id;
-  // for ( k=0; k<nz_real; k++ ){
-  //   for ( j=0; j<ny_real; j++ ){
-  //     for ( i=0; i<nx_real; i++ ){
-  //       id = i + j*nx + k*nx*ny;
-  //       G.Cool.fields.density[id] = G.C.density[id] * G.Cool.dens_conv ;
-  //       G.Cool.fields.internal_energy[id] = G.C.GasEnergy[id]  / G.Cool.fields.density[id] * G.Cool.energy_conv * G.Cool.dens_conv / G.Cosmo.current_a / G.Cosmo.current_a ;
-  //     }
-  //   }
-  // }
-
-
 }
 
 void Do_Cooling_Step( Real dt, Grid3D &G ){
 
-  Copy_Fields_to_Grackle( G );
+  // Copy_Fields_to_Grackle( G );
 
   // Calculate temperature.
   if (calculate_temperature(&G.Cool.units, &G.Cool.fields,  G.Cool.temperature) == 0) {
@@ -191,6 +172,10 @@ void Clear_Data_Grackle( Grid3D &G ){
   free( G.Cool.fields.z_velocity );
   free( G.Cool.temperature );
   free( G.Cool.cooling_time );
+
+  #ifdef OUTPUT_COOLING_RATE
+  free( G.Cool.cooling_rate );
+  #endif
 
 
 }

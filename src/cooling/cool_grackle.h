@@ -34,6 +34,10 @@ class Cool_GK
   Real *temperature;
   Real *cooling_time;
 
+  #ifdef OUTPUT_COOLING_RATE
+  Real *cooling_rate;
+  #endif
+
   Real tiny_number;
 
   // Create struct for storing grackle field data
