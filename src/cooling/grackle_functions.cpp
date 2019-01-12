@@ -33,9 +33,10 @@ void Initialize_Grackle_Fields( Grid3D &G ){
   G.Cool.fields.grid_dimension[0] = G.H.nx; // the active dimension not including ghost zones.
   G.Cool.fields.grid_dimension[1] = G.H.ny; // the active dimension not including ghost zones.
   G.Cool.fields.grid_dimension[2] = G.H.nz; // the active dimension not including ghost zones.
-    for (int i = 0;i < 3;i++) {
-    G.Cool.fields.grid_start[i] = G.H.n_ghost;
-  }
+
+  G.Cool.fields.grid_start[0] = G.H.n_ghost;
+  G.Cool.fields.grid_start[1] = G.H.n_ghost;
+  G.Cool.fields.grid_start[2] = G.H.n_ghost;
   G.Cool.fields.grid_end[0] =  G.H.nx - G.H.n_ghost ;
   G.Cool.fields.grid_end[1] =  G.H.ny - G.H.n_ghost ;
   G.Cool.fields.grid_end[2] =  G.H.nz - G.H.n_ghost ;
@@ -139,7 +140,11 @@ void Do_Cooling_Step( Real dt, Grid3D &G ){
     chprintf( "GRACKLE: Error in calculate_cooling_time.\n");
     exit(-1) ;
   }
-  chprintf( "Cooling time = %le s.\n", G.Cool.cooling_time[0] *  G.Cool.units.time_units);
+  chprintf( "Cooling time = %le s.\n", G.Cool.cooling_time[128] );
+
+  for (int i = 0;i < G.Cool.field_size;i++) {
+    G.Cool.cooling_rate[i] = G.Cool.cooling_time[i];
+  }
 
   //
   // // Calculate pressure.
