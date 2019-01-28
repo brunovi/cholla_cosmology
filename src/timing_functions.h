@@ -80,6 +80,13 @@ public:
   #endif
   #endif
 
+  #ifdef COOLING_GRACKLE
+  Real time_cooling_min;
+  Real time_cooling_max;
+  Real time_cooling_mean;
+  Real time_cooling_all;
+  #endif
+
   Time();
   void Initialize();
   void Start_Timer();

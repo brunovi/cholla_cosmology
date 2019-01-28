@@ -36,6 +36,10 @@ void Time::Initialize(){
   #endif
   #endif
 
+  #ifdef COOLING_GRACKLE
+  time_cooling_all = 0;
+  #endif
+
   chprintf( "\nTiming Functions is ON \n\n");
 
 
@@ -133,12 +137,18 @@ void Time::End_and_Record_Time( int time_var ){
     if (n_steps > 0) time_bound_pot_all += t_max;
   }
   #endif
-
   #endif
 
+  #ifdef COOLING_GRACKLE
+  if( time_var == 10 ){
+    time_cooling_min = t_min;
+    time_cooling_max = t_max;
+    time_cooling_mean = t_avg;
+    if (n_steps > 0) time_cooling_all += t_max;
+  }
+  #endif
   // if ( time_var == 1 ) n_steps += 1;
   // chprintf("n_steps: %d\n", n_steps);
-
 }
 
 void Time::Print_Times(){
