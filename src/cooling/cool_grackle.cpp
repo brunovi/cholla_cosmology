@@ -48,25 +48,32 @@ void Initialize_Grackle( Cool_GK &Cool, struct parameters P,  Grav3D &Grav, Cosm
 
   // First, set up the units system.
   // These are conversions from code units to cgs.
-  Cool.units.comoving_coordinates = 1; // 1 if cosmological sim, 0 if not
-
-  // Cool.units.density_units = 1.67e-24;
-  // Cool.units.length_units = 3.08567e+24;  //cm per Mpc
-  // Cool.units.time_units = 31557600000000.0;  //sec per Myr
-  // Cool.units.velocity_units = Cool.units.length_units / Cool.units.time_units;
-
-  Cool.units.density_units =  Cool.dens_conv * Cool.dens_to_CGS;
+  Cool.units.comoving_coordinates = 0; // 1 if cosmological sim, 0 if not
+  Cool.units.density_units = Cool.dens_to_CGS;
   Cool.units.length_units = kpc_CGS / Cosmo.cosmo_h;
   Cool.units.time_units = 1.0;
   Cool.units.velocity_units = km_CGS ;
-
   Cool.units.a_units = 1.0; // units for the expansion factor
-  // Set expansion factor to 1 for non-cosmological simulation.
   Cool.units.a_value = Cosmo.current_a / Cool.units.a_units;
+  // Cool.units.a_value = 1;
+
+  // // Units to compare to pygracle
+  // Cool.units.density_units = 1.67373522381e-24;  //mass_hydrogen_cgs
+  // Cool.units.length_units = 3.08567e+24;        //cm per Mpc
+  // Cool.units.time_units = 3.15576e+13;           //sec per Myr
+  // Cool.units.velocity_units = Cool.units.length_units / Cool.units.time_units;
+
+  // // Units to compare to gracle_cxx
+  // Cool.units.density_units = 1.67e-24;  //mass_hydrogen_cgs
+  // Cool.units.length_units = 1.0;        //cm per Mpc
+  // Cool.units.time_units = 1.0e+12;           //sec per Myr
+  // Cool.units.velocity_units = Cool.units.length_units / Cool.units.time_units;
+
+
 
   // Second, create a chemistry object for parameters.  This needs to be a pointer.
   // chemistry_data *my_grackle_data;
-  Cool.data = (chemistry_data *) malloc(sizeof(chemistry_data));
+  Cool.data = new chemistry_data;
   if (set_default_chemistry_parameters(Cool.data) == 0) {
     chprintf( "GRACKLE: Error in set_default_chemistry_parameters.\n");
     exit(-1) ;
@@ -74,15 +81,17 @@ void Initialize_Grackle( Cool_GK &Cool, struct parameters P,  Grav3D &Grav, Cosm
   // Set parameter values for chemistry.
   // Access the parameter storage with the struct you've created
   // or with the grackle_data pointer declared in grackle.h (see further below).
-  Cool.data->use_grackle = 1;            // chemistry on
-  Cool.data->with_radiative_cooling = 1; // G.Cooling on
-  Cool.data->primordial_chemistry = 1;   // molecular network with H, He, D
-  Cool.data->metal_cooling = 1;          // metal cooling on
-  Cool.data->UVbackground = 1;           // UV background on
-  Cool.data->grackle_data_file = "src/cooling/CloudyData_UVB=HM2012.h5"; // data file
-  Cool.data->omp_nthreads = 5;
+  grackle_data->use_grackle = 1;            // chemistry on
+  grackle_data->with_radiative_cooling = 1; // G.Cooling on
+  grackle_data->primordial_chemistry = 1;   // molecular network with H, He, D
+  grackle_data->metal_cooling = 1;          // metal cooling on
+  grackle_data->UVbackground = 1;           // UV background on
+  grackle_data->grackle_data_file = "src/cooling/CloudyData_UVB=HM2012.h5"; // data file
+  grackle_data->use_specific_heating_rate = 0;
+  grackle_data->use_volumetric_heating_rate = 0;
+  grackle_data->omp_nthreads = 5;
 
-  if ( Cool.data->UVbackground == 1) chprintf( "GRACKLE: Loading UV Background File: %s\n", Cool.data->grackle_data_file );
+  if ( grackle_data->UVbackground == 1) chprintf( "GRACKLE: Loading UV Background File: %s\n", grackle_data->grackle_data_file );
 
   // Finally, initialize the chemistry object.
   if (initialize_chemistry_data(&Cool.units) == 0) {
