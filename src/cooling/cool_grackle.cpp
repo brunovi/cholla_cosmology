@@ -48,7 +48,7 @@ void Initialize_Grackle( Cool_GK &Cool, struct parameters P,  Grav3D &Grav, Cosm
 
   // First, set up the units system.
   // These are conversions from code units to cgs.
-  Cool.units.comoving_coordinates = 0; // 1 if cosmological sim, 0 if not
+  Cool.units.comoving_coordinates = 1; // 1 if cosmological sim, 0 if not
   Cool.units.density_units = Cool.dens_to_CGS;
   Cool.units.length_units = kpc_CGS / Cosmo.cosmo_h;
   Cool.units.time_units = 1.0;
@@ -84,8 +84,8 @@ void Initialize_Grackle( Cool_GK &Cool, struct parameters P,  Grav3D &Grav, Cosm
   grackle_data->use_grackle = 1;            // chemistry on
   grackle_data->with_radiative_cooling = 1; // G.Cooling on
   grackle_data->primordial_chemistry = 1;   // molecular network with H, He, D
-  grackle_data->metal_cooling = 1;          // metal cooling on
-  grackle_data->UVbackground = 1;           // UV background on
+  grackle_data->metal_cooling = 0;          // metal cooling on
+  grackle_data->UVbackground = 0;           // UV background on
   grackle_data->grackle_data_file = "src/cooling/CloudyData_UVB=HM2012.h5"; // data file
   grackle_data->use_specific_heating_rate = 0;
   grackle_data->use_volumetric_heating_rate = 0;

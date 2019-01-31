@@ -40,7 +40,6 @@ void Initialize_Grackle_Fields( Grid3D &G ){
   G.Cool.fields.grid_end[1] =  G.H.ny - G.H.n_ghost - 1 ;
   G.Cool.fields.grid_end[2] =  G.H.nz - G.H.n_ghost - 1 ;
 
-
   G.Cool.fields.grid_dx = 0.0; // used only for H2 self-shielding approximation
 
   // G.Cool.fields.density         = G.C.density;
@@ -101,11 +100,11 @@ void Set_Initial_Fields_Grackle( Grid3D &G ){
     for (j=0; j<ny_g; j++) {
       for (i=0; i<nx_g; i++) {
         id = i + j*nx_g + k*nx_g*ny_g;
-        if (id > G.Cool.field_size ) continue;
+        // if (id > G.Cool.field_size ) continue;
         G.Cool.fields.x_velocity[id] = 0.0;
         G.Cool.fields.y_velocity[id] = 0.0;
         G.Cool.fields.z_velocity[id] = 0.0;
-        G.Cool.fields.density[i] = G.C.density[i] * G.Cool.dens_conv / G.Cosmo.current_a / G.Cosmo.current_a / G.Cosmo.current_a ;
+        G.Cool.fields.density[i] = G.C.density[i] * G.Cool.dens_conv  ;
         G.Cool.fields.internal_energy[i] = G.C.GasEnergy[i]  / G.Cool.fields.density[i] * G.Cool.energy_conv * G.Cool.dens_conv / G.Cosmo.current_a / G.Cosmo.current_a ;
 
         // temp = temp_min + (temp_max - temp_min ) / (nx*ny*nz - 1) * counter;
