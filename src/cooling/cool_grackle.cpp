@@ -21,7 +21,7 @@ void Initialize_Grackle( Cool_GK &Cool, struct parameters P,  Grav3D &Grav, Cosm
   chprintf( "\nUsing GRACKLE for cooling...\n");
 
 
-  grackle_verbose = 0;
+  grackle_verbose = 1;
   #ifdef MPI_CHOLLA
   // Enable output
   if (procID != 0 ) grackle_verbose = 0;

@@ -104,8 +104,8 @@ void Set_Initial_Fields_Grackle( Grid3D &G ){
         G.Cool.fields.x_velocity[id] = 0.0;
         G.Cool.fields.y_velocity[id] = 0.0;
         G.Cool.fields.z_velocity[id] = 0.0;
-        G.Cool.fields.density[i] = G.C.density[i] * G.Cool.dens_conv  ;
-        G.Cool.fields.internal_energy[i] = G.C.GasEnergy[i]  / G.Cool.fields.density[i] * G.Cool.energy_conv * G.Cool.dens_conv / G.Cosmo.current_a / G.Cosmo.current_a ;
+        G.Cool.fields.density[id] = G.C.density[id] * G.Cool.dens_conv  ;
+        G.Cool.fields.internal_energy[id] = G.C.GasEnergy[id]  / G.Cool.fields.density[id] * G.Cool.energy_conv * G.Cool.dens_conv / G.Cosmo.current_a / G.Cosmo.current_a ;
 
         // temp = temp_min + (temp_max - temp_min ) / (nx*ny*nz - 1) * counter;
         // temp = pow( 10, temp );
@@ -134,17 +134,14 @@ void Copy_Fields_to_Grackle( Grid3D &G ){
 
   for (int i = 0;i < G.Cool.field_size;i++) {
     G.Cool.fields.density[i] = G.C.density[i] * G.Cool.dens_conv ;
-    G.Cool.fields.internal_energy[i] = G.C.GasEnergy[i]  / G.Cool.fields.density[i] * G.Cool.energy_conv / G.Cool.dens_conv / G.Cosmo.current_a / G.Cosmo.current_a ;
-    // initilize internal energy (here 1000 K for no reason)
-    // G.Cool.fields.internal_energy[i] = 1000./ ( G.Cool.gamma -1 ) / temperature_units;
+    G.Cool.fields.internal_energy[i] = G.C.GasEnergy[i]  / G.Cool.fields.density[i] * G.Cool.energy_conv * G.Cool.dens_conv / G.Cosmo.current_a / G.Cosmo.current_a ;
   }
 }
 
 void Do_Cooling_Step( Real dt, Grid3D &G ){
 
-  // Copy_Fields_to_Grackle( G );
+  Copy_Fields_to_Grackle( G );
 
-  // Calculate temperature.
   if (calculate_temperature(&G.Cool.units, &G.Cool.fields,  G.Cool.temperature) == 0) {
     chprintf( "GRACKLE: Error in calculate_temperature.\n");
     return ;
@@ -179,25 +176,25 @@ void Do_Cooling_Step( Real dt, Grid3D &G ){
     // chprintf( "Cooling time = %le s.\n", G.Cool.cooling_time[i] * G.Cool.units.time_units );
   }
 
-  // Calculate pressure.
-  gr_float *pressure;
-  pressure = (Real *) malloc(G.Cool.field_size * sizeof(Real));
-  if (calculate_pressure(&G.Cool.units, &G.Cool.fields, pressure) == 0) {
-    chprintf( "GRACKLE: Error in calculate_pressure.\n");
-    return ;
-  }
-
-  chprintf("Pressure = %le.\n", pressure[0]);
-
-  // Calculate gamma.
-  gr_float *gamma;
-  gamma = (Real *) malloc(G.Cool.field_size * sizeof(Real));
-  if (calculate_gamma(&G.Cool.units, &G.Cool.fields,  gamma) == 0) {
-    chprintf("GRACKLE: Error in calculate_gamma.\n");
-    return ;
-  }
-
-  chprintf( "gamma = %le.\n", gamma[0]);
+  // // Calculate pressure.
+  // gr_float *pressure;
+  // pressure = (Real *) malloc(G.Cool.field_size * sizeof(Real));
+  // if (calculate_pressure(&G.Cool.units, &G.Cool.fields, pressure) == 0) {
+  //   chprintf( "GRACKLE: Error in calculate_pressure.\n");
+  //   return ;
+  // }
+  //
+  // chprintf("Pressure = %le.\n", pressure[0]);
+  //
+  // // Calculate gamma.
+  // gr_float *gamma;
+  // gamma = (Real *) malloc(G.Cool.field_size * sizeof(Real));
+  // if (calculate_gamma(&G.Cool.units, &G.Cool.fields,  gamma) == 0) {
+  //   chprintf("GRACKLE: Error in calculate_gamma.\n");
+  //   return ;
+  // }
+  //
+  // chprintf( "gamma = %le.\n", gamma[0]);
 
 }
 
