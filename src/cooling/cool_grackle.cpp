@@ -72,7 +72,6 @@ void Initialize_Grackle( Cool_GK &Cool, struct parameters P,  Grav3D &Grav, Cosm
 
 
   // Second, create a chemistry object for parameters.  This needs to be a pointer.
-  // chemistry_data *my_grackle_data;
   Cool.data = new chemistry_data;
   if (set_default_chemistry_parameters(Cool.data) == 0) {
     chprintf( "GRACKLE: Error in set_default_chemistry_parameters.\n");
@@ -81,17 +80,17 @@ void Initialize_Grackle( Cool_GK &Cool, struct parameters P,  Grav3D &Grav, Cosm
   // Set parameter values for chemistry.
   // Access the parameter storage with the struct you've created
   // or with the grackle_data pointer declared in grackle.h (see further below).
-  grackle_data->use_grackle = 1;            // chemistry on
-  grackle_data->with_radiative_cooling = 1; // G.Cooling on
-  grackle_data->primordial_chemistry = 1;   // molecular network with H, He, D
-  grackle_data->metal_cooling = 0;          // metal cooling on
-  grackle_data->UVbackground = 0;           // UV background on
-  grackle_data->grackle_data_file = "src/cooling/CloudyData_UVB=HM2012.h5"; // data file
-  grackle_data->use_specific_heating_rate = 0;
-  grackle_data->use_volumetric_heating_rate = 0;
-  grackle_data->omp_nthreads = 5;
+  Cool.data->use_grackle = 1;            // chemistry on
+  Cool.data->with_radiative_cooling = 1; // G.Cooling on
+  Cool.data->primordial_chemistry = 1;   // molecular network with H, He, D
+  Cool.data->metal_cooling = 0;          // metal cooling on
+  Cool.data->UVbackground = 0;           // UV background on
+  Cool.data->grackle_data_file = "src/cooling/CloudyData_UVB=HM2012.h5"; // data file
+  Cool.data->use_specific_heating_rate = 0;
+  Cool.data->use_volumetric_heating_rate = 0;
+  Cool.data->omp_nthreads = 5;
 
-  if ( grackle_data->UVbackground == 1) chprintf( "GRACKLE: Loading UV Background File: %s\n", grackle_data->grackle_data_file );
+  if ( Cool.data->UVbackground == 1) chprintf( "GRACKLE: Loading UV Background File: %s\n", Cool.data->grackle_data_file );
 
   // Finally, initialize the chemistry object.
   if (initialize_chemistry_data(&Cool.units) == 0) {
