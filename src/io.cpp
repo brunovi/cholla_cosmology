@@ -1266,6 +1266,40 @@ void Grid3D::Write_Grid_HDF5(hid_t file_id)
     // Free the dataset id
     status = H5Dclose(dataset_id);
 
+    // Copy the internal energy array to the memory buffer
+    for (k=0; k<H.nz_real; k++) {
+      for (j=0; j<H.ny_real; j++) {
+        for (i=0; i<H.nx_real; i++) {
+          id = (i+H.n_ghost) + (j+H.n_ghost)*H.nx + (k+H.n_ghost)*H.nx*H.ny;
+          buf_id = k + j*H.nz_real + i*H.nz_real*H.ny_real;
+          dataset_buffer[buf_id] = Cool.fields.internal_energy[id];
+        }
+      }
+    }
+    // Create a dataset id for density
+    dataset_id = H5Dcreate(file_id, "/internal_energy", H5T_IEEE_F64BE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    // Write the density array to file  // NOTE: NEED TO FIX FOR FLOAT REAL!!!
+    status = H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, dataset_buffer);
+    // Free the dataset id
+    status = H5Dclose(dataset_id);
+
+    // Copy the internal energy array to the memory buffer
+    for (k=0; k<H.nz_real; k++) {
+      for (j=0; j<H.ny_real; j++) {
+        for (i=0; i<H.nx_real; i++) {
+          id = (i+H.n_ghost) + (j+H.n_ghost)*H.nx + (k+H.n_ghost)*H.nx*H.ny;
+          buf_id = k + j*H.nz_real + i*H.nz_real*H.ny_real;
+          dataset_buffer[buf_id] = Cool.temperature[id];
+        }
+      }
+    }
+    // Create a dataset id for density
+    dataset_id = H5Dcreate(file_id, "/temperature", H5T_IEEE_F64BE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    // Write the density array to file  // NOTE: NEED TO FIX FOR FLOAT REAL!!!
+    status = H5Dwrite(dataset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, dataset_buffer);
+    // Free the dataset id
+    status = H5Dclose(dataset_id);
+
     #endif //OUTPUT_COOLING_RATE
     #endif //COOLING_GRACKLE
 

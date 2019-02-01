@@ -57,9 +57,10 @@ void Initialize_Grackle_Fields( Grid3D &G ){
   G.Cool.fields.HeIII_density   = &G.C.scalar[ 4*n_cells ];
   G.Cool.fields.e_density       = &G.C.scalar[ 5*n_cells ];
 
-
-  chprintf( " Allocating memory for: metal density\n");
-  G.Cool.fields.metal_density   = &G.C.scalar[ 6*n_cells ];;
+  if ( G.Cool.data->metal_cooling == 1){
+    chprintf( " Allocating memory for: metal density\n");
+    G.Cool.fields.metal_density   = &G.C.scalar[ 6*n_cells ];
+  }
 
   G.Cool.temperature = (Real *) malloc(G.Cool.field_size * sizeof(Real));
   G.Cool.cooling_time = (Real *) malloc(G.Cool.field_size * sizeof(Real));
@@ -120,10 +121,12 @@ void Set_Initial_Fields_Grackle( Grid3D &G ){
         G.Cool.fields.HeII_density[id] = G.Cool.tiny_number * G.Cool.fields.density[id];
         G.Cool.fields.HeIII_density[id] = G.Cool.tiny_number * G.Cool.fields.density[id];
         G.Cool.fields.e_density[id] = G.Cool.tiny_number * G.Cool.fields.density[id];
+
+        #ifdef GRACKLE_METAL_COOLING
         // G.Cool.fields.metal_density[id] = G.Cool.tiny_number  * G.Cool.fields.density[id];
         G.Cool.fields.metal_density[id] = G.Cool.data->SolarMetalFractionByMass  * G.Cool.fields.density[i];
         // G.Cool.fields.metal_density[id] = 0.0241  * G.Cool.fields.density[i];
-
+        #endif
 
       }
     }
@@ -204,13 +207,25 @@ void Clear_Data_Grackle( Grid3D &G ){
   free( G.Cool.fields.x_velocity );
   free( G.Cool.fields.y_velocity );
   free( G.Cool.fields.z_velocity );
-  free( G.Cool.temperature );
-  free( G.Cool.cooling_time );
+
+  // Free scalars
+  // free(G.Cool.fields.HI_density );
+  // free(G.Cool.fields.HII_density );
+  // free(G.Cool.fields.HeI_density );
+  // free(G.Cool.fields.HeII_density );
+  // free(G.Cool.fields.HeIII_density );
+  // free(G.Cool.fields.e_density );
+
+  // #ifdef GRACKLE_METAL_COOLING
+  // free(G.Cool.fields.metal_density );
+  // #endif
 
   #ifdef OUTPUT_COOLING_RATE
   free( G.Cool.cooling_rate );
   #endif
 
+  free( G.Cool.temperature );
+  free( G.Cool.cooling_time );
 
 }
 

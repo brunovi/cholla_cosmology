@@ -40,11 +40,15 @@ typedef double Real;
 
 #ifdef SCALAR
 #ifdef COOLING_GRACKLE
+#ifdef GRACKLE_METAL_COOLING
 #define NSCALARS 7
-#else
+#else  //GRACKLE_METAL_COOLING
+#define NSCALARS 6
+#endif //GRACKLE_METAL_COOLING
+#else  //COOLING_GRACKLE
 #define NSCALARS 1
-#endif
-#endif
+#endif //COOLING_GRACKLE
+#endif //SCALAR
 
 #ifdef GRAVITY
 #define N_GHOST_POTENTIAL 2

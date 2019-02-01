@@ -82,8 +82,12 @@ void Initialize_Grackle( Cool_GK &Cool, struct parameters P,  Grav3D &Grav, Cosm
   // or with the grackle_data pointer declared in grackle.h (see further below).
   Cool.data->use_grackle = 1;            // chemistry on
   Cool.data->with_radiative_cooling = 1; // G.Cooling on
-  Cool.data->primordial_chemistry = 1;   // molecular network with H, He, D
-  Cool.data->metal_cooling = 0;          // metal cooling on
+  Cool.data->primordial_chemistry = 1;   // molecular network with H, He
+  #ifdef GRACKLE_METAL_COOLING
+  Cool.data->metal_cooling = 1;          // metal cooling on
+  #else
+  Cool.data->metal_cooling = 0;          // metal cooling off
+  #endif
   Cool.data->UVbackground = 0;           // UV background on
   Cool.data->grackle_data_file = "src/cooling/CloudyData_UVB=HM2012.h5"; // data file
   Cool.data->use_specific_heating_rate = 0;
