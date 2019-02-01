@@ -151,12 +151,14 @@ int main(int argc, char *argv[])
   #ifdef COOLING_GRACKLE
   Initialize_Grackle( G.Cool, P, G.Grav, G.Cosmo );
   Initialize_Grackle_Fields( G );
-  Real start_cool, stop_cool, time_cool;
-  start_cool = get_time();
+  #ifdef CPU_TIME
+  G.Timer.Start_Timer();
+  #endif
   Do_Cooling_Step( 0, G );
-  stop_cool = get_time();
-  time_cool = stop_cool - start_cool;
-  chprintf( " Time Cooling: %f\n", time_cool*1000 );
+  #ifdef CPU_TIME
+  G.Timer.End_and_Record_Time(10);
+  G.Timer.Print_Cooling_Time();
+  #endif
   #endif
 
 

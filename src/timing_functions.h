@@ -94,6 +94,10 @@ public:
   void Print_Times();
   void Get_Average_Times();
   void Print_Average_Times();
+
+  #ifdef COOLING_GRACKLE
+  void Print_Cooling_Time();
+  #endif
 };
 
 

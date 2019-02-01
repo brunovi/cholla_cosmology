@@ -171,6 +171,10 @@ void Time::Print_Times(){
   #endif
   #endif
 
+  #ifdef COOLING_GRACKLE
+  chprintf(" Time Cooling           min: %9.4f  max: %9.4f  avg: %9.4f   ms\n", time_cooling_min, time_cooling_max, time_cooling_mean);
+  #endif
+
 }
 
 void Time::Get_Average_Times(){
@@ -196,6 +200,10 @@ void Time::Get_Average_Times(){
   #endif
   #endif
 
+  #ifdef COOLING_GRACKLE
+  time_cooling_all /= n_steps;
+  #endif
+
 }
 
 void Time::Print_Average_Times(){
@@ -219,6 +227,10 @@ void Time::Print_Average_Times(){
   #endif
   #endif
 
+  #ifdef COOLING_GRACKLE
+  time_total += time_cooling_all;
+  #endif
+
   chprintf("\nAverage Times      n_steps:%d\n", n_steps);
   #ifdef GRAVITY_CPU
   chprintf(" Time Calc dt           avg: %9.4f   ms\n", time_dt_all);
@@ -236,11 +248,22 @@ void Time::Print_Average_Times(){
   chprintf(" Time Part Dens Transf  avg: %9.4f   ms\n", time_part_dens_transf_all);
   chprintf(" Time Advance Part 1    avg: %9.4f   ms\n", time_advance_particles_1_all);
   chprintf(" Time Advance Part 2    avg: %9.4f   ms\n", time_advance_particles_2_all);
-  chprintf(" Time Total             avg: %9.4f   ms\n", time_total);
   #endif
   #endif
 
+  #ifdef COOLING_GRACKLE
+  chprintf(" Time Cooling           avg: %9.4f   ms\n", time_cooling_all);
+  #endif
+
+  chprintf(" Time Total             avg: %9.4f   ms\n", time_total);
 }
+
+#ifdef COOLING_GRACKLE
+void Time::Print_Cooling_Time(){
+  chprintf(" Time Cooling           min: %9.4f  max: %9.4f  avg: %9.4f   ms\n", time_cooling_min, time_cooling_max, time_cooling_mean);
+}
+#endif
+
 
 
 #endif
