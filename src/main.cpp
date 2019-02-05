@@ -151,14 +151,14 @@ int main(int argc, char *argv[])
   #ifdef COOLING_GRACKLE
   Initialize_Grackle( G.Cool, P, G.Grav, G.Cosmo );
   Initialize_Grackle_Fields( G );
-  #ifdef CPU_TIME
-  G.Timer.Start_Timer();
-  #endif
-  Do_Cooling_Step( 0, G );
-  #ifdef CPU_TIME
-  G.Timer.End_and_Record_Time(10);
-  G.Timer.Print_Cooling_Time();
-  #endif
+  // #ifdef CPU_TIME
+  // G.Timer.Start_Timer();
+  // #endif
+  // Do_Cooling_Step( G );
+  // #ifdef CPU_TIME
+  // G.Timer.End_and_Record_Time(10);
+  // G.Timer.Print_Cooling_Time();
+  // #endif
   #endif
 
 
@@ -200,11 +200,10 @@ int main(int argc, char *argv[])
   // Evolve the grid, one timestep at a time
   chprintf("Starting calculations.\n");
   while (G.H.t < P.tout)
-  //while (G.H.n_step < 1)
   {
-    #ifdef COOLING_GRACKLE
-    break;
-    #endif
+    // #ifdef COOLING_GRACKLE
+    // break;
+    // #endif
 
     chprintf("n_step: %d \n", G.H.n_step + 1 );
     // get the start time
@@ -238,6 +237,14 @@ int main(int argc, char *argv[])
 
     // Advance the grid by one timestep
     dti = G.Update_Hydro_Grid();
+
+    #ifdef CPU_TIME
+    G.Timer.Start_Timer();
+    #endif
+    Do_Cooling_Step( G );
+    #ifdef CPU_TIME
+    G.Timer.End_and_Record_Time(10);
+    #endif
 
     // update the simulation time ( t += dt )
     G.Update_Time();

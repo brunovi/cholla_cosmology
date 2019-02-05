@@ -35,9 +35,6 @@ void Initialize_Grackle( Cool_GK &Cool, struct parameters P,  Grav3D &Grav, Cosm
   Cool.momentum_conv = Cosmo.rho_0_gas * Cosmo.v_0_gas;
   Cool.energy_conv =   Cosmo.v_0_gas * Cosmo.v_0_gas ;
 
-  // chprintf( "########## V_0: %f \n", Cosmo.v_0_gas);
-
-
   Real Msun_CGS = 1.98847e33; //Msun in gr
   Real kpc_CGS = 3.086e21;  //kpc in cm
   Real km_CGS = 1e5; //km in cm
@@ -83,16 +80,16 @@ void Initialize_Grackle( Cool_GK &Cool, struct parameters P,  Grav3D &Grav, Cosm
   Cool.data->use_grackle = 1;            // chemistry on
   Cool.data->with_radiative_cooling = 1; // G.Cooling on
   Cool.data->primordial_chemistry = 1;   // molecular network with H, He
-  #ifdef GRACKLE_METAL_COOLING
-  Cool.data->metal_cooling = 1;          // metal cooling on
-  #else
+  // #ifdef GRACKLE_METAL_COOLING
+  // Cool.data->metal_cooling = 1;          // metal cooling on
+  // #else
   Cool.data->metal_cooling = 0;          // metal cooling off
-  #endif
+  // #endif
   Cool.data->UVbackground = 0;           // UV background on
   Cool.data->grackle_data_file = "src/cooling/CloudyData_UVB=HM2012.h5"; // data file
   Cool.data->use_specific_heating_rate = 0;
   Cool.data->use_volumetric_heating_rate = 0;
-  Cool.data->omp_nthreads = 5;
+  Cool.data->omp_nthreads = 10;
 
   if ( Cool.data->UVbackground == 1) chprintf( "GRACKLE: Loading UV Background File: %s\n", Cool.data->grackle_data_file );
 
