@@ -44,6 +44,17 @@ void Change_GAS_Frame_System( Grid3D &G, bool forward ){
         #ifdef DE
         G.C.GasEnergy[id] = G.C.GasEnergy[id]  * energy_factor ;
         #endif
+
+        #ifdef COOLING_GRACKLE
+        // if ( G.Grav.INITIAL ) continue;
+        G.C.scalar[0*G.H.n_cells + id] *= dens_factor;
+        G.C.scalar[1*G.H.n_cells + id] *= dens_factor;
+        G.C.scalar[2*G.H.n_cells + id] *= dens_factor;
+        G.C.scalar[3*G.H.n_cells + id] *= dens_factor;
+        G.C.scalar[4*G.H.n_cells + id] *= dens_factor;
+        G.C.scalar[5*G.H.n_cells + id] *= dens_factor;
+        G.C.scalar[6*G.H.n_cells + id] *= dens_factor;
+        #endif
       }
     }
   }
