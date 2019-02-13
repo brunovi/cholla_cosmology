@@ -46,15 +46,16 @@ void Initialize_Grackle( Cool_GK &Cool, struct parameters P,  Grav3D &Grav, Cosm
   // First, set up the units system.
   // These are conversions from code units to cgs.
   Cool.units.comoving_coordinates = 1; // 1 if cosmological sim, 0 if not
+  // Cool.units.density_units = Cool.dens_to_CGS  ;
   Cool.units.density_units = Cool.dens_to_CGS  / Cosmo.current_a / Cosmo.current_a / Cosmo.current_a ;
   // Cool.units.length_units = kpc_CGS / Cosmo.cosmo_h;
   Cool.units.length_units = Cool.vel_to_CGS;
   Cool.units.time_units = 1.0;
   Cool.units.a_units = 1.0; // units for the expansion factor
   Cool.units.a_value = Cosmo.current_a / Cool.units.a_units;
+  // Cool.units.a_value = 1;
   // Cool.units.velocity_units = km_CGS ;
   Cool.units.velocity_units = Cool.vel_to_CGS / Cosmo.current_a / Cool.units.time_units; // since u = a * dx/dt
-  // Cool.units.a_value = 1;
 
   // // Units to compare to pygracle
   // Cool.units.density_units = 1.67373522381e-24;  //mass_hydrogen_cgs

@@ -111,10 +111,12 @@ void Set_Initial_Fields_Grackle( Grid3D &G ){
         G.Cool.fields.x_velocity[id] = 0.0;
         G.Cool.fields.y_velocity[id] = 0.0;
         G.Cool.fields.z_velocity[id] = 0.0;
-        G.Cool.fields.density[id] = G.C.density[id];
+        // G.Cool.fields.density[id] = G.C.density[id];
+        // G.Cool.fields.internal_energy[id] = G.C.GasEnergy[id]  / G.C.density[id] * G.Cool.energy_conv  ;
         // G.Cool.fields.density[id] = G.C.density[id] * G.Cool.dens_conv / G.Cosmo.current_a / G.Cosmo.current_a / G.Cosmo.current_a    ;
+        // G.Cool.fields.internal_energy[id] = G.C.GasEnergy[id]  / G.C.density[id] * G.Cool.energy_conv / G.Cosmo.current_a / G.Cosmo.current_a ;
+
         // G.Cool.fields.internal_energy[id] = G.C.GasEnergy[id]  / G.Cool.fields.density[id] * G.Cool.energy_conv * G.Cool.dens_conv  ;
-        G.Cool.fields.internal_energy[id] = G.C.GasEnergy[id]  / G.C.density[id] * G.Cool.energy_conv  ;
 
         // temp = temp_min + (temp_max - temp_min ) / (nx*ny*nz - 1) * counter;
         // temp = pow( 10, temp );
@@ -152,11 +154,12 @@ void Set_Initial_Fields_Grackle( Grid3D &G ){
 
 void Copy_Fields_to_Grackle( Grid3D &G ){
 
-  for (int i = 0;i < G.Cool.field_size;i++) {
-    G.Cool.fields.density[i] = G.C.density[i];
+  for (int id = 0;id < G.Cool.field_size;id++) {
+    G.Cool.fields.density[id] = G.C.density[id];
     // G.Cool.fields.density[i] = G.C.density[i] * G.Cool.dens_conv / G.Cosmo.current_a / G.Cosmo.current_a / G.Cosmo.current_a ;
     // G.Cool.fields.internal_energy[i] = G.C.GasEnergy[i]  / G.Cool.fields.density[i] * G.Cool.energy_conv * G.Cool.dens_conv  ;
-    G.Cool.fields.internal_energy[i] = G.C.GasEnergy[i]  / G.C.density[i] * G.Cool.energy_conv ;
+    G.Cool.fields.internal_energy[id] = G.C.GasEnergy[id]  / G.C.density[id] * G.Cool.energy_conv ;
+    // G.Cool.fields.internal_energy[id] = G.C.GasEnergy[id]  / G.C.density[id] * G.Cool.energy_conv / G.Cosmo.current_a / G.Cosmo.current_a ;
   }
 }
 
@@ -164,10 +167,12 @@ void Do_Cooling_Step( Grid3D &G ){
 
   Copy_Fields_to_Grackle( G );
 
+  // G.Cool.units.a_value = 1;
   G.Cool.units.a_value = G.Cosmo.current_a / G.Cool.units.a_units;
+  // G.Cool.units.density_units = G.Cool.dens_to_CGS ;
   G.Cool.units.density_units = G.Cool.dens_to_CGS  / G.Cosmo.current_a / G.Cosmo.current_a / G.Cosmo.current_a ;
-  // G.Cool.units.velocity_units = G.Cool.units.length_units / G.Cool.units.a_value / G.Cool.units.time_units;
   G.Cool.units.velocity_units = G.Cool.units.length_units / G.Cool.units.time_units /  G.Cosmo.current_a ;
+  // G.Cool.units.length_units = G.Cool.vel_to_CGS/ G.Cosmo.current_a;
 
 
   if (calculate_temperature(&G.Cool.units, &G.Cool.fields,  G.Cool.temperature) == 0) {
@@ -242,7 +247,7 @@ void Update_Internal_Energy( Grid3D &G ){
   nz = G.H.nz_real;
   nGHST = G.H.n_ghost;
 
-  Real dens, ge_0, ge_1, delta_ge;
+  Real dens, ge_0, ge_1, delta_ge, vx, vy, vz, Ek;
   int k, j, i, id;
   Real delta_ge_max = 0;
   Real delta_ge_min = 100;
@@ -255,7 +260,6 @@ void Update_Internal_Energy( Grid3D &G ){
         id = (i) + (j)*nx_g + (k)*nx_g*ny_g;
         dens = G.C.density[id];
         ge_0 = G.C.GasEnergy[id];
-        if ( ge_0 <= 0) std::cout << ge_0 << std::endl;
         // ge_1 = G.Cool.fields.internal_energy[id] * dens / G.Cool.energy_conv  * G.Cosmo.current_a * G.Cosmo.current_a;
         ge_1 = G.Cool.fields.internal_energy[id] * dens / G.Cool.energy_conv;
         avrg_0 += ge_0;
@@ -264,24 +268,33 @@ void Update_Internal_Energy( Grid3D &G ){
         delta_ge_max = fmax( delta_ge/ge_0, delta_ge_max );
         delta_ge_min = fmin( delta_ge/ge_0, delta_ge_min );
         G.C.GasEnergy[id] += delta_ge ;
+        if ( G.C.GasEnergy[id] <= 0 ) std::cout << "Negative gasEnergy " <<  G.C.GasEnergy[id] << std::endl;
         G.C.Energy[id] += delta_ge ;
+        vx = G.C.momentum_x[id] / dens;
+        vy = G.C.momentum_y[id] / dens;
+        vz = G.C.momentum_z[id] / dens;
+        Ek = 0.5 * dens * ( vx*vx + vy*vy + vz*vz );
+        if ( G.C.Energy[id] < Ek ) {
+          std::cout <<  G.C.Energy[id] << "  " << Ek + G.C.GasEnergy[id]  << std::endl;
+          G.C.Energy[id] = Ek + G.C.GasEnergy[id];
+        }
       }
     }
   }
   avrg_0 /= (nx_g*ny_g*nz_g);
   avrg_1 /= (nx_g*ny_g*nz_g);
-  // std::cout << delta_ge_min << "   " << delta_ge_max << std::endl;
-  std::cout << avrg_0 << "   " << avrg_1 << std::endl;
+  std::cout << delta_ge_min << "   " << delta_ge_max << std::endl;
+  // std::cout << avrg_0 << "   " << avrg_1 << std::endl;
 }
 
 
 
 void Clear_Data_Grackle( Grid3D &G ){
   free( G.Cool.fields.density );
-  free( G.Cool.fields.internal_energy );
   free( G.Cool.fields.x_velocity );
   free( G.Cool.fields.y_velocity );
   free( G.Cool.fields.z_velocity );
+  free( G.Cool.fields.internal_energy );
 
 
   #ifdef OUTPUT_COOLING_RATE
