@@ -576,6 +576,10 @@ class Grid3D
 
      void Uniform_Grid();
 
+     #ifdef CELL_SMOOTHING
+     void Smooth_Cell( int i, int j, int k);
+     #endif
+
 #ifdef   MPI_CHOLLA
     void Set_Boundaries_MPI(struct parameters P);
     void Set_Boundaries_MPI_SLAB(int *flags, struct parameters P);
@@ -626,8 +630,9 @@ class Grid3D
     void Unload_Potential_from_Buffer_Conserved( int direction, int side, Real *buffer, int buffer_start  );
     int Load_Potential_To_Buffer( int direction, int side, Real *buffer, int buffer_start  );
     void Unload_Potential_from_Buffer( int direction, int side, Real *buffer, int buffer_start  );
-
     #endif
+
+
 #endif /*MPI_CHOLLA*/
 
 

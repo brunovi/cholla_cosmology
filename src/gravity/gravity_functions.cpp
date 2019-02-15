@@ -753,7 +753,7 @@ void Set_dt( Grid3D &G, bool &output_now, int n_step ){
     chprintf( " Seting max delta_a: %f\n", da_courant );
   }
 
-  Real da_min = da_particles / 50;
+  Real da_min = da_particles / 20;
   if ( da_courant < da_min ){
     da_courant = da_min;
     chprintf( " Seting min delta_a: %f\n", da_courant );
