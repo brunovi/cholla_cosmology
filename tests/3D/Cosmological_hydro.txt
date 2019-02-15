@@ -36,9 +36,9 @@ zu_bcnd=1
 # path to output directory
 indir=/raid/bruno/data/cosmo_sims/cholla_pm/256_cool/ics/
 outdir=/raid/bruno/data/cosmo_sims/cholla_pm/256_cool/
-#indir=/raid/bruno/data/cosmo_sims/cholla_pm/cosmo_256_hydro/nyx/ics/
-#outdir=/raid/bruno/data/cosmo_sims/cholla_pm/cosmo_256_hydro/nyx/
 #indir=/raid/bruno/data/cosmo_sims/cholla_pm/cosmo_256_hydro/enzo/ics/
 #outdir=/raid/bruno/data/cosmo_sims/cholla_pm/cosmo_256_hydro/enzo/
+#indir=/raid/bruno/data/cosmo_sims/cholla_pm/cosmo_256_hydro/nyx/ics/
+#outdir=/raid/bruno/data/cosmo_sims/cholla_pm/cosmo_256_hydro/nyx/
 #indir=/raid/bruno/data/cosmo_sims/cholla_pm/cosmo_256_hydro/gadget/ics/
 #outdir=/raid/bruno/data/cosmo_sims/cholla_pm/cosmo_256_hydro/gadget/
