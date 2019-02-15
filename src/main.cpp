@@ -230,16 +230,6 @@ int main(int argc, char *argv[])
     // Advance the grid by one timestep
     dti = G.Update_Hydro_Grid();
 
-    #ifdef COOLING_GRACKLE
-    #ifdef CPU_TIME
-    G.Timer.Start_Timer();
-    #endif
-    Do_Cooling_Step( G );
-    #ifdef CPU_TIME
-    G.Timer.End_and_Record_Time(10);
-    #endif
-    #endif
-
     // update the simulation time ( t += dt )
     G.Update_Time();
 
