@@ -103,14 +103,6 @@ class Grav3D
     #endif //GRAVITY_CPU
     #endif //GRAVITY_CORRECTOR
 
-    #ifdef EXTRA_FIELD
-    Real *extra_field;
-    #endif
-
-
-
-
-
   } F;
 
   /*! \fn Grav3D(void)

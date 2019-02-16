@@ -108,10 +108,6 @@ void Grav3D::AllocateMemory_CPU(void)
   #endif //GRAVITY_CPU
   #endif //GRAVITY_CORRECTOR
 
-  #ifdef EXTRA_FIELD
-  F.extra_field  = (Real *) malloc(n_cells*sizeof(Real));
-  #endif
-
 }
 
 void Grav3D::Initialize_values_CPU(void){
@@ -133,10 +129,6 @@ void Grav3D::Initialize_values_CPU(void){
     #endif //GRAVITY_CPU
     #endif //GRAVITY_CORRECTOR
 
-
-    #ifdef EXTRA_FIELD
-    F.extra_field[id] = 0;
-    #endif
   }
 
   for (int id_pot=0; id_pot<n_cells_potential; id_pot++){
@@ -166,10 +158,6 @@ void Grav3D::FreeMemory_CPU(void)
   #endif //GRAVITY_CPU
   #endif //GRAVITY_CORRECTOR
 
-
-  #ifdef EXTRA_FIELD
-  free(F.extra_field);
-  #endif
 }
 
 #endif

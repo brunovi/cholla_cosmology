@@ -73,7 +73,7 @@ void Get_Mean_Kinetic_Energy( Grid3D &G ){
     Ek_sum += Ek_sum_all[i];
   }
   #endif
-  
+
   G.H.Ekin_mean = Ek_sum / ( G.Grav.nx_local * G.Grav.ny_local * G.Grav.nz_local);
 
 }
@@ -130,22 +130,14 @@ void Sync_Energies_3D_Host_Function(Grid3D &G, int g_start, int g_end ){
         ge1 = G.C.GasEnergy[id];
         ge2 = E - 0.5*d*(vx*vx + vy*vy + vz*vz);
 
-        #ifdef EXTRA_FIELD
-        G.Grav.F.extra_field[id_grav] = 0;
-        #endif
-
         #ifdef DE_EKINETIC_LIMIT
-        if (ge2 > 0.0 && E > 0.0 && ge2/E > 0.001 && Ek/G.H.Ekin_mean > 0.4 ) {
+        if (ge2 > 0.0 && E > 0.0 && ge2/E > 0.02 && Ek/G.H.Ekin_mean > 0.4 ) {
         #else
         if (ge2 > 0.0 && E > 0.0 && ge2/E > 0.001 ) {
         #endif //DE_EKINETIC_LIMIT
 
           G.C.GasEnergy[id] = ge2;
           ge1 = ge2;
-          #ifdef EXTRA_FIELD
-          G.Grav.F.extra_field[id_grav] = 1;
-          #endif
-          // std::cout << ge2/E << std::endl;
         }
 
         //find the max nearby total energy
@@ -159,9 +151,6 @@ void Sync_Energies_3D_Host_Function(Grid3D &G, int g_start, int g_end ){
 
         if (ge2/Emax > 0.1 && ge2 > 0.0 && Emax > 0.0) {
           G.C.GasEnergy[id] = ge2;
-          #ifdef EXTRA_FIELD
-          G.Grav.F.extra_field[id_grav] = 2;
-          #endif
         }
         // sync the total energy with the internal energy
         else {
