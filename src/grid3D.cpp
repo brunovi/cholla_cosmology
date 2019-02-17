@@ -245,7 +245,7 @@ void Grid3D::Initialize(struct parameters *P)
   #endif
 
   #ifdef TEMPERATURE_FLOOR
-  H.temperature_floor = 1.0;
+  H.temperature_floor = 0.1;
   #else
   H.temperature_floor = 0;
   #endif
