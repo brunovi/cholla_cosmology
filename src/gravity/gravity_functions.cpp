@@ -453,6 +453,10 @@ void Add_Gavity_To_Hydro_Function( Grid3D &G, int g_start, int g_end ){
   Real d, vx, vy, vz, gx, gy, gz;
   Real d_0, vx_0, vy_0, vz_0;
 
+  #ifdef GRAVITY_DELTA_EK
+  Real Ek_0, Ek_1;
+  #endif
+
   int k, j, i, id_grav, id_grid;
   for ( k=g_start; k<g_end; k++ ){
     for ( j=0; j<ny_grav; j++ ){
@@ -474,11 +478,23 @@ void Add_Gavity_To_Hydro_Function( Grid3D &G, int g_start, int g_end ){
         gy = G.Grav.F.gravity_y_h[id_grav];
         gz = G.Grav.F.gravity_z_h[id_grav];
 
+        #ifdef GRAVITY_DELTA_EK
+        Ek_0 = 0.5 * d * ( vx*vx + vy*vy + vz*vz );
+        #endif
+
 
         G.C.momentum_x[id_grid] += 0.5 *  G.H.dt * gx * ( d_0 + d );
         G.C.momentum_y[id_grid] += 0.5 *  G.H.dt * gy * ( d_0 + d );
         G.C.momentum_z[id_grid] += 0.5 *  G.H.dt * gz * ( d_0 + d );
+        #ifndef GRAVITY_DELTA_EK
         G.C.Energy[id_grid] += 0.5 * G.H.dt * ( gx*(d_0*vx_0 + d*vx) + gy*(d_0*vy_0 + d*vy) + gz*(d_0*vz_0 + d*vz)   );
+        #else
+        vx = G.C.momentum_x[id_grid] / d;
+        vy = G.C.momentum_y[id_grid] / d;
+        vz = G.C.momentum_z[id_grid] / d;
+        Ek_1 = 0.5 * d * ( vx*vx + vy*vy + vz*vz );
+        G.C.Energy[id_grid] += Ek_1 - Ek_0;
+        #endif
       }
     }
   }
