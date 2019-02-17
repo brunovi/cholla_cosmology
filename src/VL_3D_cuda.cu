@@ -353,6 +353,10 @@ __global__ void Update_Conserved_Variables_3D_half(Real *dev_conserved, Real *de
   int ipo, jpo, kpo;
   #endif
 
+  #ifdef ENERGY_FLOOR
+  Real E, Ek;
+  #endif
+
   // threads corresponding to all cells except outer ring of ghost cells do the calculation
   if (xid > 0 && xid < nx-1 && yid > 0 && yid < ny-1 && zid > 0 && zid < nz-1)
   {
@@ -420,6 +424,24 @@ __global__ void Update_Conserved_Variables_3D_half(Real *dev_conserved, Real *de
       printf("###Thread density change  %f -> %f \n", dev_conserved[            id], dens_floor );
       dev_conserved[            id] = dens_floor;
     }
+    #endif
+
+    #ifdef DE
+    #ifdef ENERGY_FLOOR
+    d  =  dev_conserved[            id];
+    d_inv = 1.0 / d;
+    vx =  dev_conserved[1*n_cells + id] * d_inv;
+    vy =  dev_conserved[2*n_cells + id] * d_inv;
+    vz =  dev_conserved[3*n_cells + id] * d_inv;
+    E = dev_conserved[4*n_cells + id];
+    Ek = 0.5 * d * ( vx*vx + vy*vy + vz*vz );
+    if (dev_conserved_half[(n_fields-1)*n_cells + id] < 0 ) dev_conserved_half[(n_fields-1)*n_cells + id] = 1e-5;
+    if ( E - Ek < 0 ){
+      dev_conserved[4*n_cells + id] = Ek + dev_conserved_half[(n_fields-1)*n_cells + id];
+      printf("###Thread Energy change  %f -> %f \n", E, dev_conserved[4*n_cells + id] );
+    }
+
+    #endif
     #endif
     //if (dev_conserved_half[id] < 0.0 || dev_conserved_half[id] != dev_conserved_half[id] || dev_conserved_half[4*n_cells+id] < 0.0 || dev_conserved_half[4*n_cells+id] != dev_conserved_half[4*n_cells+id]) {
       //printf("%3d %3d %3d Thread crashed in half step update. d: %e E: %e\n", xid, yid, zid, dev_conserved_half[id], dev_conserved_half[4*n_cells+id]);
