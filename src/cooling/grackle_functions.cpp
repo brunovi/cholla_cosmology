@@ -48,8 +48,8 @@ void Initialize_Grackle_Fields( Grid3D &G ){
 
   G.Cool.fields.grid_dx = 0.0; // used only for H2 self-shielding approximation
 
-  // G.Cool.fields.density         = G.C.density;
-  G.Cool.fields.density         = (Real *) malloc(G.Cool.field_size * sizeof(Real));
+  G.Cool.fields.density         = G.C.density;
+  // G.Cool.fields.density         = (Real *) malloc(G.Cool.field_size * sizeof(Real));
   G.Cool.fields.x_velocity      = (Real *) malloc(G.Cool.field_size * sizeof(Real));
   G.Cool.fields.y_velocity      = (Real *) malloc(G.Cool.field_size * sizeof(Real));
   G.Cool.fields.z_velocity      = (Real *) malloc(G.Cool.field_size * sizeof(Real));
@@ -68,10 +68,13 @@ void Initialize_Grackle_Fields( Grid3D &G ){
     G.Cool.fields.metal_density   = &G.C.scalar[ 6*n_cells ];
   // }
 
+  #ifdef OUTPUT_TEMPERATURE
   G.Cool.temperature = (Real *) malloc(G.Cool.field_size * sizeof(Real));
-  G.Cool.cooling_time = (Real *) malloc(G.Cool.field_size * sizeof(Real));
+  #endif
+
 
   #ifdef OUTPUT_COOLING_RATE
+  G.Cool.cooling_time = (Real *) malloc(G.Cool.field_size * sizeof(Real));
   G.Cool.cooling_rate = (Real *) malloc(G.Cool.field_size * sizeof(Real));
   #endif
 
@@ -83,12 +86,7 @@ void Initialize_Grackle_Fields( Grid3D &G ){
 
 void Set_Initial_Fields_Grackle( Grid3D &G ){
 
-  // set temperature units
-  // Real temperature_units = MASS_HYDROGEN * pow(G.Cool.units.a_units * G.Cool.units.length_units / G.Cool.units.time_units, 2) / K_BOLTZ;
-  // Real temp, temp_min, temp_max;
-  // temp_min = 1;
-  // temp_max = 9;
-  // chprintf( "Temp units: %le\n", temperature_units );
+
   chprintf( "H fraction: %f\n", grackle_data->HydrogenFractionByMass );
   chprintf( "Solar Metal fraction: %f\n", grackle_data->SolarMetalFractionByMass );
 
@@ -103,84 +101,48 @@ void Set_Initial_Fields_Grackle( Grid3D &G ){
   int i, j, k, i_g, j_g, k_g, id;
   int counter = 0;
   for (k=0; k<nz_g; k++) {
-    // if ( k > nGHST && k <= nz_g-nGHST ) counter += 1;
     for (j=0; j<ny_g; j++) {
       for (i=0; i<nx_g; i++) {
         id = i + j*nx_g + k*nx_g*ny_g;
-        // if (id > G.Cool.field_size ) continue;
+        // G.Cool.fields.density[id] = G.C.density[id];
         G.Cool.fields.x_velocity[id] = 0.0;
         G.Cool.fields.y_velocity[id] = 0.0;
         G.Cool.fields.z_velocity[id] = 0.0;
-        // G.Cool.fields.density[id] = G.C.density[id];
-        // G.Cool.fields.internal_energy[id] = G.C.GasEnergy[id]  / G.C.density[id] * G.Cool.energy_conv  ;
-        // G.Cool.fields.density[id] = G.C.density[id] * G.Cool.dens_conv / G.Cosmo.current_a / G.Cosmo.current_a / G.Cosmo.current_a    ;
-        // G.Cool.fields.internal_energy[id] = G.C.GasEnergy[id]  / G.C.density[id] * G.Cool.energy_conv / G.Cosmo.current_a / G.Cosmo.current_a ;
 
-        // G.Cool.fields.internal_energy[id] = G.C.GasEnergy[id]  / G.Cool.fields.density[id] * G.Cool.energy_conv * G.Cool.dens_conv  ;
-
-        // temp = temp_min + (temp_max - temp_min ) / (nx*ny*nz - 1) * counter;
-        // temp = pow( 10, temp );
-        // G.Cool.fields.density[id] = 1;
-        // G.Cool.fields.internal_energy[id] =temp / temperature_units / ( G.Cool.gamma -1 );
-        // counter += 1;
-        // G.Cool.fields.HI_density[id] = G.Cool.fields.density[id];
-        // G.Cool.fields.HI_density[id] = grackle_data->HydrogenFractionByMass * G.Cool.fields.density[id];
-        // G.Cool.fields.HII_density[id] = G.Cool.tiny_number * G.Cool.fields.density[id];
-        // G.Cool.fields.HeI_density[id] = G.Cool.tiny_number * G.Cool.fields.density[id];
-        // G.Cool.fields.HeI_density[id] = (1.0 - grackle_data->HydrogenFractionByMass) * G.Cool.fields.density[id];
-        // G.Cool.fields.HeII_density[id] = G.Cool.tiny_number * G.Cool.fields.density[id];
-        // G.Cool.fields.HeIII_density[id] = G.Cool.tiny_number * G.Cool.fields.density[id];
-        // G.Cool.fields.e_density[id] = G.Cool.tiny_number * G.Cool.fields.density[id];
-
-        // G.Cool.fields.HI_density[id] = 0.759846034884 * G.Cool.fields.density[id];
-        // G.Cool.fields.HII_density[id] = 0.00015396511 * G.Cool.fields.density[id];
-        // G.Cool.fields.HeI_density[id] = 0.239999999 * G.Cool.fields.density[id];
-        // G.Cool.fields.HeII_density[id] = 9.59999999999999e-15 * G.Cool.fields.density[id];
-        // G.Cool.fields.HeIII_density[id] =  9.599999999999992e-18 * G.Cool.fields.density[id];
-        // G.Cool.fields.e_density[id] = 8.379624017146845e-08 * G.Cool.fields.density[id];
-
-
-
-        // if ( G.Cool.data->metal_cooling == 1){
-          G.Cool.fields.metal_density[id] = G.Cool.tiny_number  * G.Cool.fields.density[id];
-          // G.Cool.fields.metal_density[id] = G.Cool.data->SolarMetalFractionByMass  * G.Cool.fields.density[i];
-          // G.Cool.fields.metal_density[id] = 0.0241  * G.Cool.fields.density[i];
-        // }
+        G.Cool.fields.internal_energy[id] = G.C.GasEnergy[id]  / G.C.density[id] * G.Cool.energy_conv / G.Cosmo.current_a / G.Cosmo.current_a ;
+        // G.Cool.fields.metal_density[id] = 0  * G.Cool.fields.density[id];
 
       }
     }
   }
-}
 
-void Copy_Fields_to_Grackle( Grid3D &G ){
-
-  for (int id = 0;id < G.Cool.field_size;id++) {
-    G.Cool.fields.density[id] = G.C.density[id];
-    // G.Cool.fields.density[i] = G.C.density[i] * G.Cool.dens_conv / G.Cosmo.current_a / G.Cosmo.current_a / G.Cosmo.current_a ;
-    // G.Cool.fields.internal_energy[i] = G.C.GasEnergy[i]  / G.Cool.fields.density[i] * G.Cool.energy_conv * G.Cool.dens_conv  ;
-    G.Cool.fields.internal_energy[id] = G.C.GasEnergy[id]  / G.C.density[id] * G.Cool.energy_conv ;
-    // G.Cool.fields.internal_energy[id] = G.C.GasEnergy[id]  / G.C.density[id] * G.Cool.energy_conv / G.Cosmo.current_a / G.Cosmo.current_a ;
-  }
-}
-
-void Do_Cooling_Step( Grid3D &G ){
-
-  Copy_Fields_to_Grackle( G );
-
-  // G.Cool.units.a_value = 1;
-  G.Cool.units.a_value = G.Cosmo.current_a / G.Cool.units.a_units;
-  // G.Cool.units.density_units = G.Cool.dens_to_CGS ;
-  G.Cool.units.density_units = G.Cool.dens_to_CGS  / G.Cosmo.current_a / G.Cosmo.current_a / G.Cosmo.current_a ;
-  G.Cool.units.velocity_units = G.Cool.units.length_units / G.Cool.units.time_units /  G.Cosmo.current_a ;
-  // G.Cool.units.length_units = G.Cool.vel_to_CGS/ G.Cosmo.current_a;
-
-
+  #ifdef OUTPUT_TEMPERATURE
   if (calculate_temperature(&G.Cool.units, &G.Cool.fields,  G.Cool.temperature) == 0) {
     chprintf( "GRACKLE: Error in calculate_temperature.\n");
     return ;
   }
   chprintf("Temperature = %le K.\n", G.Cool.temperature[0]);
+  #endif
+}
 
+void Copy_Fields_to_Grackle( Grid3D &G ){
+
+  for (int id = 0;id < G.Cool.field_size;id++) {
+    // G.Cool.fields.density[id] = G.C.density[id];
+    G.Cool.fields.internal_energy[id] = G.C.GasEnergy[id]  / G.C.density[id] * G.Cool.energy_conv / G.Cosmo.current_a / G.Cosmo.current_a ;
+  }
+}
+
+void Do_Cooling_Step( Grid3D &G ){
+
+  Real kpc_CGS = 3.086e21;  //kpc in cm
+
+  // Upfate the units conversion
+  G.Cool.units.a_value = G.Cosmo.current_a / G.Cool.units.a_units;
+  G.Cool.units.density_units = G.Cool.dens_to_CGS  / G.Cosmo.current_a / G.Cosmo.current_a / G.Cosmo.current_a ;
+  G.Cool.units.length_units = kpc_CGS / G.Cosmo.cosmo_h * G.Cosmo.current_a;
+
+  Copy_Fields_to_Grackle( G );
 
   /*********************************************************************
   / Calling the chemistry solver
@@ -188,13 +150,24 @@ void Do_Cooling_Step( Grid3D &G ){
   *********************************************************************/
   Real dt_cool = G.Cosmo.dt_secs;
   chprintf( " dt_cool: %e s\n", dt_cool );
-  if (solve_chemistry(&G.Cool.units, &G.Cool.fields, dt_cool ) == 0) {
+  if (solve_chemistry(&G.Cool.units, &G.Cool.fields, dt_cool / G.Cool.units.time_units ) == 0) {
     chprintf( "GRACKLE: Error in solve_chemistry.\n");
     return ;
   }
 
+  #ifdef OUTPUT_TEMPERATURE
+  if (calculate_temperature(&G.Cool.units, &G.Cool.fields,  G.Cool.temperature) == 0) {
+    chprintf( "GRACKLE: Error in calculate_temperature.\n");
+    return ;
+  }
+  // for (int i=0; i<G.Cool.field_size; i++)  chprintf(" Temperature = %le K.\n", G.Cool.temperature[i]);
+  #endif
+
+
+
 
   Update_Internal_Energy(G);
+
   //
   // // Calculate cooling time.
   // if (calculate_cooling_time(&G.Cool.units, &G.Cool.fields, G.Cool.cooling_time) == 0) {
@@ -247,50 +220,56 @@ void Update_Internal_Energy( Grid3D &G ){
   nz = G.H.nz_real;
   nGHST = G.H.n_ghost;
 
-  Real dens, ge_0, ge_1, delta_ge, vx, vy, vz, Ek;
+  Real dens, ge_0, ge_1, delta_ge, vx, vy, vz, E, Ek;
   int k, j, i, id;
-  Real delta_ge_max = 0;
-  Real delta_ge_min = 100;
-  Real avrg_0, avrg_1;
-  avrg_0 = 0;
-  avrg_1 = 0;
-  for (k=0; k<nz_g; k++) {
-    for (j=0; j<ny_g; j++) {
-      for (i=0; i<nx_g; i++) {
-        id = (i) + (j)*nx_g + (k)*nx_g*ny_g;
+  // Real avrg_0, avrg_1;
+  // avrg_0 = 0;
+  // avrg_1 = 0;
+  for (k=0; k<nz; k++) {
+    for (j=0; j<ny; j++) {
+      for (i=0; i<nx; i++) {
+        id = (i+nGHST) + (j+nGHST)*nx_g + (k+nGHST)*nx_g*ny_g;
         dens = G.C.density[id];
-        ge_0 = G.C.GasEnergy[id];
-        // ge_1 = G.Cool.fields.internal_energy[id] * dens / G.Cool.energy_conv  * G.Cosmo.current_a * G.Cosmo.current_a;
-        ge_1 = G.Cool.fields.internal_energy[id] * dens / G.Cool.energy_conv;
-        avrg_0 += ge_0;
-        avrg_1 += ge_1;
-        delta_ge = ge_1 - ge_0;
-        delta_ge_max = fmax( delta_ge/ge_0, delta_ge_max );
-        delta_ge_min = fmin( delta_ge/ge_0, delta_ge_min );
-        G.C.GasEnergy[id] += delta_ge ;
-        if ( G.C.GasEnergy[id] <= 0 ) std::cout << "Negative gasEnergy " <<  G.C.GasEnergy[id] << std::endl;
-        G.C.Energy[id] += delta_ge ;
         vx = G.C.momentum_x[id] / dens;
         vy = G.C.momentum_y[id] / dens;
         vz = G.C.momentum_z[id] / dens;
         Ek = 0.5 * dens * ( vx*vx + vy*vy + vz*vz );
-        if ( G.C.Energy[id] < Ek ) {
-          std::cout <<  G.C.Energy[id] << "  " << Ek + G.C.GasEnergy[id]  << std::endl;
+        E = G.C.Energy[id];
+        if ( E < Ek ) {
+          std::cout << "##Negative Energy before Cooling: " <<  E   << " " << dens << std::endl;
           G.C.Energy[id] = Ek + G.C.GasEnergy[id];
         }
+        ge_0 = G.C.GasEnergy[id];
+        if ( ge_0 < 0 ) std::cout << "##Negative GasEnergy before Cooling: " <<  ge_0   << " " << dens << std::endl;
+        if ( fabs(( E - (Ek + ge_0) )  / E ) > 1e-5 ) std::cout << "##Energy Error before cooling: " << E << "  " << Ek + ge_0 << std::endl;
+        ge_1 = G.Cool.fields.internal_energy[id] * dens / G.Cool.energy_conv  * G.Cosmo.current_a * G.Cosmo.current_a;
+        // avrg_0 += ge_0;
+        delta_ge = ge_1 - ge_0;
+        G.C.GasEnergy[id] += delta_ge ;
+        G.C.Energy[id] += delta_ge ;
+        ge_1 = G.C.GasEnergy[id];
+        E = G.C.Energy[id];
+        // avrg_1 += ge_1;
+        if (ge_1 <= 0 ) std::cout << "##Negative gasEnergy after Cooling" <<  G.C.GasEnergy[id] << std::endl;
+        if ( fabs(( E - (Ek + ge_1) )  / E ) > 1e-5 ) std::cout << "##Energy Error after cooling: " << E << "  " << Ek + ge_1 << std::endl;
+
+        // if (E < 0 ) {
+        //   std::cout << "##Negative Energy after Cooling: " <<  G.C.Energy[id] << "  " << Ek + G.C.GasEnergy[id]  << std::endl;
+        //   G.C.Energy[id] = Ek + G.C.GasEnergy[id];
+        // }
       }
     }
   }
-  avrg_0 /= (nx_g*ny_g*nz_g);
-  avrg_1 /= (nx_g*ny_g*nz_g);
-  std::cout << delta_ge_min << "   " << delta_ge_max << std::endl;
+  // avrg_0 /= (nx_g*ny_g*nz_g);
+  // avrg_1 /= (nx_g*ny_g*nz_g);
+  // std::cout << delta_ge_min << "   " << delta_ge_max << std::endl;
   // std::cout << avrg_0 << "   " << avrg_1 << std::endl;
 }
 
 
 
 void Clear_Data_Grackle( Grid3D &G ){
-  free( G.Cool.fields.density );
+  // free( G.Cool.fields.density );
   free( G.Cool.fields.x_velocity );
   free( G.Cool.fields.y_velocity );
   free( G.Cool.fields.z_velocity );
@@ -299,10 +278,12 @@ void Clear_Data_Grackle( Grid3D &G ){
 
   #ifdef OUTPUT_COOLING_RATE
   free( G.Cool.cooling_rate );
+  free( G.Cool.cooling_time );
   #endif
 
+  #ifdef OUTPUT_TEMPERATURE
   free( G.Cool.temperature );
-  free( G.Cool.cooling_time );
+  #endif
 
 }
 

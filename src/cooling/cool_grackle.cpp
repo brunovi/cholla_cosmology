@@ -39,6 +39,8 @@ void Initialize_Grackle( Cool_GK &Cool, struct parameters P,  Grav3D &Grav, Cosm
   Real kpc_CGS = 3.086e21;  //kpc in cm
   Real km_CGS = 1e5; //km in cm
 
+  Real initial_redshift = 100;
+
   Cool.dens_to_CGS = Cool.dens_conv * Msun_CGS / kpc_CGS / kpc_CGS / kpc_CGS * Cosmo.cosmo_h * Cosmo.cosmo_h;
   Cool.vel_to_CGS = km_CGS;
   Cool.energy_to_CGS =  km_CGS * km_CGS;
@@ -46,30 +48,16 @@ void Initialize_Grackle( Cool_GK &Cool, struct parameters P,  Grav3D &Grav, Cosm
   // First, set up the units system.
   // These are conversions from code units to cgs.
   Cool.units.comoving_coordinates = 1; // 1 if cosmological sim, 0 if not
-  // Cool.units.density_units = Cool.dens_to_CGS  ;
-  Cool.units.density_units = Cool.dens_to_CGS  / Cosmo.current_a / Cosmo.current_a / Cosmo.current_a ;
-  // Cool.units.length_units = kpc_CGS / Cosmo.cosmo_h;
-  Cool.units.length_units = Cool.vel_to_CGS;
-  Cool.units.time_units = 1.0;
-  Cool.units.a_units = 1.0; // units for the expansion factor
+  // Cool.units.a_units = 1.0 / ( 1.0 + initial_redshift ); // units for the expansion factor
+  Cool.units.a_units = 1.0 ; // units for the expansion factor
   Cool.units.a_value = Cosmo.current_a / Cool.units.a_units;
-  // Cool.units.a_value = 1;
-  // Cool.units.velocity_units = km_CGS ;
-  Cool.units.velocity_units = Cool.vel_to_CGS / Cosmo.current_a / Cool.units.time_units; // since u = a * dx/dt
-
-  // // Units to compare to pygracle
-  // Cool.units.density_units = 1.67373522381e-24;  //mass_hydrogen_cgs
-  // Cool.units.length_units = 3.08567e+24;        //cm per Mpc
-  // Cool.units.time_units = 3.15576e+13;           //sec per Myr
-  // Cool.units.velocity_units = Cool.units.length_units / Cool.units.time_units;
-
-  // // Units to compare to gracle_cxx
-  // Cool.units.density_units = 1.67e-24;  //mass_hydrogen_cgs
-  // Cool.units.length_units = 1.0;        //cm per Mpc
-  // Cool.units.time_units = 1.0e+12;           //sec per Myr
-  // Cool.units.velocity_units = Cool.units.length_units / Cool.units.time_units;
-
-
+  Cool.units.density_units = Cool.dens_to_CGS  / Cosmo.current_a / Cosmo.current_a / Cosmo.current_a ;
+  // Cool.units.length_units = Cool.vel_to_CGS * Cosmo.current_a;
+  Cool.units.length_units = kpc_CGS / Cosmo.cosmo_h * Cosmo.current_a;
+  // Cool.units.time_units = 1.0;
+  Cool.units.time_units = KPC / Cosmo.cosmo_h ;
+  // Cool.units.velocity_units = Cool.vel_to_CGS / Cool.units.time_units; // since u = a * dx/dt
+  Cool.units.velocity_units = Cool.units.length_units / Cosmo.current_a / Cool.units.time_units; // since u = a * dx/dt
 
   // Second, create a chemistry object for parameters.  This needs to be a pointer.
   Cool.data = new chemistry_data;
@@ -86,7 +74,7 @@ void Initialize_Grackle( Cool_GK &Cool, struct parameters P,  Grav3D &Grav, Cosm
   // #ifdef GRACKLE_METAL_COOLING
   // Cool.data->metal_cooling = 1;          // metal cooling on
   // #else
-  Cool.data->metal_cooling = 0;          // metal cooling off
+  Cool.data->metal_cooling = 1;          // metal cooling off
   // #endif
   Cool.data->UVbackground = 0;           // UV background on
   Cool.data->grackle_data_file = "src/cooling/CloudyData_UVB=HM2012.h5"; // data file

@@ -31,10 +31,13 @@ class Cool_GK
   Real gamma;
 
   Real temperature_units;
+
+  #ifdef OUTPUT_TEMPERATURE
   Real *temperature;
-  Real *cooling_time;
+  #endif
 
   #ifdef OUTPUT_COOLING_RATE
+  Real *cooling_time;
   Real *cooling_rate;
   #endif
 
