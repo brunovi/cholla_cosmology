@@ -125,13 +125,13 @@ void Sync_Energies_3D_Host_Function(Grid3D &G, int g_start, int g_end ){
         vz = G.C.momentum_z[id] * d_inv;
         E = G.C.Energy[id];
 
-        if (E < 0.0 || E != E) continue;
+        // if (E < 0.0 || E != E) continue; // BUG: This leads to negative Energy
         Ek = 0.5*d*(vx*vx + vy*vy + vz*vz);
         ge1 = G.C.GasEnergy[id];
         ge2 = E - 0.5*d*(vx*vx + vy*vy + vz*vz);
 
         #ifdef DE_EKINETIC_LIMIT
-        if (ge2 > 0.0 && E > 0.0 && ge2/E > 0.02 && Ek/G.H.Ekin_mean > 0.4 ) {
+        if (ge2 > 0.0 && E > 0.0 && ge2/E > 0.05 && Ek/G.H.Ekin_mean > 0.4 ) {
         #else
         if (ge2 > 0.0 && E > 0.0 && ge2/E > 0.001 ) {
         #endif //DE_EKINETIC_LIMIT
@@ -157,6 +157,9 @@ void Sync_Energies_3D_Host_Function(Grid3D &G, int g_start, int g_end ){
           if (ge1 > 0.0) G.C.Energy[id] += ge1 - ge2;
           else G.C.GasEnergy[id] = ge2;
         }
+        // G.C.Energy[id] = Ek + G.C.GasEnergy[id];
+        // if ( fabs(( G.C.Energy[id] - (Ek + G.C.GasEnergy[id]) )  / G.C.Energy[id] ) > 1e-5 ) std::cout << "##Energy Error: " << G.C.Energy[id] << "  " << Ek + G.C.GasEnergy[id] << std::endl;
+        // if (G.C.Energy[id] < 0 ) std::cout << "##Negative Energy after E_sync: " <<  G.C.Energy[id] << "  " << G.C.GasEnergy[id] << " " << d << " " << Ek << std::endl;
       }
     }
   }
@@ -209,8 +212,8 @@ void Apply_Temperature_Floor_Host( Grid3D &G, int g_start, int g_end ){
   nz_grav = G.Grav.nz_local;
 
   int nGHST = nGHST_grid ;
-
   Real d, u, temp;
+  Real d_inv, vx, vy, vz, Ekin, E;
   Real u_new, delta_u;
   int k, j, i, id;
   int k_g, j_g, i_g;
@@ -224,6 +227,16 @@ void Apply_Temperature_Floor_Host( Grid3D &G, int g_start, int g_end ){
 
         d = G.C.density[id];
         u = G.C.GasEnergy[id];
+
+        d_inv = 1/d;
+        vx = G.C.momentum_x[id] * d_inv;
+        vy = G.C.momentum_y[id] * d_inv;
+        vz = G.C.momentum_z[id] * d_inv;
+        Ekin = 0.5 * d * (vx*vx + vy*vy + vz*vz);
+        E = G.C.Energy[id];
+
+        if ( fabs(( E - (Ekin + u) )  / E ) > 1e-5 ) std::cout << "##Energy Error: " << E << "  " << Ekin + u << std::endl;
+
         temp = u / d;
 
         if ( temp < temp_floor ){
@@ -233,6 +246,10 @@ void Apply_Temperature_Floor_Host( Grid3D &G, int g_start, int g_end ){
           G.C.GasEnergy[id] += delta_u;
           G.C.Energy[id] += delta_u;
         }
+        E = G.C.Energy[id];
+        u = G.C.GasEnergy[id];
+        if ( fabs(( E - (Ekin + u) )  / E ) > 1e-5 ) std::cout << "##Energy Error: " << E << "  " << Ekin + u << std::endl;
+        if (G.C.Energy[id] < 0 ) std::cout << "##Negative Energy after Temp_floor: " <<  G.C.Energy[id] << "  " << G.C.GasEnergy[id] << " " << d << " " << Ekin << std::endl;
       }
     }
   }
