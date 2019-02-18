@@ -239,7 +239,7 @@ void Grid3D::Initialize(struct parameters *P)
 
 
   #ifdef DENSITY_FLOOR
-  H.density_floor = 1e-5;
+  H.density_floor = 1e-4;
   #else
   H.density_floor = 0;
   #endif
@@ -399,6 +399,8 @@ void Smooth_Cell_Single_Field( Real *field, int i, int j, int k, int nx, int ny,
   field[id] = v_avrg;
 }
 
+// void Grid3D::Smooths_and_Scale_Density( Real* density, Real *momentum_x, Real *momentum_y, Real *momentum_z,  Realint i, int j, int k )
+
 void Grid3D::Smooth_Cell( int i, int j, int k){
 
   i += H.n_ghost;
@@ -449,26 +451,26 @@ Real Grid3D::calc_dti_3D_CPU_function( int g_start, int g_end ){
         dt_cell = fmin( dt_cell, C_cfl * H.dz / (fabs(vz) + cs) );
         if ( dt_cell < dt_prev / 2 ){
           std::cout << "[Slow Cell] ( " << i << " , " << j << " , " << k << " ) " << "dt_cell: " << dt_cell << "  dt_prev: " << dt_prev <<std::endl;
-          std::cout << " cs: " << cs << " vx: " <<  fabs(vx) << " vy: " <<  fabs(vy) << " vz: " <<  fabs(vz) << std::endl;
-          std::cout << " Prev Conserved Values: " << std::endl;
-          std::cout << " Density : " << C.density[id] << std::endl;
-          std::cout << " Momentum_x : " << C.momentum_x[id] << std::endl;
-          std::cout << " Momentum_y : " << C.momentum_y[id] << std::endl;
-          std::cout << " Momentum_z : " << C.momentum_z[id] << std::endl;
-          std::cout << " Energy : " << C.Energy[id] << std::endl;
-          #ifdef DE
-          std::cout << " GasEnergy : " << C.GasEnergy[id] << std::endl;
-          #endif
+          // std::cout << " cs: " << cs << " vx: " <<  fabs(vx) << " vy: " <<  fabs(vy) << " vz: " <<  fabs(vz) << std::endl;
+          // std::cout << " Prev Conserved Values: " << std::endl;
+          // std::cout << " Density : " << C.density[id] << std::endl;
+          // std::cout << " Momentum_x : " << C.momentum_x[id] << std::endl;
+          // std::cout << " Momentum_y : " << C.momentum_y[id] << std::endl;
+          // std::cout << " Momentum_z : " << C.momentum_z[id] << std::endl;
+          // std::cout << " Energy : " << C.Energy[id] << std::endl;
+          // #ifdef DE
+          // std::cout << " GasEnergy : " << C.GasEnergy[id] << std::endl;
+          // #endif
           Smooth_Cell( i, j, k );
-          std::cout << " New Conserved Values: " << std::endl;
-          std::cout << " Density : " << C.density[id] << std::endl;
-          std::cout << " Momentum_x : " << C.momentum_x[id] << std::endl;
-          std::cout << " Momentum_y : " << C.momentum_y[id] << std::endl;
-          std::cout << " Momentum_z : " << C.momentum_z[id] << std::endl;
-          std::cout << " Energy : " << C.Energy[id] << std::endl;
-          #ifdef DE
-          std::cout << " GasEnergy : " << C.GasEnergy[id] << std::endl;
-          #endif
+          // std::cout << " New Conserved Values: " << std::endl;
+          // std::cout << " Density : " << C.density[id] << std::endl;
+          // std::cout << " Momentum_x : " << C.momentum_x[id] << std::endl;
+          // std::cout << " Momentum_y : " << C.momentum_y[id] << std::endl;
+          // std::cout << " Momentum_z : " << C.momentum_z[id] << std::endl;
+          // std::cout << " Energy : " << C.Energy[id] << std::endl;
+          // #ifdef DE
+          // std::cout << " GasEnergy : " << C.GasEnergy[id] << std::endl;
+          // #endif
 
           d_inv = 1.0 / C.density[id];
           vx = d_inv * C.momentum_x[id];
