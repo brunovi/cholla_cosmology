@@ -85,6 +85,10 @@ void Initialize_Grackle( Cool_GK &Cool, struct parameters P,  Grav3D &Grav, Cosm
     exit(-1) ;
   }
 
+  if ( Cool.data->UVbackground == 1){
+    Cool.a_UVB_on = 1 / (Cool.data->UVbackground_redshift_on + 1 );
+    chprintf( "GRACKLE: UVB on: %f \n", Cool.a_UVB_on  );
+  }
 
 }
 

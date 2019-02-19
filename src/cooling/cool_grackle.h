@@ -43,6 +43,8 @@ class Cool_GK
 
   Real tiny_number;
 
+  Real a_UVB_on;
+
   // Create struct for storing grackle field data
   grackle_field_data fields;
   int field_size;
