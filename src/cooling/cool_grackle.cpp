@@ -39,8 +39,6 @@ void Initialize_Grackle( Cool_GK &Cool, struct parameters P,  Grav3D &Grav, Cosm
   Real kpc_CGS = 3.086e21;  //kpc in cm
   Real km_CGS = 1e5; //km in cm
 
-  Real initial_redshift = 100;
-
   Cool.dens_to_CGS = Cool.dens_conv * Msun_CGS / kpc_CGS / kpc_CGS / kpc_CGS * Cosmo.cosmo_h * Cosmo.cosmo_h;
   Cool.vel_to_CGS = km_CGS;
   Cool.energy_to_CGS =  km_CGS * km_CGS;
@@ -48,15 +46,11 @@ void Initialize_Grackle( Cool_GK &Cool, struct parameters P,  Grav3D &Grav, Cosm
   // First, set up the units system.
   // These are conversions from code units to cgs.
   Cool.units.comoving_coordinates = 1; // 1 if cosmological sim, 0 if not
-  // Cool.units.a_units = 1.0 / ( 1.0 + initial_redshift ); // units for the expansion factor
   Cool.units.a_units = 1.0 ; // units for the expansion factor
   Cool.units.a_value = Cosmo.current_a / Cool.units.a_units;
   Cool.units.density_units = Cool.dens_to_CGS  / Cosmo.current_a / Cosmo.current_a / Cosmo.current_a ;
-  // Cool.units.length_units = Cool.vel_to_CGS * Cosmo.current_a;
   Cool.units.length_units = kpc_CGS / Cosmo.cosmo_h * Cosmo.current_a;
-  // Cool.units.time_units = 1.0;
   Cool.units.time_units = KPC / Cosmo.cosmo_h ;
-  // Cool.units.velocity_units = Cool.vel_to_CGS / Cool.units.time_units; // since u = a * dx/dt
   Cool.units.velocity_units = Cool.units.length_units / Cosmo.current_a / Cool.units.time_units; // since u = a * dx/dt
 
   // Second, create a chemistry object for parameters.  This needs to be a pointer.
@@ -76,10 +70,11 @@ void Initialize_Grackle( Cool_GK &Cool, struct parameters P,  Grav3D &Grav, Cosm
   // #else
   Cool.data->metal_cooling = 1;          // metal cooling off
   // #endif
-  Cool.data->UVbackground = 0;           // UV background on
+  Cool.data->UVbackground = 1;           // UV background on
   Cool.data->grackle_data_file = "src/cooling/CloudyData_UVB=HM2012.h5"; // data file
   Cool.data->use_specific_heating_rate = 0;
   Cool.data->use_volumetric_heating_rate = 0;
+  Cool.data->cmb_temperature_floor = 1;
   Cool.data->omp_nthreads = 10;
 
   if ( Cool.data->UVbackground == 1) chprintf( "GRACKLE: Loading UV Background File: %s\n", Cool.data->grackle_data_file );

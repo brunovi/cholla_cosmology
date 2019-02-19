@@ -108,8 +108,8 @@ void Set_Initial_Fields_Grackle( Grid3D &G ){
         G.Cool.fields.x_velocity[id] = 0.0;
         G.Cool.fields.y_velocity[id] = 0.0;
         G.Cool.fields.z_velocity[id] = 0.0;
-
         G.Cool.fields.internal_energy[id] = G.C.GasEnergy[id]  / G.C.density[id] * G.Cool.energy_conv / G.Cosmo.current_a / G.Cosmo.current_a ;
+
         // G.Cool.fields.metal_density[id] = 0  * G.Cool.fields.density[id];
 
       }
@@ -160,7 +160,6 @@ void Do_Cooling_Step( Grid3D &G ){
     chprintf( "GRACKLE: Error in calculate_temperature.\n");
     return ;
   }
-  // for (int i=0; i<G.Cool.field_size; i++)  chprintf(" Temperature = %le K.\n", G.Cool.temperature[i]);
   #endif
 
 
@@ -222,9 +221,6 @@ void Update_Internal_Energy( Grid3D &G ){
 
   Real dens, ge_0, ge_1, delta_ge, vx, vy, vz, E, Ek;
   int k, j, i, id;
-  // Real avrg_0, avrg_1;
-  // avrg_0 = 0;
-  // avrg_1 = 0;
   for (k=0; k<nz; k++) {
     for (j=0; j<ny; j++) {
       for (i=0; i<nx; i++) {
@@ -243,13 +239,11 @@ void Update_Internal_Energy( Grid3D &G ){
         if ( ge_0 < 0 ) std::cout << "##Negative GasEnergy before Cooling: " <<  ge_0   << " " << dens << std::endl;
         if ( fabs(( E - (Ek + ge_0) )  / E ) > 1e-5 ) std::cout << "##Energy Error before cooling: " << E << "  " << Ek + ge_0 << std::endl;
         ge_1 = G.Cool.fields.internal_energy[id] * dens / G.Cool.energy_conv  * G.Cosmo.current_a * G.Cosmo.current_a;
-        // avrg_0 += ge_0;
         delta_ge = ge_1 - ge_0;
         G.C.GasEnergy[id] += delta_ge ;
         G.C.Energy[id] += delta_ge ;
         ge_1 = G.C.GasEnergy[id];
         E = G.C.Energy[id];
-        // avrg_1 += ge_1;
         if (ge_1 <= 0 ) std::cout << "##Negative gasEnergy after Cooling" <<  G.C.GasEnergy[id] << std::endl;
         if ( fabs(( E - (Ek + ge_1) )  / E ) > 1e-5 ) std::cout << "##Energy Error after cooling: " << E << "  " << Ek + ge_1 << std::endl;
 
@@ -260,10 +254,6 @@ void Update_Internal_Energy( Grid3D &G ){
       }
     }
   }
-  // avrg_0 /= (nx_g*ny_g*nz_g);
-  // avrg_1 /= (nx_g*ny_g*nz_g);
-  // std::cout << delta_ge_min << "   " << delta_ge_max << std::endl;
-  // std::cout << avrg_0 << "   " << avrg_1 << std::endl;
 }
 
 
