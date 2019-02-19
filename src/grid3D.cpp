@@ -259,6 +259,10 @@ void Grid3D::Initialize(struct parameters *P)
   chprintf( "Revert Step is ON \n" );
   #endif
 
+  #ifdef CELL_SMOOTHING
+  H.dt_avrg = -1;
+  #endif
+
 }
 
 
@@ -711,6 +715,7 @@ Real Grid3D::Update_Grid(void)
   #endif
 
   #ifdef COOLING_GRACKLE
+  Cool.fields.density = C.density;
   Cool.fields.HI_density      = &C.scalar[ 0*H.n_cells ];
   Cool.fields.HII_density     = &C.scalar[ 1*H.n_cells ];
   Cool.fields.HeI_density     = &C.scalar[ 2*H.n_cells ];

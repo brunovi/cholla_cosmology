@@ -230,6 +230,10 @@ struct Header
   Real Ekin_mean;
   #endif
 
+  #ifdef CELL_SMOOTHING
+  Real dt_avrg;
+  #endif
+
   #ifdef GRAVITY
   /*! \var n_ghost
   *  \brief Number of offset betewen hydro_ghost_cells and potential_ghost_cells */
