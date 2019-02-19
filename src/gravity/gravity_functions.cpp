@@ -751,6 +751,7 @@ void Set_dt( Grid3D &G, bool &output_now, int n_step ){
   Real da_particles;
   Real dt_hydro, da_hydro, dt_courant, da_courant;
 
+  chprintf( " Current_z: %f \n", G.Cosmo.current_z );
 
   #ifdef ONLY_PM
   da_particles = Get_Particles_da_cosmo( G );

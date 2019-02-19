@@ -110,6 +110,13 @@ void Set_Initial_Fields_Grackle( Grid3D &G ){
         G.Cool.fields.z_velocity[id] = 0.0;
         G.Cool.fields.internal_energy[id] = G.C.GasEnergy[id]  / G.C.density[id] * G.Cool.energy_conv / G.Cosmo.current_a / G.Cosmo.current_a ;
 
+        // G.Cool.fields.HI_density[id] = 0.759846034884 * G.Cool.fields.density[id];
+        // G.Cool.fields.HII_density[id] = 0.00015396511 * G.Cool.fields.density[id];
+        // G.Cool.fields.HeI_density[id] = 0.239999999 * G.Cool.fields.density[id];
+        // G.Cool.fields.HeII_density[id] = 9.59999999999999e-15 * G.Cool.fields.density[id];
+        // G.Cool.fields.HeIII_density[id] =  9.599999999999992e-18 * G.Cool.fields.density[id];
+        // G.Cool.fields.e_density[id] = 8.379624017146845e-08 * G.Cool.fields.density[id];
+
         // G.Cool.fields.metal_density[id] = 0  * G.Cool.fields.density[id];
 
       }
