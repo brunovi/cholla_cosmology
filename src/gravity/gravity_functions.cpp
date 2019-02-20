@@ -777,7 +777,7 @@ void Set_dt( Grid3D &G, bool &output_now, int n_step ){
   }
 
   #ifdef COOLING_GRACKLE
-  if ( fabs(G.Cosmo.current_a + da_courant - G.Cool.a_UVB_on) < 0.002 ){
+  if ( fabs(G.Cosmo.current_a + da_courant - G.Cool.a_UVB_on) < 0.001 ){
     da_courant /= 10;
     chprintf( " Starting UVB. Limiting delta_a:  %f \n", da_courant);
   }

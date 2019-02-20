@@ -396,7 +396,7 @@ class Grid3D
      *  \brief Calculate the timestep. */
     void set_dt(Real dti);
 
-    Real calc_dti_3D_CPU_function( int g_start, int g_eend );
+    Real calc_dti_3D_CPU_function( int g_start, int g_eend, Real *dt_avrg );
 
     Real calc_dti_3D_CPU();
 

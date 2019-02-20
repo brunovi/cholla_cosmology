@@ -403,7 +403,41 @@ void Smooth_Cell_Single_Field( Real *field, int i, int j, int k, int nx, int ny,
   field[id] = v_avrg;
 }
 
-// void Grid3D::Smooths_and_Scale_Density( Real* density, Real *momentum_x, Real *momentum_y, Real *momentum_z,  Realint i, int j, int k )
+Real Smooth_Cell_Density( Real *density, int i, int j, int k, int nx, int ny, int nz){
+  Real v_l, v_r, v_d, v_u, v_b, v_t, v_avrg;
+  int id;
+  Real dens_0;
+  id = (i) + (j)*nx + (k)*nx*ny;
+  dens_0 = density[id];
+
+  id = (i-1) + (j)*nx + (k)*nx*ny;
+  v_l = density[id];
+  id = (i+1) + (j)*nx + (k)*nx*ny;
+  v_r = density[id];
+  id = (i) + (j-1)*nx + (k)*nx*ny;
+  v_d = density[id];
+  id = (i) + (j+1)*nx + (k)*nx*ny;
+  v_u = density[id];
+  id = (i) + (j)*nx + (k-1)*nx*ny;
+  v_b = density[id];
+  id = (i) + (j)*nx + (k+1)*nx*ny;
+  v_t = density[id];
+  v_avrg = ( v_l + v_l + v_d + v_u + v_b + v_t ) / 6;
+  id = (i) + (j)*nx + (k)*nx*ny;
+  density[id] = v_avrg;
+
+  Real dens_factor = 2 * dens_0 / v_avrg;
+  density[id] *= dens_factor;
+  return dens_factor;
+
+}
+
+void Scale_Field( Real *field, Real dens_factor, int i, int j, int k, int nx, int ny, int nz){
+  int id;
+  id = (i) + (j)*nx + (k)*nx*ny;
+  field[id] *= dens_factor;
+}
+
 
 void Grid3D::Smooth_Cell( int i, int j, int k){
 
@@ -411,7 +445,7 @@ void Grid3D::Smooth_Cell( int i, int j, int k){
   j += H.n_ghost;
   k += H.n_ghost;
 
-  Smooth_Cell_Single_Field( C.density, i, j, k, H.nx, H.ny, H.nz);
+  // Smooth_Cell_Single_Field( C.density, i, j, k, H.nx, H.ny, H.nz);
   Smooth_Cell_Single_Field( C.momentum_x, i, j, k, H.nx, H.ny, H.nz);
   Smooth_Cell_Single_Field( C.momentum_y, i, j, k, H.nx, H.ny, H.nz);
   Smooth_Cell_Single_Field( C.momentum_z, i, j, k, H.nx, H.ny, H.nz);
@@ -419,13 +453,39 @@ void Grid3D::Smooth_Cell( int i, int j, int k){
   #ifdef DE
   Smooth_Cell_Single_Field( C.GasEnergy, i, j, k, H.nx, H.ny, H.nz);
   #endif
+  #ifdef COOLING_GRACKLE
+  Smooth_Cell_Single_Field( Cool.fields.HI_density, i, j, k, H.nx, H.ny, H.nz);
+  Smooth_Cell_Single_Field( Cool.fields.HII_density, i, j, k, H.nx, H.ny, H.nz);
+  Smooth_Cell_Single_Field( Cool.fields.HeI_density, i, j, k, H.nx, H.ny, H.nz);
+  Smooth_Cell_Single_Field( Cool.fields.HeII_density, i, j, k, H.nx, H.ny, H.nz);
+  Smooth_Cell_Single_Field( Cool.fields.HeIII_density, i, j, k, H.nx, H.ny, H.nz);
+  Smooth_Cell_Single_Field( Cool.fields.e_density, i, j, k, H.nx, H.ny, H.nz);
+  Smooth_Cell_Single_Field( Cool.fields.metal_density, i, j, k, H.nx, H.ny, H.nz);
+  #endif
 
+  Real dens_factor = Smooth_Cell_Density( C.density, i, j, k, H.nx, H.ny, H.nz);
+  Scale_Field( C.momentum_x, dens_factor, i, j, k, H.nx, H.ny, H.nz );
+  Scale_Field( C.momentum_y, dens_factor, i, j, k, H.nx, H.ny, H.nz );
+  Scale_Field( C.momentum_z, dens_factor, i, j, k, H.nx, H.ny, H.nz );
+  Scale_Field( C.Energy, dens_factor, i, j, k, H.nx, H.ny, H.nz );
+  #ifdef DE
+  Scale_Field( C.GasEnergy, dens_factor, i, j, k, H.nx, H.ny, H.nz );
+  #endif
+  #ifdef COOLING_GRACKLE
+  Scale_Field( Cool.fields.HI_density, dens_factor, i, j, k, H.nx, H.ny, H.nz );
+  Scale_Field( Cool.fields.HII_density, dens_factor, i, j, k, H.nx, H.ny, H.nz );
+  Scale_Field( Cool.fields.HeI_density, dens_factor, i, j, k, H.nx, H.ny, H.nz );
+  Scale_Field( Cool.fields.HeII_density, dens_factor, i, j, k, H.nx, H.ny, H.nz );
+  Scale_Field( Cool.fields.HeIII_density, dens_factor, i, j, k, H.nx, H.ny, H.nz );
+  Scale_Field( Cool.fields.e_density, dens_factor, i, j, k, H.nx, H.ny, H.nz );
+  Scale_Field( Cool.fields.metal_density, dens_factor, i, j, k, H.nx, H.ny, H.nz );
+  #endif
 
 
 }
 #endif
 
-Real Grid3D::calc_dti_3D_CPU_function( int g_start, int g_end ){
+Real Grid3D::calc_dti_3D_CPU_function( int g_start, int g_end, Real *dt_avrg ){
   int i, j, k, id;
   Real d_inv, vx, vy, vz, P, cs;
   Real max_vx, max_vy, max_vz;
@@ -435,6 +495,7 @@ Real Grid3D::calc_dti_3D_CPU_function( int g_start, int g_end ){
   #ifdef CELL_SMOOTHING
   Real dt_cell;
   Real dt_prev = H.dt;
+  Real dt_avrg_now = 0;
   #endif
 
   // Find the maximum wave speed in the grid
@@ -453,28 +514,29 @@ Real Grid3D::calc_dti_3D_CPU_function( int g_start, int g_end ){
         dt_cell = C_cfl * H.dx / (fabs(vx) + cs);
         dt_cell = fmin( dt_cell, C_cfl * H.dy / (fabs(vy) + cs) );
         dt_cell = fmin( dt_cell, C_cfl * H.dz / (fabs(vz) + cs) );
-        if ( dt_cell < dt_prev / 2 ){
-          std::cout << "[Slow Cell] ( " << i << " , " << j << " , " << k << " ) " << "dt_cell: " << dt_cell << "  dt_prev: " << dt_prev <<std::endl;
-          // std::cout << " cs: " << cs << " vx: " <<  fabs(vx) << " vy: " <<  fabs(vy) << " vz: " <<  fabs(vz) << std::endl;
-          // std::cout << " Prev Conserved Values: " << std::endl;
-          // std::cout << " Density : " << C.density[id] << std::endl;
-          // std::cout << " Momentum_x : " << C.momentum_x[id] << std::endl;
-          // std::cout << " Momentum_y : " << C.momentum_y[id] << std::endl;
-          // std::cout << " Momentum_z : " << C.momentum_z[id] << std::endl;
-          // std::cout << " Energy : " << C.Energy[id] << std::endl;
-          // #ifdef DE
-          // std::cout << " GasEnergy : " << C.GasEnergy[id] << std::endl;
-          // #endif
+        // if ( dt_cell < dt_prev / 2 ){
+        if ( dt_cell < H.dt_avrg / 10 ){
+          std::cout << "[Slow Cell] ( " << i << " , " << j << " , " << k << " ) " << "dt_cell: " << dt_cell << "  dt_avrg: " << H.dt_avrg <<std::endl;
+          std::cout << " cs: " << cs << " vx: " <<  fabs(vx) << " vy: " <<  fabs(vy) << " vz: " <<  fabs(vz) << std::endl;
+          std::cout << " Prev Conserved Values: " << std::endl;
+          std::cout << " Density : " << C.density[id] << std::endl;
+          std::cout << " Momentum_x : " << C.momentum_x[id] << std::endl;
+          std::cout << " Momentum_y : " << C.momentum_y[id] << std::endl;
+          std::cout << " Momentum_z : " << C.momentum_z[id] << std::endl;
+          std::cout << " Energy : " << C.Energy[id] << std::endl;
+          #ifdef DE
+          std::cout << " GasEnergy : " << C.GasEnergy[id] << std::endl;
+          #endif
           Smooth_Cell( i, j, k );
-          // std::cout << " New Conserved Values: " << std::endl;
-          // std::cout << " Density : " << C.density[id] << std::endl;
-          // std::cout << " Momentum_x : " << C.momentum_x[id] << std::endl;
-          // std::cout << " Momentum_y : " << C.momentum_y[id] << std::endl;
-          // std::cout << " Momentum_z : " << C.momentum_z[id] << std::endl;
-          // std::cout << " Energy : " << C.Energy[id] << std::endl;
-          // #ifdef DE
-          // std::cout << " GasEnergy : " << C.GasEnergy[id] << std::endl;
-          // #endif
+          std::cout << " New Conserved Values: " << std::endl;
+          std::cout << " Density : " << C.density[id] << std::endl;
+          std::cout << " Momentum_x : " << C.momentum_x[id] << std::endl;
+          std::cout << " Momentum_y : " << C.momentum_y[id] << std::endl;
+          std::cout << " Momentum_z : " << C.momentum_z[id] << std::endl;
+          std::cout << " Energy : " << C.Energy[id] << std::endl;
+          #ifdef DE
+          std::cout << " GasEnergy : " << C.GasEnergy[id] << std::endl;
+          #endif
 
           d_inv = 1.0 / C.density[id];
           vx = d_inv * C.momentum_x[id];
@@ -482,9 +544,13 @@ Real Grid3D::calc_dti_3D_CPU_function( int g_start, int g_end ){
           vz = d_inv * C.momentum_z[id];
           P = fmax((C.Energy[id] - 0.5*C.density[id]*(vx*vx + vy*vy + vz*vz) )*(gama-1.0), TINY_NUMBER);
           cs = sqrt(d_inv * gama * P);
-          std::cout << " cs: " << cs << " vx: " <<  fabs(vx) << " vy: " <<  fabs(vy) << " vz: " <<  fabs(vz) << std::endl;
-
+          // std::cout << " cs: " << cs << " vx: " <<  fabs(vx) << " vy: " <<  fabs(vy) << " vz: " <<  fabs(vz) << std::endl;
+          dt_cell = C_cfl * H.dx / (fabs(vx) + cs);
+          dt_cell = fmin( dt_cell, C_cfl * H.dy / (fabs(vy) + cs) );
+          dt_cell = fmin( dt_cell, C_cfl * H.dz / (fabs(vz) + cs) );
         }
+        // chprintf( " %f \n", dt_cell );
+        dt_avrg_now += dt_cell;
         #endif
 
         // compute maximum cfl velocity
@@ -501,19 +567,25 @@ Real Grid3D::calc_dti_3D_CPU_function( int g_start, int g_end ){
   max_dti = fmax(max_dti, max_vy / H.dy);
   max_dti = fmax(max_dti, max_vz / H.dy);
 
+  #ifdef CELL_SMOOTHING
+  *dt_avrg = dt_avrg_now;
+  #endif
+
   return max_dti;
 }
 
 Real Grid3D::calc_dti_3D_CPU(){
 
   Real max_dti;
+  Real dt_avrg;
 
   #ifndef PARALLEL_OMP
-  max_dti = calc_dti_3D_CPU_function( 0, H.nz_real );
+  max_dti = calc_dti_3D_CPU_function( 0, H.nz_real, &dt_avrg );
   return max_dti;
   #else
   max_dti = 0;
   Real max_dti_all[N_OMP_THREADS];
+  Real dt_avrg_all[N_OMP_THREADS];
   #pragma omp parallel num_threads( N_OMP_THREADS )
   {
     int omp_id, n_omp_procs;
@@ -522,12 +594,25 @@ Real Grid3D::calc_dti_3D_CPU(){
     omp_id = omp_get_thread_num();
     n_omp_procs = omp_get_num_threads();
     Get_OMP_Grid_Indxs( n_omp_procs, omp_id, H.nz_real,  &g_start, &g_end  );
-    max_dti_all[omp_id] = calc_dti_3D_CPU_function( g_start, g_end );
+    max_dti_all[omp_id] = calc_dti_3D_CPU_function( g_start, g_end, &dt_avrg_all[omp_id] );
 
   }
+
   for ( int i=0; i<N_OMP_THREADS; i++ ){
     max_dti = fmax( max_dti, max_dti_all[i]);
   }
+
+  #ifdef CELL_SMOOTHING
+  dt_avrg = 0;
+  for ( int i=0; i<N_OMP_THREADS; i++ ){
+    dt_avrg += dt_avrg_all[i];
+  }
+  dt_avrg /= ( H.nx_real * H.ny_real * H.nz_real );
+
+  dt_avrg = ReduceRealAvg( dt_avrg );
+  H.dt_avrg = dt_avrg;
+  // chprintf( " dt_avrg: %f \n", dt_avrg );
+  #endif
 
   return max_dti;
   #endif
