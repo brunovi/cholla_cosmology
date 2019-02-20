@@ -426,7 +426,7 @@ Real Smooth_Cell_Density( Real *density, int i, int j, int k, int nx, int ny, in
   id = (i) + (j)*nx + (k)*nx*ny;
   density[id] = v_avrg;
 
-  Real dens_factor = 2 * dens_0 / v_avrg;
+  Real dens_factor = 1 * dens_0 / v_avrg;
   density[id] *= dens_factor;
   return dens_factor;
 
@@ -518,25 +518,25 @@ Real Grid3D::calc_dti_3D_CPU_function( int g_start, int g_end, Real *dt_avrg ){
         if ( dt_cell < H.dt_avrg / 10 ){
           std::cout << "[Slow Cell] ( " << i << " , " << j << " , " << k << " ) " << "dt_cell: " << dt_cell << "  dt_avrg: " << H.dt_avrg <<std::endl;
           std::cout << " cs: " << cs << " vx: " <<  fabs(vx) << " vy: " <<  fabs(vy) << " vz: " <<  fabs(vz) << std::endl;
-          std::cout << " Prev Conserved Values: " << std::endl;
-          std::cout << " Density : " << C.density[id] << std::endl;
-          std::cout << " Momentum_x : " << C.momentum_x[id] << std::endl;
-          std::cout << " Momentum_y : " << C.momentum_y[id] << std::endl;
-          std::cout << " Momentum_z : " << C.momentum_z[id] << std::endl;
-          std::cout << " Energy : " << C.Energy[id] << std::endl;
-          #ifdef DE
-          std::cout << " GasEnergy : " << C.GasEnergy[id] << std::endl;
-          #endif
+          // std::cout << " Prev Conserved Values: " << std::endl;
+          // std::cout << " Density : " << C.density[id] << std::endl;
+          // std::cout << " Momentum_x : " << C.momentum_x[id] << std::endl;
+          // std::cout << " Momentum_y : " << C.momentum_y[id] << std::endl;
+          // std::cout << " Momentum_z : " << C.momentum_z[id] << std::endl;
+          // std::cout << " Energy : " << C.Energy[id] << std::endl;
+          // #ifdef DE
+          // std::cout << " GasEnergy : " << C.GasEnergy[id] << std::endl;
+          // #endif
           Smooth_Cell( i, j, k );
-          std::cout << " New Conserved Values: " << std::endl;
-          std::cout << " Density : " << C.density[id] << std::endl;
-          std::cout << " Momentum_x : " << C.momentum_x[id] << std::endl;
-          std::cout << " Momentum_y : " << C.momentum_y[id] << std::endl;
-          std::cout << " Momentum_z : " << C.momentum_z[id] << std::endl;
-          std::cout << " Energy : " << C.Energy[id] << std::endl;
-          #ifdef DE
-          std::cout << " GasEnergy : " << C.GasEnergy[id] << std::endl;
-          #endif
+          // std::cout << " New Conserved Values: " << std::endl;
+          // std::cout << " Density : " << C.density[id] << std::endl;
+          // std::cout << " Momentum_x : " << C.momentum_x[id] << std::endl;
+          // std::cout << " Momentum_y : " << C.momentum_y[id] << std::endl;
+          // std::cout << " Momentum_z : " << C.momentum_z[id] << std::endl;
+          // std::cout << " Energy : " << C.Energy[id] << std::endl;
+          // #ifdef DE
+          // std::cout << " GasEnergy : " << C.GasEnergy[id] << std::endl;
+          // #endif
 
           d_inv = 1.0 / C.density[id];
           vx = d_inv * C.momentum_x[id];
@@ -544,7 +544,7 @@ Real Grid3D::calc_dti_3D_CPU_function( int g_start, int g_end, Real *dt_avrg ){
           vz = d_inv * C.momentum_z[id];
           P = fmax((C.Energy[id] - 0.5*C.density[id]*(vx*vx + vy*vy + vz*vz) )*(gama-1.0), TINY_NUMBER);
           cs = sqrt(d_inv * gama * P);
-          // std::cout << " cs: " << cs << " vx: " <<  fabs(vx) << " vy: " <<  fabs(vy) << " vz: " <<  fabs(vz) << std::endl;
+          std::cout << " cs: " << cs << " vx: " <<  fabs(vx) << " vy: " <<  fabs(vy) << " vz: " <<  fabs(vz) << std::endl;
           dt_cell = C_cfl * H.dx / (fabs(vx) + cs);
           dt_cell = fmin( dt_cell, C_cfl * H.dy / (fabs(vy) + cs) );
           dt_cell = fmin( dt_cell, C_cfl * H.dz / (fabs(vz) + cs) );
