@@ -72,6 +72,7 @@ void Initialize_Grackle( Cool_GK &Cool, struct parameters P,  Grav3D &Grav, Cosm
   // #endif
   Cool.data->UVbackground = 1;           // UV background on
   Cool.data->grackle_data_file = "src/cooling/CloudyData_UVB=HM2012.h5"; // data file
+  // Cool.data->grackle_data_file = "src/cooling/CloudyData_UVB=FG2011.h5"; // data file
   Cool.data->use_specific_heating_rate = 0;
   Cool.data->use_volumetric_heating_rate = 0;
   Cool.data->cmb_temperature_floor = 1;
