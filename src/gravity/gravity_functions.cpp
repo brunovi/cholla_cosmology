@@ -770,7 +770,7 @@ void Set_dt( Grid3D &G, bool &output_now, int n_step ){
     chprintf( " Seting max delta_a: %f\n", da_courant );
   }
 
-  Real da_min = da_particles / 10;
+  Real da_min = da_particles / 50;
   if ( da_courant < da_min ){
     da_courant = da_min;
     chprintf( " Seting min delta_a: %f\n", da_courant );
@@ -778,7 +778,7 @@ void Set_dt( Grid3D &G, bool &output_now, int n_step ){
 
   #ifdef COOLING_GRACKLE
   if ( fabs(G.Cosmo.current_a + da_courant - G.Cool.a_UVB_on) < 0.002 ){
-    da_courant /= 10;
+    da_courant /= 5;
     chprintf( " Starting UVB. Limiting delta_a:  %f \n", da_courant);
   }
   #endif
