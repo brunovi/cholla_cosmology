@@ -138,7 +138,7 @@ void Grid3D::Initialize(struct parameters *P)
   int nz_in = P->nz;
 
   // Set the CFL coefficient (a global variable)
-  C_cfl = 0.3;
+  C_cfl = 0.05;
 
 #ifndef MPI_CHOLLA
 
@@ -423,11 +423,11 @@ Real Smooth_Cell_Density( Real *density, int i, int j, int k, int nx, int ny, in
   id = (i) + (j)*nx + (k+1)*nx*ny;
   v_t = density[id];
   v_avrg = ( v_l + v_l + v_d + v_u + v_b + v_t ) / 6;
-  id = (i) + (j)*nx + (k)*nx*ny;
-  density[id] = v_avrg;
+  // id = (i) + (j)*nx + (k)*nx*ny;
+  // density[id] = v_avrg;
 
   Real dens_factor = 1 * dens_0 / v_avrg;
-  density[id] *= dens_factor;
+  // density[id] *= dens_factor;
   return dens_factor;
 
 }
@@ -515,7 +515,7 @@ Real Grid3D::calc_dti_3D_CPU_function( int g_start, int g_end, Real *dt_avrg ){
         dt_cell = fmin( dt_cell, C_cfl * H.dy / (fabs(vy) + cs) );
         dt_cell = fmin( dt_cell, C_cfl * H.dz / (fabs(vz) + cs) );
         // if ( dt_cell < dt_prev / 2 ){
-        if ( dt_cell < H.dt_avrg / 10 ){
+        if ( dt_cell < H.dt_avrg / 30 ){
           std::cout << "[Slow Cell] ( " << i << " , " << j << " , " << k << " ) " << "dt_cell: " << dt_cell << "  dt_avrg: " << H.dt_avrg <<std::endl;
           std::cout << " cs: " << cs << " vx: " <<  fabs(vx) << " vy: " <<  fabs(vy) << " vz: " <<  fabs(vz) << std::endl;
           // std::cout << " Prev Conserved Values: " << std::endl;
