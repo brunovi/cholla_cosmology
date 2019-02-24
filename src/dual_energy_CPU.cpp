@@ -132,6 +132,7 @@ void Sync_Energies_3D_Host_Function(Grid3D &G, int g_start, int g_end ){
 
         #ifdef DE_EKINETIC_LIMIT
         if (ge2 > 0.0 && E > 0.0 && ge2/E > 0.075 && Ek/G.H.Ekin_mean > 0.4 ) {
+        // if (ge2 > 0.0 && E > 0.0 && ge2/E > 0.05 && Ek/G.H.Ekin_mean > 0.4 ) {
         #else
         if (ge2 > 0.0 && E > 0.0 && ge2/E > 0.001 ) {
         #endif //DE_EKINETIC_LIMIT
