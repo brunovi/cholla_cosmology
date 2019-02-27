@@ -137,7 +137,7 @@ HDF5_INCL = -I$(OLCF_HDF5_ROOT)/include
 HDF5_LIBS = -L$(OLCF_HDF5_ROOT)/lib -lhdf5
 endif
 
-INCL   = -I./ -I/usr/include/linux/ $(HDF5_INCL)
+INCL   = -I./ $(HDF5_INCL)
 NVINCL = $(INCL) $(CUDA_INCL)
 LIBS   = -lm $(HDF5_LIBS) $(CUDA_LIBS)
 
