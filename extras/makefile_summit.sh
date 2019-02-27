@@ -44,7 +44,7 @@ MPI_FLAGS =  -DMPI_CHOLLA
 
 ifdef MPI_FLAGS
   CC	= mpicc
-  CXX   = mpiCC
+  CXX   = mpic++
 
   #MPI_FLAGS += -DSLAB
   MPI_FLAGS += -DBLOCK
