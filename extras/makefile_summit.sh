@@ -126,23 +126,23 @@ COSMOLOGY = -DCOSMOLOGY
 CPU_TIME = -DCPU_TIME
 
 ifdef CUDA
-CUDA_INCL = -I/usr/include/linux/
-CUDA_LIBS = -L/usr/lib64/ -lcuda -lcudart
+CUDA_INCL = -I$(OLCF_CUDA_ROOT)/include
+CUDA_LIBS = -L$(OLCF_CUDA_ROOT)/lib64 -lcuda -lcudart
 ifeq ($(POTENTIAL),-DPOTENTIAL_CUFFT)
 CUDA_LIBS += -lcufft
 endif
 endif
 ifeq ($(OUTPUT),-DHDF5)
-HDF5_INCL = -I/autofs/nccs-svm1_sw/summit/.swci/1-compute/opt/spack/20180914/linux-rhel7-ppc64le/xl-16.1.1-1/hdf5-1.10.3-vbfx7fx5av4jv5q3cynql3qwocans42z/include
-HDF5_LIBS = -L/autofs/nccs-svm1_sw/summit/.swci/1-compute/opt/spack/20180914/linux-rhel7-ppc64le/xl-16.1.1-1/hdf5-1.10.3-vbfx7fx5av4jv5q3cynql3qwocans42z/lib -lhdf5
+HDF5_INCL = -I$(OLCF_HDF5_ROOT)/include
+HDF5_LIBS = -L$(OLCF_HDF5_ROOT)/lib -lhdf5
 endif
 
-INCL   = -I./ $(HDF5_INCL)
+INCL   = -I./ -I/usr/include/linux/ $(HDF5_INCL)
 NVINCL = $(INCL) $(CUDA_INCL)
 LIBS   = -lm $(HDF5_LIBS) $(CUDA_LIBS)
 
-FFTW_INCL = -I/autofs/nccs-svm1_sw/summit/.swci/1-compute/opt/spack/20180914/linux-rhel7-ppc64le/xl-16.1.1-1/fftw-3.3.8-vuwn274gfobnmpcr6d3bbualaqbj6nnc/include
-FFTW_LIBS = -L/autofs/nccs-svm1_sw/summit/.swci/1-compute/opt/spack/20180914/linux-rhel7-ppc64le/xl-16.1.1-1/fftw-3.3.8-vuwn274gfobnmpcr6d3bbualaqbj6nnc/lib -lfftw3
+FFTW_INCL = -I$(OLCF_FFTW_ROOT)/include
+FFTW_LIBS = -L$(OLCF_FFTW_ROOT)/lib -lfftw3
 ifeq ($(POTENTIAL),-DPOTENTIAL_FFTW)
 INCL += $(FFTW_INCL)
 LIBS += $(FFTW_LIBS)
