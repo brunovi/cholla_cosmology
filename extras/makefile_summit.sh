@@ -141,8 +141,8 @@ INCL   = -I./ $(HDF5_INCL)
 NVINCL = $(INCL) $(CUDA_INCL)
 LIBS   = -lm $(HDF5_LIBS) $(CUDA_LIBS)
 
-FFTW_INCL = -I/home/bruno/code/fftw/include
-FFTW_LIBS = -L/home/bruno/code/fftw/lib -lfftw3
+FFTW_INCL = -I/autofs/nccs-svm1_sw/summit/.swci/1-compute/opt/spack/20180914/linux-rhel7-ppc64le/xl-16.1.1-1/fftw-3.3.8-vuwn274gfobnmpcr6d3bbualaqbj6nnc/include
+FFTW_LIBS = -L/autofs/nccs-svm1_sw/summit/.swci/1-compute/opt/spack/20180914/linux-rhel7-ppc64le/xl-16.1.1-1/fftw-3.3.8-vuwn274gfobnmpcr6d3bbualaqbj6nnc/lib -lfftw3
 ifeq ($(POTENTIAL),-DPOTENTIAL_FFTW)
 INCL += $(FFTW_INCL)
 LIBS += $(FFTW_LIBS)
