@@ -121,36 +121,36 @@ COSMOLOGY = -DCOSMOLOGY
 #SCALAR = -DSCALAR
 
 
-COOLING = -DCOOLING_GRACKLE
+# COOLING = -DCOOLING_GRACKLE
 
 CPU_TIME = -DCPU_TIME
 
 ifdef CUDA
-CUDA_INCL = -I/usr/local/cuda-9.0/targets/x86_64-linux/include/
-CUDA_LIBS = -L/usr/local/cuda-9.0/targets/x86_64-linux/lib/ -lcuda -lcudart
+CUDA_INCL = -I/usr/include/linux/
+CUDA_LIBS = -L/usr/lib64/ -lcuda -lcudart
 ifeq ($(POTENTIAL),-DPOTENTIAL_CUFFT)
 CUDA_LIBS += -lcufft
 endif
 endif
 ifeq ($(OUTPUT),-DHDF5)
-HDF5_INCL = -I/usr/include/hdf5/serial/
-HDF5_LIBS = -L/usr/lib/x86_64-linux-gnu/hdf5/serial/ -lhdf5
+HDF5_INCL = -I/autofs/nccs-svm1_sw/summit/.swci/1-compute/opt/spack/20180914/linux-rhel7-ppc64le/xl-16.1.1-1/hdf5-1.10.3-vbfx7fx5av4jv5q3cynql3qwocans42z/include
+HDF5_LIBS = -L/autofs/nccs-svm1_sw/summit/.swci/1-compute/opt/spack/20180914/linux-rhel7-ppc64le/xl-16.1.1-1/hdf5-1.10.3-vbfx7fx5av4jv5q3cynql3qwocans42z/lib -lhdf5
 endif
 
 INCL   = -I./ $(HDF5_INCL)
 NVINCL = $(INCL) $(CUDA_INCL)
 LIBS   = -lm $(HDF5_LIBS) $(CUDA_LIBS)
 
-FFTW_INCL = -I/home/bruno/apps/fftw-3.3.5/include
-FFTW_LIBS = -L/home/bruno/apps/fftw-3.3.5/lib -lfftw3
+FFTW_INCL = -I/home/bruno/code/fftw/include
+FFTW_LIBS = -L/home/bruno/code/fftw/lib -lfftw3
 ifeq ($(POTENTIAL),-DPOTENTIAL_FFTW)
 INCL += $(FFTW_INCL)
 LIBS += $(FFTW_LIBS)
 endif
 
 ifeq ($(POTENTIAL),-DPOTENTIAL_PFFT)
-PFFT_INCL = -I/home/bruno/apps/pfft-1.0.8-alpha/include
-PFFT_LIBS = -L/home/bruno/apps/pfft-1.0.8-alpha/lib  -lpfft  -lfftw3_mpi -lfftw3
+PFFT_INCL = -I/home/bruno/code/pfft/include
+PFFT_LIBS = -L/home/bruno/code/pfft/lib  -lpfft  -lfftw3_mpi -lfftw3
 INCL += $(FFTW_INCL) $(PFFT_INCL)
 LIBS += $(FFTW_LIBS) $(PFFT_LIBS)
 endif
