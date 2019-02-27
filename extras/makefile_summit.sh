@@ -149,8 +149,8 @@ LIBS += $(FFTW_LIBS)
 endif
 
 ifeq ($(POTENTIAL),-DPOTENTIAL_PFFT)
-PFFT_INCL = -I/home/bruno/code/pfft/include
-PFFT_LIBS = -L/home/bruno/code/pfft/lib  -lpfft  -lfftw3_mpi -lfftw3
+PFFT_INCL = -I/ccs/home/bvilasen/code/pfft/include
+PFFT_LIBS = -L/ccs/home/bvilasen/code/pfft/lib  -lpfft  -lfftw3_mpi -lfftw3
 INCL += $(FFTW_INCL) $(PFFT_INCL)
 LIBS += $(FFTW_LIBS) $(PFFT_LIBS)
 endif
