@@ -187,7 +187,7 @@ int main(int argc, char *argv[])
   #endif //MPI_CHOLLA
   #endif //CPU_TIME
 
-
+  MPI_Barrier(world);
   bool output_now = false;
   // Evolve the grid, one timestep at a time
   chprintf("Starting calculations.\n");
