@@ -193,9 +193,9 @@ int main(int argc, char *argv[])
   chprintf("Starting calculations.\n");
   while (G.H.t < P.tout)
   {
-    #ifdef COOLING_GRACKLE
-    break;
-    #endif
+    // #ifdef COOLING_GRACKLE
+    // break;
+    // #endif
 
     chprintf("n_step: %d \n", G.H.n_step + 1 );
     // get the start time
@@ -350,7 +350,7 @@ int main(int argc, char *argv[])
     G.Timer.n_steps += 1;
     #endif
 
-    if (G.H.n_step >= 1) break;
+    if (G.H.n_step >= 5) break;
 
     #ifdef COSMOLOGY
     if ( G.Cosmo.current_a >= G.Cosmo.scale_outputs[G.Cosmo.n_outputs-1] ) {
