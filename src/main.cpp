@@ -101,12 +101,12 @@ int main(int argc, char *argv[])
   chprintf ("Parameter values:  nx = %d, ny = %d, nz = %d, tout = %f, init = %s, boundaries = %d %d %d %d %d %d\n",
     P.nx, P.ny, P.nz, P.tout, P.init, P.xl_bcnd, P.xu_bcnd, P.yl_bcnd, P.yu_bcnd, P.zl_bcnd, P.zu_bcnd);
   chprintf ("Output directory:  %s\n", P.outdir);
-//
-//
-//   // initialize the grid
-//   G.Initialize(&P);
-//   chprintf("Local number of grid cells: %d %d %d %d\n", G.H.nx_real, G.H.ny_real, G.H.nz_real, G.H.n_cells);
-//
+
+
+  // initialize the grid
+  G.Initialize(&P);
+  chprintf("Local number of grid cells: %d %d %d %d\n", G.H.nx_real, G.H.ny_real, G.H.nz_real, G.H.n_cells);
+
 //
 //   // Set initial conditions and calculate first dt
 //   chprintf("Setting initial conditions...\n");
