@@ -81,16 +81,16 @@ int main(int argc, char *argv[])
   struct parameters P;
   int nfile = 0; // number of output files
   Real outtime = 0; // current output time
-//
-//
-//   // read in command line arguments
-//   if (argc != 2)
-//   {
-//     chprintf("usage: %s <parameter_file>\n", argv[0]);
-//     chexit(-1);
-//   } else {
-//     param_file = argv[1];
-//   }
+
+
+  // read in command line arguments
+  if (argc != 2)
+  {
+    chprintf("usage: %s <parameter_file>\n", argv[0]);
+    chexit(-1);
+  } else {
+    param_file = argv[1];
+  }
 //
 //   // create the grid
 //   Grid3D G;
