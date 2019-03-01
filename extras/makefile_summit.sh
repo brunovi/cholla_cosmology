@@ -141,8 +141,8 @@ INCL   = -I./ $(HDF5_INCL)
 NVINCL = $(INCL) $(CUDA_INCL)
 LIBS   = -lm $(HDF5_LIBS) $(CUDA_LIBS)
 
-FFTW_INCL = -I$(OLCF_FFTW_ROOT)/include
-FFTW_LIBS = -L$(OLCF_FFTW_ROOT)/lib -lfftw3
+FFTW_INCL = -I/ccs/home/bvilasen/code/fftw/include
+FFTW_LIBS = -L/ccs/home/bvilasen/code/fftw/lib -lfftw3
 ifeq ($(POTENTIAL),-DPOTENTIAL_FFTW)
 INCL += $(FFTW_INCL)
 LIBS += $(FFTW_LIBS)
