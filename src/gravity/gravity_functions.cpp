@@ -765,6 +765,7 @@ void Set_dt( Grid3D &G, bool &output_now, int n_step ){
   da_courant = std::min(da_particles, da_hydro);
   #endif
 
+  G.Cosmo.max_delta_a = fmin( 0.015 * G.Cosmo.current_a, 0.0005 );
   if( da_courant > G.Cosmo.max_delta_a){
     da_courant = G.Cosmo.max_delta_a;
     chprintf( " Seting max delta_a: %f\n", da_courant );
