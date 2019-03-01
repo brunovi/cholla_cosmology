@@ -56,23 +56,23 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-//   // timing variables
-//   double start_total, stop_total, start_step, stop_step;
-//   #ifdef CPU_TIME
-//   double stop_init, init_min, init_max, init_avg;
-//   // double start_bound, stop_bound, bound_min, bound_max, bound_avg;
-//   // double start_hydro, stop_hydro, hydro_min, hydro_max, hydro_avg;
-//   double init, bound, hydro;
-//   init = bound = hydro = 0;
-//   #endif //CPU_TIME
-//
-//   // start the total time
-//   start_total = get_time();
-//
-//   /* Initialize MPI communication */
-//   #ifdef MPI_CHOLLA
-//   InitializeChollaMPI(&argc, &argv);
-//   #endif /*MPI_CHOLLA*/
+  // timing variables
+  double start_total, stop_total, start_step, stop_step;
+  #ifdef CPU_TIME
+  double stop_init, init_min, init_max, init_avg;
+  // double start_bound, stop_bound, bound_min, bound_max, bound_avg;
+  // double start_hydro, stop_hydro, hydro_min, hydro_max, hydro_avg;
+  double init, bound, hydro;
+  init = bound = hydro = 0;
+  #endif //CPU_TIME
+
+  // start the total time
+  start_total = get_time();
+
+  /* Initialize MPI communication */
+  #ifdef MPI_CHOLLA
+  InitializeChollaMPI(&argc, &argv);
+  #endif /*MPI_CHOLLA*/
 //
 //   Real dti = 0; // inverse time step, 1.0 / dt
 //
