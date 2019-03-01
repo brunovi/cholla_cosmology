@@ -161,8 +161,8 @@ OUTPUT_TEMPERATURE = -DOUTPUT_TEMPERATURE
 OUTPUT_CHEMISTRY = -DOUTPUT_CHEMISTRY
 GRACKLE_METAL_COOLING = -DGRACKLE_METAL_COOLING
 SCALAR = -DSCALAR
-GRACKLE_INCL = -I/home/bruno/code/grackle/include
-GRACKLE_LIBS = -L/home/bruno/code/grackle/lib -lgrackle
+GRACKLE_INCL = -I/ccs/home/bvilasen/code/grackle/include
+GRACKLE_LIBS = -L/ccs/home/bvilasen/code/grackle/lib -lgrackle
 INCL += $(GRACKLE_INCL)
 LIBS += $(GRACKLE_LIBS)
 endif
