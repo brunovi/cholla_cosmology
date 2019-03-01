@@ -73,14 +73,14 @@ int main(int argc, char *argv[])
   #ifdef MPI_CHOLLA
   InitializeChollaMPI(&argc, &argv);
   #endif /*MPI_CHOLLA*/
-//
-//   Real dti = 0; // inverse time step, 1.0 / dt
-//
-//   // input parameter variables
-//   char *param_file;
-//   struct parameters P;
-//   int nfile = 0; // number of output files
-//   Real outtime = 0; // current output time
+
+  Real dti = 0; // inverse time step, 1.0 / dt
+
+  // input parameter variables
+  char *param_file;
+  struct parameters P;
+  int nfile = 0; // number of output files
+  Real outtime = 0; // current output time
 //
 //
 //   // read in command line arguments
