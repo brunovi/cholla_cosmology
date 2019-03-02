@@ -182,18 +182,18 @@ void Particles_3D::FreeMemory_CPU(void)
  mass.clear();
  #endif
 
- // free(send_buffer_x0_particles);
- // free(send_buffer_x1_particles);
- // free(recv_buffer_x0_particles);
- // free(recv_buffer_x1_particles);
- // free(send_buffer_y0_particles);
- // free(send_buffer_y1_particles);
- // free(recv_buffer_y0_particles);
- // free(recv_buffer_y1_particles);
- // free(send_buffer_z0_particles);
- // free(send_buffer_z1_particles);
- // free(recv_buffer_z0_particles);
- // free(recv_buffer_z1_particles);
+ free(send_buffer_x0_particles);
+ free(send_buffer_x1_particles);
+ free(recv_buffer_x0_particles);
+ free(recv_buffer_x1_particles);
+ free(send_buffer_y0_particles);
+ free(send_buffer_y1_particles);
+ free(recv_buffer_y0_particles);
+ free(recv_buffer_y1_particles);
+ free(send_buffer_z0_particles);
+ free(send_buffer_z1_particles);
+ free(recv_buffer_z0_particles);
+ free(recv_buffer_z1_particles);
 }
 
 void Particles_3D::Reset( void ){
