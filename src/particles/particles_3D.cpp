@@ -132,9 +132,9 @@ void Particles_3D::Initialize( struct parameters P, Grav3D &Grav, Real xblocal, 
     #pragma omp barrier
     Get_OMP_Indxs( n_local, n_omp_procs, omp_id, G.nz_local + 2*G.n_ghost_particles_grid, &omp_pIndx_start, &omp_pIndx_end, &omp_gridIndx_start, &omp_gridIndx_end );
 
-    // for (int omp_indx = 0; omp_indx<n_omp_procs; omp_indx++){
-    //   if (omp_id == omp_indx) chprintf( "  omp_id:%d  p_start:%ld  p_end:%ld  g_start:%d  g_end:%d\n", omp_id, omp_pIndx_start, omp_pIndx_end, omp_gridIndx_start, omp_gridIndx_end );
-    // }
+    for (int omp_indx = 0; omp_indx<n_omp_procs; omp_indx++){
+      if (omp_id == omp_indx) chprintf( "  omp_id:%d  p_start:%ld  p_end:%ld  g_start:%d  g_end:%d\n", omp_id, omp_pIndx_start, omp_pIndx_end, omp_gridIndx_start, omp_gridIndx_end );
+    }
   }
   #endif
 
