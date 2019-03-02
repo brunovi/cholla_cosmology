@@ -193,9 +193,9 @@ int main(int argc, char *argv[])
   chprintf("Starting calculations.\n");
   while (G.H.t < P.tout)
   {
-    // #ifdef COOLING_GRACKLE
-    // break;
-    // #endif
+    #ifdef COOLING_GRACKLE
+    break;
+    #endif
 
     chprintf("n_step: %d \n", G.H.n_step + 1 );
     // get the start time
@@ -246,55 +246,55 @@ int main(int argc, char *argv[])
     Update_Particles( G, 2 );
     #endif
 
-    #else
-
-
-    #ifdef CPU_TIME
-    G.Timer.Start_Timer();
-    #endif
-    #pragma omp parallel num_threads( 2 )
-    {
-        int omp_id;
-        omp_id = omp_get_thread_num();
-
-        if ( omp_id == 0 ) dti = G.Update_Grid();
-        if ( omp_id == 1 ) Compute_Gravitational_Potential( G, P );
-
-    }
-    #ifdef CPU_TIME
-    G.Timer.End_and_Record_Time(10);
-    #endif
-
-    #ifdef PARTICLES
-    //Advance the particles KDK( first step )
-    Update_Particles( G, 1 );
-    #endif
-
-    // set boundary conditions for next time step
-    G.Set_Boundary_Conditions_All( P );
-
-    // Extrapolate gravitational potential for hydro step
-    Extrapolate_Grav_Potential( G );
-    Add_Gavity_To_Hydro( G );
-    #ifdef DE_EKINETIC_LIMIT
-    Get_Mean_Kinetic_Energy( G );
-    #endif
-    Sync_Energies_3D_Host( G );
-
-    // update the simulation time ( t += dt )
-    G.Update_Time();
-
-
-    #ifdef PARTICLES
-    // Compute_Gravitational_Potential( G, G.p_solver, P );
-    // G.Grav.TRANSFER_POTENTIAL_BOUNDARIES = true;
-    // G.Set_Boundary_Conditions(P);
-    // G.Grav.TRANSFER_POTENTIAL_BOUNDARIES = false;
-    // Extrapolate_Grav_Potential( G, 1 );
-    //Advance the particles KDK( second step )
-    Update_Particles( G, 2 );
-    #endif
-
+    // #else
+    //
+    //
+    // #ifdef CPU_TIME
+    // G.Timer.Start_Timer();
+    // #endif
+    // #pragma omp parallel num_threads( 2 )
+    // {
+    //     int omp_id;
+    //     omp_id = omp_get_thread_num();
+    //
+    //     if ( omp_id == 0 ) dti = G.Update_Grid();
+    //     if ( omp_id == 1 ) Compute_Gravitational_Potential( G, P );
+    //
+    // }
+    // #ifdef CPU_TIME
+    // G.Timer.End_and_Record_Time(10);
+    // #endif
+    //
+    // #ifdef PARTICLES
+    // //Advance the particles KDK( first step )
+    // Update_Particles( G, 1 );
+    // #endif
+    //
+    // // set boundary conditions for next time step
+    // G.Set_Boundary_Conditions_All( P );
+    //
+    // // Extrapolate gravitational potential for hydro step
+    // Extrapolate_Grav_Potential( G );
+    // Add_Gavity_To_Hydro( G );
+    // #ifdef DE_EKINETIC_LIMIT
+    // Get_Mean_Kinetic_Energy( G );
+    // #endif
+    // Sync_Energies_3D_Host( G );
+    //
+    // // update the simulation time ( t += dt )
+    // G.Update_Time();
+    //
+    //
+    // #ifdef PARTICLES
+    // // Compute_Gravitational_Potential( G, G.p_solver, P );
+    // // G.Grav.TRANSFER_POTENTIAL_BOUNDARIES = true;
+    // // G.Set_Boundary_Conditions(P);
+    // // G.Grav.TRANSFER_POTENTIAL_BOUNDARIES = false;
+    // // Extrapolate_Grav_Potential( G, 1 );
+    // //Advance the particles KDK( second step )
+    // Update_Particles( G, 2 );
+    // #endif
+    //
 
     #endif
 
