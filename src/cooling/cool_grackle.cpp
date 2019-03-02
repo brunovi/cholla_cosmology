@@ -76,7 +76,7 @@ void Initialize_Grackle( Cool_GK &Cool, struct parameters P,  Grav3D &Grav, Cosm
   Cool.data->use_specific_heating_rate = 0;
   Cool.data->use_volumetric_heating_rate = 0;
   Cool.data->cmb_temperature_floor = 1;
-  Cool.data->omp_nthreads = 4;
+  Cool.data->omp_nthreads = N_OMP_THREADS;
 
   if ( Cool.data->UVbackground == 1) chprintf( "GRACKLE: Loading UV Background File: %s\n", Cool.data->grackle_data_file );
 
