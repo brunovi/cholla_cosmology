@@ -93,11 +93,12 @@ public:
   void End_and_Record_Time( int time_var );
   void Print_Times();
   void Get_Average_Times();
-  void Print_Average_Times();
+  void Print_Average_Times( struct parameters P );
 
   #ifdef COOLING_GRACKLE
   void Print_Cooling_Time();
   #endif
+
 };
 
 

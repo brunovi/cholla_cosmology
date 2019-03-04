@@ -3,7 +3,12 @@
 
 #include "timing_functions.h"
 #include "io.h"
+#include <iostream>
+#include <fstream>
+#include <string>
 
+
+using namespace std;
 
 #ifdef MPI_CHOLLA
 #include "mpi_routines.h"
@@ -206,7 +211,7 @@ void Time::Get_Average_Times(){
 
 }
 
-void Time::Print_Average_Times(){
+void Time::Print_Average_Times( struct parameters P ){
 
   Real time_total;
   time_total = time_hydro_all + time_bound_all;
@@ -255,7 +260,94 @@ void Time::Print_Average_Times(){
   chprintf(" Time Cooling           avg: %9.4f   ms\n", time_cooling_all);
   #endif
 
-  chprintf(" Time Total             avg: %9.4f   ms\n", time_total);
+  chprintf(" Time Total             avg: %9.4f   ms\n\n", time_total);
+
+  string file_name ( "run_timing.log" );
+  string header;
+
+
+  chprintf( "Writing timming values to file: %s  \n", file_name.c_str());
+
+  header = "# nz ny nx n_proc n_omp n_steps ";
+
+
+
+  #ifdef GRAVITY_CPU
+  header += "dt ";
+  #endif
+  header += "hydo ";
+  header += "bound ";
+  #ifdef GRAVITY
+  header += "grav_pot ";
+  #ifdef GRAVITY_CPU
+  header += "pot_bound ";
+  #endif
+  #endif
+  #ifdef PARTICLES
+  header += "part_dens ";
+  header += "part_bound ";
+  header += "part_dens_boud ";
+  header += "part_adv_1 ";
+  header += "part_adv_2 ";
+  #endif
+  #ifdef COOLING_GRACKLE
+  header += "cool ";
+  #endif
+  header += "total ";
+  header += " \n";
+
+
+
+  bool file_exists = false;
+  if (FILE *file = fopen(file_name.c_str(), "r")){
+    file_exists = true;
+    chprintf( " File exists, appending values: %s \n", file_name.c_str() );
+    fclose( file );
+  } else{
+    chprintf( " Creating File: %s \n", file_name.c_str() );
+  }
+
+
+
+  // Output timing values
+  ofstream out_file;
+  if ( procID == 0 ){
+    out_file.open(file_name.c_str(), ios::app);
+    if ( !file_exists ) out_file << header;
+    out_file << P.nz << " " << P.ny << " " << P.nx << " ";
+    out_file << nproc << " ";
+    #ifdef PARALLEL_OMP
+    out_file << N_OMP_THREADS << " ";
+    #else
+    out_file << 0 << " ";
+    #endif
+    out_file << n_steps << " ";
+    #ifdef GRAVITY_CPU
+    out_file << time_dt_all << " ";
+    #endif
+    out_file << time_hydro_all << " ";
+    out_file << time_bound_all << " ";
+    #ifdef GRAVITY
+    out_file << time_potential_all << " ";
+    #ifdef GRAVITY_CPU
+    out_file << time_bound_pot_all << " ";
+    #endif
+    #endif
+    #ifdef PARTICLES
+    out_file << time_part_dens_all << " ";
+    out_file << time_part_tranf_all << " ";
+    out_file << time_part_dens_transf_all << " ";
+    out_file << time_advance_particles_1_all << " ";
+    out_file << time_advance_particles_2_all << " ";
+    #endif
+    #ifdef COOLING_GRACKLE
+    out_file << time_cooling_all << " ";
+    #endif
+    out_file << time_total << " ";
+
+    out_file << "\n";
+    out_file.close();
+  }
 }
 
 #ifdef COOLING_GRACKLE
@@ -263,6 +355,7 @@ void Time::Print_Cooling_Time(){
   chprintf(" Time Cooling           min: %9.4f  max: %9.4f  avg: %9.4f   ms\n", time_cooling_min, time_cooling_max, time_cooling_mean);
 }
 #endif
+
 
 
 

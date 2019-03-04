@@ -14,8 +14,6 @@
 #include "io.h"
 #include "error_handling.h"
 
-#include <iostream>
-#include <fstream>
 using namespace std;
 
 #ifdef GRAVITY
@@ -381,27 +379,10 @@ int main(int argc, char *argv[])
 
   #ifdef CPU_TIME
   G.Timer.Get_Average_Times();
-  G.Timer.Print_Average_Times();
+  G.Timer.Print_Average_Times( P );
 
   #endif
 
-  //
-  //
-  // // Output timing values
-  // ofstream out_file;
-  // out_file.open("run_timing.log", ios::app);
-  // out_file << P.nz << " " << P.ny << " " << P.nx << " ";
-  // #ifndef PARALLEL_OMP
-  // out_file << 0 << " ";
-  // #endif
-  // #ifdef PARALLEL_OMP
-  // out_file << N_OMP_THREADS << " ";
-  // #endif
-  // out_file << time_hydro_total << " " << time_boundaries_total << " ";
-  // out_file << time_potential_total << " " << time_particles_total << " ";
-  // out_file << "\n";
-  // out_file.close();
-  // #endif
 
 
   // free the grid
