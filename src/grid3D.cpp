@@ -881,7 +881,8 @@ Real Grid3D::Update_Hydro_Grid( void ){
   Extrapolate_Grav_Potential( *this );
   #endif
 
-  dti = Update_Grid();
+  dti = 0.00001;
+  // dti = Update_Grid();
   #ifdef GRAVITY_CPU
   Add_Gavity_To_Hydro( *this );
   #ifdef DE_EKINETIC_LIMIT
