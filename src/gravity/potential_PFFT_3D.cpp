@@ -154,11 +154,13 @@ void Potential_PFFT_3D::Get_K_for_Green_function( void){
         G_x = sin( k_x/2  );
         G_y = sin( k_y/2 );
         G_z = sin( k_z/2 );
-        G = -1 / ( G_x*G_x + G_y*G_y + G_z*G_z ) * dx * dx /4 ;
         if ( k_0==0 && k_1==0 && k_2 == 0 ){
           index_0 = m ;
           G = 1;
           std::cout << "  K=0   index: " << index_0 << std::endl;
+        }
+        else{
+          G = -1 / ( G_x*G_x + G_y*G_y + G_z*G_z ) * dx * dx /4 ;
         }
         F.G[m] = G;
         m += 1;
