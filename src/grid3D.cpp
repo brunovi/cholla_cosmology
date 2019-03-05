@@ -841,6 +841,25 @@ Real Grid3D::Update_Grid(void)
   // reset the grid flag to swap buffers
   gflag = (gflag+1)%2;
 
+
+  // check for failures
+  int id;
+  for (int i=H.n_ghost; i<H.nx-H.n_ghost; i++) {
+    for (int j=H.n_ghost; j<H.ny-H.n_ghost; j++) {
+      for (int k=H.n_ghost; k<H.nz-H.n_ghost; k++) {
+        id = i + j*H.nx + k*H.nx*H.ny;
+        if (C.density[id] < 0.0 || C.density[id] != C.density[id]) {
+          printf("Failure in cell %d %d %d. Density %e\n", i, j, k, C.density[id]);
+          #ifdef MPI_CHOLLA
+          MPI_Finalize();
+          chexit(-1);
+          #endif
+          exit(0);
+        }
+      }
+    }
+  }
+
   return max_dti;
 
 }
