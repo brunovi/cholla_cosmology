@@ -76,6 +76,7 @@ void Potential_PFFT_3D::Initialize( Grav3D Grav){
       PFFT_BACKWARD, PFFT_TRANSPOSED_IN | PFFT_MEASURE);
   chprintf( "  PFFT: Computing K for Gravity Green Funtion\n");
   Get_K_for_Green_function();
+  chprintf( " PFFT Initialized Successfully.")
 
 }
 
@@ -226,8 +227,6 @@ void Potential_PFFT_3D::Apply_G_Funtion( void ){
 
 Real Potential_PFFT_3D::Get_Potential( Grav3D &Grav ){
 
-  // double start = get_time();
-
   Copy_Input( Grav );
 
   pfft_execute( plan_fwd );
@@ -236,10 +235,6 @@ Real Potential_PFFT_3D::Get_Potential( Grav3D &Grav ){
   pfft_execute( plan_bwd );
   Copy_Output( Grav );
 
-  // double stop = get_time();
-  // double milliseconds = (stop - start) * 1000.0;
-  // chprintf( " PFFT: Potential Time = %f   msecs\n", milliseconds);
-  // return milliseconds;
   return 0;
 }
 
