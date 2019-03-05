@@ -78,7 +78,7 @@ void Potential_PFFT_3D::Initialize( Grav3D Grav){
   Get_K_for_Green_function();
 
   MPI_Barrier( world );
-  chprintf( " PFFT Initialized Successfully.")
+  chprintf( " PFFT Initialized Successfully. \n");
 
 }
 
