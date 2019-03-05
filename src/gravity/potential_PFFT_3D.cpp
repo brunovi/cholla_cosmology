@@ -76,6 +76,8 @@ void Potential_PFFT_3D::Initialize( Grav3D Grav){
       PFFT_BACKWARD, PFFT_TRANSPOSED_IN | PFFT_MEASURE);
   chprintf( "  PFFT: Computing K for Gravity Green Funtion\n");
   Get_K_for_Green_function();
+
+  MPI_Barrier( world );
   chprintf( " PFFT Initialized Successfully.")
 
 }
