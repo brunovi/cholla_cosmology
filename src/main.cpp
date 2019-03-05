@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
 
   #ifdef GRAVITY
   G.Grav.Initialize( G.H.xblocal, G.H.yblocal, G.H.zblocal, G.H.xdglobal, G.H.ydglobal, G.H.zdglobal, P.nx, P.ny, P.nz, G.H.nx_real, G.H.ny_real, G.H.nz_real, G.H.dx, G.H.dy, G.H.dz, G.H.n_ghost_pot_offset  );
-  G.p_solver.Initialize( G.Grav );
+  // G.p_solver.Initialize( G.Grav );
   #endif
 
   #ifdef PARTICLES
