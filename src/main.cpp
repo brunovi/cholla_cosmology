@@ -125,32 +125,32 @@ int main(int argc, char *argv[])
   G.Grav.Initialize( G.H.xblocal, G.H.yblocal, G.H.zblocal, G.H.xdglobal, G.H.ydglobal, G.H.zdglobal, P.nx, P.ny, P.nz, G.H.nx_real, G.H.ny_real, G.H.nz_real, G.H.dx, G.H.dy, G.H.dz, G.H.n_ghost_pot_offset  );
   G.p_solver.Initialize( G.Grav );
   #endif
-  //
-  // #ifdef PARTICLES
-  // G.Particles.Initialize( P, G.Grav, G.H.xblocal, G.H.yblocal, G.H.zblocal, G.H.xbound, G.H.ybound, G.H.zbound, G.H.xdglobal, G.H.ydglobal, G.H.zdglobal );
-  // #endif
-  //
-  // #ifdef COSMOLOGY
-  // Initialize_Cosmology( G.Cosmo, P, G.Particles, G.Grav );
-  // Change_Cosmological_Frame_Sytem( G, true );
-  // #endif
-  //
-  // #ifdef GRAVITY
-  // Compute_Gravitational_Potential( G,  P );
-  // #endif
-  //
-  //
-  // // set boundary conditions (assign appropriate values to ghost cells)
-  // chprintf("\nSetting boundary conditions...\n");
-  // G.Set_Boundary_Conditions_All( P );
-  // chprintf("Boundary conditions set.\n");
-  //
-  //
-  // #ifdef COOLING_GRACKLE
-  // Initialize_Grackle( G.Cool, P, G.Grav, G.Cosmo );
-  // Initialize_Grackle_Fields( G );
-  // #endif
-  //
+
+  #ifdef PARTICLES
+  G.Particles.Initialize( P, G.Grav, G.H.xblocal, G.H.yblocal, G.H.zblocal, G.H.xbound, G.H.ybound, G.H.zbound, G.H.xdglobal, G.H.ydglobal, G.H.zdglobal );
+  #endif
+
+  #ifdef COSMOLOGY
+  Initialize_Cosmology( G.Cosmo, P, G.Particles, G.Grav );
+  Change_Cosmological_Frame_Sytem( G, true );
+  #endif
+
+  #ifdef GRAVITY
+  Compute_Gravitational_Potential( G,  P );
+  #endif
+
+
+  // set boundary conditions (assign appropriate values to ghost cells)
+  chprintf("\nSetting boundary conditions...\n");
+  G.Set_Boundary_Conditions_All( P );
+  chprintf("Boundary conditions set.\n");
+
+
+  #ifdef COOLING_GRACKLE
+  Initialize_Grackle( G.Cool, P, G.Grav, G.Cosmo );
+  Initialize_Grackle_Fields( G );
+  #endif
+  
   //
   // #ifdef PARTICLES
   // Get_Particles_Acceleration( G, 0, G.Particles.n_local, 0, G.Particles.G.nz_local + 2*G.Particles.G.n_ghost_particles_grid );
