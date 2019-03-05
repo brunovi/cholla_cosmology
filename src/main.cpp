@@ -150,45 +150,45 @@ int main(int argc, char *argv[])
   Initialize_Grackle( G.Cool, P, G.Grav, G.Cosmo );
   Initialize_Grackle_Fields( G );
   #endif
-  //
-  //
-  // #ifdef PARTICLES
-  // Get_Particles_Acceleration( G, 0, G.Particles.n_local, 0, G.Particles.G.nz_local + 2*G.Particles.G.n_ghost_particles_grid );
-  // #endif
-  //
-  //
-  // chprintf("Dimensions of each cell: dx = %f dy = %f dz = %f\n", G.H.dx, G.H.dy, G.H.dz);
-  // chprintf("Ratio of specific heats gamma = %f\n",gama);
-  // chprintf("Nstep = %d  Timestep = %f  Simulation time = %f\n", G.H.n_step, G.H.dt, G.H.t);
-  //
-  //
-  // #ifdef OUTPUT
-  // // write the initial conditions to file
-  // chprintf("Writing initial conditions to file...\n");
-  // WriteData(G, P, nfile);
-  // // add one to the output file count
-  // nfile++;
-  // #endif //OUTPUT
-  // // increment the next output time
-  // outtime += P.outstep;
-  //
-  // #ifdef CPU_TIME
-  // stop_init = get_time();
-  // init = stop_init - start_total;
-  // #ifdef MPI_CHOLLA
-  // init_min = ReduceRealMin(init);
-  // init_max = ReduceRealMax(init);
-  // init_avg = ReduceRealAvg(init);
-  // chprintf("Init  min: %9.4f  max: %9.4f  avg: %9.4f\n", init_min, init_max, init_avg);
-  // #else
-  // printf("Init %9.4f\n", init);
-  // #endif //MPI_CHOLLA
-  // #endif //CPU_TIME
-  //
-  // MPI_Barrier(world);
-  // bool output_now = false;
-  // // Evolve the grid, one timestep at a time
-  // chprintf("Starting calculations.\n");
+
+
+  #ifdef PARTICLES
+  Get_Particles_Acceleration( G, 0, G.Particles.n_local, 0, G.Particles.G.nz_local + 2*G.Particles.G.n_ghost_particles_grid );
+  #endif
+
+
+  chprintf("Dimensions of each cell: dx = %f dy = %f dz = %f\n", G.H.dx, G.H.dy, G.H.dz);
+  chprintf("Ratio of specific heats gamma = %f\n",gama);
+  chprintf("Nstep = %d  Timestep = %f  Simulation time = %f\n", G.H.n_step, G.H.dt, G.H.t);
+
+
+  #ifdef OUTPUT
+  // write the initial conditions to file
+  chprintf("Writing initial conditions to file...\n");
+  WriteData(G, P, nfile);
+  // add one to the output file count
+  nfile++;
+  #endif //OUTPUT
+  // increment the next output time
+  outtime += P.outstep;
+
+  #ifdef CPU_TIME
+  stop_init = get_time();
+  init = stop_init - start_total;
+  #ifdef MPI_CHOLLA
+  init_min = ReduceRealMin(init);
+  init_max = ReduceRealMax(init);
+  init_avg = ReduceRealAvg(init);
+  chprintf("Init  min: %9.4f  max: %9.4f  avg: %9.4f\n", init_min, init_max, init_avg);
+  #else
+  printf("Init %9.4f\n", init);
+  #endif //MPI_CHOLLA
+  #endif //CPU_TIME
+
+  MPI_Barrier(world);
+  bool output_now = false;
+  // Evolve the grid, one timestep at a time
+  chprintf("Starting calculations.\n");
   // while (G.H.t < P.tout)
   // {
   //   // #ifdef COOLING_GRACKLE
