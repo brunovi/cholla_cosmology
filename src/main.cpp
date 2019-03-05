@@ -226,7 +226,7 @@ int main(int argc, char *argv[])
     #endif
 
     // Advance the grid by one timestep
-    dti = G.Update_Hydro_Grid();
+    // dti = G.Update_Hydro_Grid();
 
     // update the simulation time ( t += dt )
     G.Update_Time();
@@ -357,7 +357,7 @@ int main(int argc, char *argv[])
     }
     #endif
 
-  
+
   } /*end loop over timesteps*/
 
   #ifdef CPU_TIME
