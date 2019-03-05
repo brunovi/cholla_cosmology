@@ -134,13 +134,13 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
   #ifdef COOLING_GPU
   CudaSafeCall( cudaMalloc((void**)&dev_dt_array, ngrid*sizeof(Real)) );
   #endif
-  //
-  // // START LOOP OVER SUBGRID BLOCKS
-  // while (block < block_tot) {
-  //
-  //   // copy the conserved variable block to the buffer
-  //   host_copy_block_3D(nx, ny, nz, nx_s, ny_s, nz_s, n_ghost, block, block1_tot, block2_tot, block3_tot, remainder1, remainder2, remainder3, BLOCK_VOL, host_conserved0, buffer, n_fields);
-  //
+
+  // START LOOP OVER SUBGRID BLOCKS
+  while (block < block_tot) {
+  
+    // copy the conserved variable block to the buffer
+    host_copy_block_3D(nx, ny, nz, nx_s, ny_s, nz_s, n_ghost, block, block1_tot, block2_tot, block3_tot, remainder1, remainder2, remainder3, BLOCK_VOL, host_conserved0, buffer, n_fields);
+
   //  // calculate the global x, y, and z offsets of this subgrid block
   //   get_offsets_3D(nx_s, ny_s, nz_s, n_ghost, x_off, y_off, z_off, block, block1_tot, block2_tot, block3_tot, remainder1, remainder2, remainder3, &x_off_s, &y_off_s, &z_off_s);
   //
@@ -287,10 +287,10 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
   //   }
   //   #endif
   //
-  //   // add one to the counter
-  //   block++;
-  //
-  // }
+    // add one to the counter
+    block++;
+
+  }
 
   // free CPU memory
   free(host_dti_array);
