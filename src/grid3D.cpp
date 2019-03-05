@@ -779,7 +779,7 @@ Real Grid3D::Update_Grid(void)
     max_dti = CTU_Algorithm_3D_CUDA(g0, g1, H.nx, H.ny, H.nz, x_off, y_off, z_off, H.n_ghost, H.dx, H.dy, H.dz, H.xbound, H.ybound, H.zbound, H.dt, H.n_fields, dens_floor, temp_floor );
     #endif //not_VL
     #ifdef VL
-    max_dti = VL_Algorithm_3D_CUDA(g0, g1, H.nx, H.ny, H.nz, x_off, y_off, z_off, H.n_ghost, H.dx, H.dy, H.dz, H.xbound, H.ybound, H.zbound, H.dt, H.n_fields, dens_floor, temp_floor );
+    // max_dti = VL_Algorithm_3D_CUDA(g0, g1, H.nx, H.ny, H.nz, x_off, y_off, z_off, H.n_ghost, H.dx, H.dy, H.dz, H.xbound, H.ybound, H.zbound, H.dt, H.n_fields, dens_floor, temp_floor );
     #endif //VL
     #endif
   }
@@ -790,53 +790,53 @@ Real Grid3D::Update_Grid(void)
   }
   // at this point g0 has the old data, g1 has the new data
   // point the grid variables at the new data
-  C.density  = &g1[0];
-  C.momentum_x = &g1[H.n_cells];
-  C.momentum_y = &g1[2*H.n_cells];
-  C.momentum_z = &g1[3*H.n_cells];
-  C.Energy   = &g1[4*H.n_cells];
-  #ifdef SCALAR
-  C.scalar = &g1[5*H.n_cells];
-  #endif
-
-  #ifdef COOLING_GRACKLE
-  Cool.fields.density = C.density;
-  Cool.fields.HI_density      = &C.scalar[ 0*H.n_cells ];
-  Cool.fields.HII_density     = &C.scalar[ 1*H.n_cells ];
-  Cool.fields.HeI_density     = &C.scalar[ 2*H.n_cells ];
-  Cool.fields.HeII_density    = &C.scalar[ 3*H.n_cells ];
-  Cool.fields.HeIII_density   = &C.scalar[ 4*H.n_cells ];
-  Cool.fields.e_density       = &C.scalar[ 5*H.n_cells ];
-  Cool.fields.metal_density   = &C.scalar[ 6*H.n_cells ];
-  #endif
-
-  #ifdef GRAVITY
-  #ifndef GRAVITY_CPU
-  #ifndef DE
-  C.Grav_potential = &g1[(H.n_fields-1)*H.n_cells];
-  #endif
-  #ifdef DE
-  C.Grav_potential = &g1[(H.n_fields-2)*H.n_cells];
-  #endif
-  #endif
-  #endif
-
-  #ifdef DE
-  C.GasEnergy = &g1[(H.n_fields-1)*H.n_cells];
-  #endif
-
-
-  #ifdef GRAVITY_CPU
-  C.density_0  = &g0[0];
-  C.momentum_x_0 = &g0[H.n_cells];
-  C.momentum_y_0 = &g0[2*H.n_cells];
-  C.momentum_z_0 = &g0[3*H.n_cells];
-  C.Energy_0   = &g0[4*H.n_cells];
-
-  #ifdef DE
-  C.GasEnergy_0 = &g0[(H.n_fields-1)*H.n_cells];
-  #endif
-  #endif
+  // C.density  = &g1[0];
+  // C.momentum_x = &g1[H.n_cells];
+  // C.momentum_y = &g1[2*H.n_cells];
+  // C.momentum_z = &g1[3*H.n_cells];
+  // C.Energy   = &g1[4*H.n_cells];
+  // #ifdef SCALAR
+  // C.scalar = &g1[5*H.n_cells];
+  // #endif
+  //
+  // #ifdef COOLING_GRACKLE
+  // Cool.fields.density = C.density;
+  // Cool.fields.HI_density      = &C.scalar[ 0*H.n_cells ];
+  // Cool.fields.HII_density     = &C.scalar[ 1*H.n_cells ];
+  // Cool.fields.HeI_density     = &C.scalar[ 2*H.n_cells ];
+  // Cool.fields.HeII_density    = &C.scalar[ 3*H.n_cells ];
+  // Cool.fields.HeIII_density   = &C.scalar[ 4*H.n_cells ];
+  // Cool.fields.e_density       = &C.scalar[ 5*H.n_cells ];
+  // Cool.fields.metal_density   = &C.scalar[ 6*H.n_cells ];
+  // #endif
+  //
+  // #ifdef GRAVITY
+  // #ifndef GRAVITY_CPU
+  // #ifndef DE
+  // C.Grav_potential = &g1[(H.n_fields-1)*H.n_cells];
+  // #endif
+  // #ifdef DE
+  // C.Grav_potential = &g1[(H.n_fields-2)*H.n_cells];
+  // #endif
+  // #endif
+  // #endif
+  //
+  // #ifdef DE
+  // C.GasEnergy = &g1[(H.n_fields-1)*H.n_cells];
+  // #endif
+  //
+  //
+  // #ifdef GRAVITY_CPU
+  // C.density_0  = &g0[0];
+  // C.momentum_x_0 = &g0[H.n_cells];
+  // C.momentum_y_0 = &g0[2*H.n_cells];
+  // C.momentum_z_0 = &g0[3*H.n_cells];
+  // C.Energy_0   = &g0[4*H.n_cells];
+  //
+  // #ifdef DE
+  // C.GasEnergy_0 = &g0[(H.n_fields-1)*H.n_cells];
+  // #endif
+  // #endif
 
   // reset the grid flag to swap buffers
   gflag = (gflag+1)%2;
@@ -882,7 +882,7 @@ Real Grid3D::Update_Hydro_Grid( void ){
   #endif
 
   dti = 0.00001;
-  // dti = Update_Grid();
+  dti = Update_Grid();
   #ifdef GRAVITY_CPU
   // Add_Gavity_To_Hydro( *this );
   #ifdef DE_EKINETIC_LIMIT
