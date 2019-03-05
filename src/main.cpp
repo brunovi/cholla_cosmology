@@ -189,195 +189,195 @@ int main(int argc, char *argv[])
   bool output_now = false;
   // Evolve the grid, one timestep at a time
   chprintf("Starting calculations.\n");
-  // while (G.H.t < P.tout)
-  // {
-  //   // #ifdef COOLING_GRACKLE
-  //   // break;
-  //   // #endif
-  //
-  //   chprintf("n_step: %d \n", G.H.n_step + 1 );
-  //   // get the start time
-  //   start_step = get_time();
-  //
-  //   // calculate the timestep
-  //   G.set_dt(dti);
-  //
-  //   #ifndef COSMOLOGY
-  //   if (G.H.t + G.H.dt > outtime)
-  //   {
-  //     G.H.dt = outtime - G.H.t;
-  //   }
-  //
-  //   #ifdef MPI_CHOLLA
-  //   // NOTE: This global reduction is done in G.set_dt(dti);
-  //   G.H.dt = ReduceRealMin(G.H.dt);
-  //   #endif
-  //   #endif
-  //
-  //   #ifdef GRAVITY
-  //   Set_dt( G, output_now, G.H.n_step + 1 );
-  //   #endif
-  //
-  //   #ifndef OVERLAP_HYDRO_GRAV
-  //
-  //   #ifdef PARTICLES
-  //   //Advance the particles KDK( first step )
-  //   Update_Particles( G, 1 );
-  //   #endif
-  //
-  //   // Advance the grid by one timestep
-  //   dti = G.Update_Hydro_Grid();
-  //
-  //   // update the simulation time ( t += dt )
-  //   G.Update_Time();
-  //
-  //   //Compute Gravitational potential for next step
-  //   #ifdef GRAVITY
-  //   Compute_Gravitational_Potential( G, P );
-  //   #endif
-  //
-  //   // set boundary conditions for next time step
-  //   G.Set_Boundary_Conditions_All( P );
-  //
-  //   #ifdef PARTICLES
-  //   //Advance the particles KDK( second step )
-  //   Update_Particles( G, 2 );
-  //   #endif
-  //
-  //   // #else
-  //   //
-  //   //
-  //   // #ifdef CPU_TIME
-  //   // G.Timer.Start_Timer();
-  //   // #endif
-  //   // #pragma omp parallel num_threads( 2 )
-  //   // {
-  //   //     int omp_id;
-  //   //     omp_id = omp_get_thread_num();
-  //   //
-  //   //     if ( omp_id == 0 ) dti = G.Update_Grid();
-  //   //     if ( omp_id == 1 ) Compute_Gravitational_Potential( G, P );
-  //   //
-  //   // }
-  //   // #ifdef CPU_TIME
-  //   // G.Timer.End_and_Record_Time(10);
-  //   // #endif
-  //   //
-  //   // #ifdef PARTICLES
-  //   // //Advance the particles KDK( first step )
-  //   // Update_Particles( G, 1 );
-  //   // #endif
-  //   //
-  //   // // set boundary conditions for next time step
-  //   // G.Set_Boundary_Conditions_All( P );
-  //   //
-  //   // // Extrapolate gravitational potential for hydro step
-  //   // Extrapolate_Grav_Potential( G );
-  //   // Add_Gavity_To_Hydro( G );
-  //   // #ifdef DE_EKINETIC_LIMIT
-  //   // Get_Mean_Kinetic_Energy( G );
-  //   // #endif
-  //   // Sync_Energies_3D_Host( G );
-  //   //
-  //   // // update the simulation time ( t += dt )
-  //   // G.Update_Time();
-  //   //
-  //   //
-  //   // #ifdef PARTICLES
-  //   // // Compute_Gravitational_Potential( G, G.p_solver, P );
-  //   // // G.Grav.TRANSFER_POTENTIAL_BOUNDARIES = true;
-  //   // // G.Set_Boundary_Conditions(P);
-  //   // // G.Grav.TRANSFER_POTENTIAL_BOUNDARIES = false;
-  //   // // Extrapolate_Grav_Potential( G, 1 );
-  //   // //Advance the particles KDK( second step )
-  //   // Update_Particles( G, 2 );
-  //   // #endif
-  //   //
-  //
-  //   #endif
-  //
-  //   // #ifdef GRAVITY_CORRECTOR
-  //   // Apply_Gavity_Corrector( G, P);
-  //   // #endif
-  //
-  //   // #ifdef REVERT_STEP
-  //   // Get_Delta_Conserved( G );
-  //   // #endif
-  //
-  //   // add one to the timestep count
-  //   G.H.n_step++;
-  //
-  //   // #ifdef CPU_TIME
-  //   // #ifdef MPI_CHOLLA
-  //   // chprintf("hydro min: %9.4f  max: %9.4f  avg: %9.4f\n", hydro_min, hydro_max, hydro_avg);
-  //   // chprintf("bound min: %9.4f  max: %9.4f  avg: %9.4f\n", bound_min, bound_max, bound_avg);
-  //   // #endif //MPI_CHOLLA
-  //   // #endif //CPU_TIME
-  //
-  //   #ifdef CPU_TIME
-  //   G.Timer.Print_Times();
-  //   #endif
-  //
-  //   // get the time to compute the total timestep
-  //   stop_step = get_time();
-  //   stop_total = get_time();
-  //   G.H.t_wall = stop_total-start_total;
-  //   #ifdef MPI_CHOLLA
-  //   G.H.t_wall = ReduceRealMax(G.H.t_wall);
-  //   #endif
-  //   chprintf("n_step: %d   sim time: %10.7f   sim timestep: %7.4e  timestep time = %9.3f ms   total time = %9.4f s\n\n",
-  //     G.H.n_step, G.H.t, G.H.dt, (stop_step-start_step)*1000, G.H.t_wall);
-  //
-  //   #ifndef COSMOLOGY
-  //   if (G.H.t == outtime) output_now = true;
-  //   #endif
-  //
-  //   if ( output_now ){
-  //     #ifdef OUTPUT
-  //     /*output the grid data*/
-  //     WriteData(G, P, nfile);
-  //     // add one to the output file count
-  //     nfile++;
-  //     #endif //OUTPUT
-  //     // update to the next output time
-  //     outtime += P.outstep;
-  //     output_now = false;
-  //   }
-  //
-  //   #ifdef CPU_TIME
-  //   G.Timer.n_steps += 1;
-  //   #endif
-  //
-  //   if (G.H.n_step >= 5) break;
-  //
-  //   #ifdef COSMOLOGY
-  //   if ( G.Cosmo.current_a >= G.Cosmo.scale_outputs[G.Cosmo.n_outputs-1] ) {
-  //     chprintf( "\nReached Last Cosmological Output: Ending Simulation\n");
-  //     break;
-  //   }
-  //   #endif
-  //
-  //
-  // } /*end loop over timesteps*/
-  //
-  // #ifdef CPU_TIME
-  // G.Timer.Get_Average_Times();
-  // G.Timer.Print_Average_Times( P );
-  //
-  // #endif
-  //
-  //
-  //
-  // // free the grid
-  // G.Reset();
-  //
-  // #ifdef Particles_3D
-  // G.Particles.Reset();
-  // #endif
-  //
-  // #ifdef COOLING_GRACKLE
-  // Clear_Data_Grackle( G );
-  // #endif
+  while (G.H.t < P.tout)
+  {
+    // #ifdef COOLING_GRACKLE
+    // break;
+    // #endif
+
+    chprintf("n_step: %d \n", G.H.n_step + 1 );
+    // get the start time
+    start_step = get_time();
+
+    // calculate the timestep
+    G.set_dt(dti);
+
+    #ifndef COSMOLOGY
+    if (G.H.t + G.H.dt > outtime)
+    {
+      G.H.dt = outtime - G.H.t;
+    }
+
+    #ifdef MPI_CHOLLA
+    // NOTE: This global reduction is done in G.set_dt(dti);
+    G.H.dt = ReduceRealMin(G.H.dt);
+    #endif
+    #endif
+
+    #ifdef GRAVITY
+    Set_dt( G, output_now, G.H.n_step + 1 );
+    #endif
+
+    #ifndef OVERLAP_HYDRO_GRAV
+
+    #ifdef PARTICLES
+    //Advance the particles KDK( first step )
+    Update_Particles( G, 1 );
+    #endif
+
+    // Advance the grid by one timestep
+    dti = G.Update_Hydro_Grid();
+
+    // update the simulation time ( t += dt )
+    G.Update_Time();
+
+    //Compute Gravitational potential for next step
+    #ifdef GRAVITY
+    Compute_Gravitational_Potential( G, P );
+    #endif
+
+    // set boundary conditions for next time step
+    G.Set_Boundary_Conditions_All( P );
+
+    #ifdef PARTICLES
+    //Advance the particles KDK( second step )
+    Update_Particles( G, 2 );
+    #endif
+
+    // #else
+    //
+    //
+    // #ifdef CPU_TIME
+    // G.Timer.Start_Timer();
+    // #endif
+    // #pragma omp parallel num_threads( 2 )
+    // {
+    //     int omp_id;
+    //     omp_id = omp_get_thread_num();
+    //
+    //     if ( omp_id == 0 ) dti = G.Update_Grid();
+    //     if ( omp_id == 1 ) Compute_Gravitational_Potential( G, P );
+    //
+    // }
+    // #ifdef CPU_TIME
+    // G.Timer.End_and_Record_Time(10);
+    // #endif
+    //
+    // #ifdef PARTICLES
+    // //Advance the particles KDK( first step )
+    // Update_Particles( G, 1 );
+    // #endif
+    //
+    // // set boundary conditions for next time step
+    // G.Set_Boundary_Conditions_All( P );
+    //
+    // // Extrapolate gravitational potential for hydro step
+    // Extrapolate_Grav_Potential( G );
+    // Add_Gavity_To_Hydro( G );
+    // #ifdef DE_EKINETIC_LIMIT
+    // Get_Mean_Kinetic_Energy( G );
+    // #endif
+    // Sync_Energies_3D_Host( G );
+    //
+    // // update the simulation time ( t += dt )
+    // G.Update_Time();
+    //
+    //
+    // #ifdef PARTICLES
+    // // Compute_Gravitational_Potential( G, G.p_solver, P );
+    // // G.Grav.TRANSFER_POTENTIAL_BOUNDARIES = true;
+    // // G.Set_Boundary_Conditions(P);
+    // // G.Grav.TRANSFER_POTENTIAL_BOUNDARIES = false;
+    // // Extrapolate_Grav_Potential( G, 1 );
+    // //Advance the particles KDK( second step )
+    // Update_Particles( G, 2 );
+    // #endif
+    //
+
+    #endif
+
+    // #ifdef GRAVITY_CORRECTOR
+    // Apply_Gavity_Corrector( G, P);
+    // #endif
+
+    // #ifdef REVERT_STEP
+    // Get_Delta_Conserved( G );
+    // #endif
+
+    // add one to the timestep count
+    G.H.n_step++;
+
+    // #ifdef CPU_TIME
+    // #ifdef MPI_CHOLLA
+    // chprintf("hydro min: %9.4f  max: %9.4f  avg: %9.4f\n", hydro_min, hydro_max, hydro_avg);
+    // chprintf("bound min: %9.4f  max: %9.4f  avg: %9.4f\n", bound_min, bound_max, bound_avg);
+    // #endif //MPI_CHOLLA
+    // #endif //CPU_TIME
+
+    #ifdef CPU_TIME
+    G.Timer.Print_Times();
+    #endif
+
+    // get the time to compute the total timestep
+    stop_step = get_time();
+    stop_total = get_time();
+    G.H.t_wall = stop_total-start_total;
+    #ifdef MPI_CHOLLA
+    G.H.t_wall = ReduceRealMax(G.H.t_wall);
+    #endif
+    chprintf("n_step: %d   sim time: %10.7f   sim timestep: %7.4e  timestep time = %9.3f ms   total time = %9.4f s\n\n",
+      G.H.n_step, G.H.t, G.H.dt, (stop_step-start_step)*1000, G.H.t_wall);
+
+    #ifndef COSMOLOGY
+    if (G.H.t == outtime) output_now = true;
+    #endif
+
+    if ( output_now ){
+      #ifdef OUTPUT
+      /*output the grid data*/
+      WriteData(G, P, nfile);
+      // add one to the output file count
+      nfile++;
+      #endif //OUTPUT
+      // update to the next output time
+      outtime += P.outstep;
+      output_now = false;
+    }
+
+    #ifdef CPU_TIME
+    G.Timer.n_steps += 1;
+    #endif
+
+    if (G.H.n_step >= 5) break;
+
+    #ifdef COSMOLOGY
+    if ( G.Cosmo.current_a >= G.Cosmo.scale_outputs[G.Cosmo.n_outputs-1] ) {
+      chprintf( "\nReached Last Cosmological Output: Ending Simulation\n");
+      break;
+    }
+    #endif
+
+  
+  } /*end loop over timesteps*/
+
+  #ifdef CPU_TIME
+  G.Timer.Get_Average_Times();
+  G.Timer.Print_Average_Times( P );
+
+  #endif
+
+
+
+  // free the grid
+  G.Reset();
+
+  #ifdef Particles_3D
+  G.Particles.Reset();
+  #endif
+
+  #ifdef COOLING_GRACKLE
+  Clear_Data_Grackle( G );
+  #endif
 
   #ifdef MPI_CHOLLA
   MPI_Finalize();
