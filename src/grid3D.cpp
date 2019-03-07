@@ -951,7 +951,10 @@ void Grid3D::FreeMemory(void)
 
   #ifdef SELF_GRAVITY
   Grav.FreeMemory_CPU();
-  // Grav.FreeMemory_GPU();
+  #endif
+
+  #ifdef VL
+  Free_GPU_Memory_VL_3D();
   #endif
 
   #ifdef COOLING_GPU

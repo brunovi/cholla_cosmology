@@ -26,7 +26,9 @@
 #include"io.h"
 
 bool gpu_data_allocated;
-int block;
+
+// total number of subgrid blocks needed
+int block_tot;
 
 // conserved variables
 Real *dev_conserved, *dev_conserved_half;
@@ -40,6 +42,11 @@ Real *dev_dti_array;
 // array of timesteps for dt calculation (cooling restriction)
 Real *dev_dt_array;
 #endif
+
+// Pointers for the location to copy from and to
+Real *buffer;
+Real *tmp1;
+Real *tmp2;
 
 __global__ void Update_Conserved_Variables_3D_half(Real *dev_conserved, Real *dev_conserved_half, Real *dev_F_x, Real *dev_F_y,  Real *dev_F_z, int nx, int ny, int nz, int n_ghost, Real dx, Real dy, Real dz, Real dt, Real gamma, int n_fields, Real dens_floor );
 
@@ -58,16 +65,10 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
   int nx_s, ny_s, nz_s;
   // x, y, and z offsets for subgrid blocks
   int x_off_s, y_off_s, z_off_s;
-  // total number of subgrid blocks needed
-  int block_tot;
   // number of subgrid blocks needed in each direction
   int block1_tot, block2_tot, block3_tot;
   // modulus of number of cells after block subdivision in each direction
   int remainder1, remainder2, remainder3;
-
-  // counter for which block we're on
-  // int block = 0;
-  block = 0;
 
 
   // calculate the dimensions for the subgrid blocks
@@ -87,11 +88,7 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
   dim3 dim1dBlock(TPB, 1, 1);
 
   // Set up pointers for the location to copy from and to
-  Real *tmp1;
-  Real *tmp2;
-
   // allocate buffer to copy conserved variable blocks to/from
-  Real *buffer;
   if (block_tot > 1) {
     if ( NULL == ( buffer = (Real *) malloc(n_fields*BLOCK_VOL*sizeof(Real)) ) ) {
       printf("Failed to allocate CPU buffer.\n");
@@ -155,6 +152,9 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
     #endif
     gpu_data_allocated = true;
   }
+
+  // counter for which block we're on
+  int block = 0;
 
   // START LOOP OVER SUBGRID BLOCKS
   while (block < block_tot) {
@@ -320,32 +320,37 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
   free(host_dt_array);
   #endif
 
-  // // free the GPU memory
-  // cudaFree(dev_conserved);
-  // cudaFree(dev_conserved_half);
-  // cudaFree(Q_Lx);
-  // cudaFree(Q_Rx);
-  // cudaFree(Q_Ly);
-  // cudaFree(Q_Ry);
-  // cudaFree(Q_Lz);
-  // cudaFree(Q_Rz);
-  // cudaFree(F_x);
-  // cudaFree(F_y);
-  // cudaFree(F_z);
-  // cudaFree(eta_x);
-  // cudaFree(eta_y);
-  // cudaFree(eta_z);
-  // cudaFree(etah_x);
-  // cudaFree(etah_y);
-  // cudaFree(etah_z);
-  // cudaFree(dev_dti_array);
-  // #ifdef COOLING_GPU
-  // cudaFree(dev_dt_array);
-  // #endif
-
   // return the maximum inverse timestep
   return max_dti;
 
+}
+
+void Free_GPU_Memory_VL_3D( void ){
+
+  // free the GPU memory
+  cudaFree(dev_conserved);
+  cudaFree(dev_conserved_half);
+  cudaFree(Q_Lx);
+  cudaFree(Q_Rx);
+  cudaFree(Q_Ly);
+  cudaFree(Q_Ry);
+  cudaFree(Q_Lz);
+  cudaFree(Q_Rz);
+  cudaFree(F_x);
+  cudaFree(F_y);
+  cudaFree(F_z);
+  cudaFree(eta_x);
+  cudaFree(eta_y);
+  cudaFree(eta_z);
+  cudaFree(etah_x);
+  cudaFree(etah_y);
+  cudaFree(etah_z);
+  cudaFree(dev_dti_array);
+  #ifdef COOLING_GPU
+  cudaFree(dev_dt_array);
+  #endif
+
+  chprintf( " VL_3D: Succesfully freed gpu memory. \n");
 }
 
 
