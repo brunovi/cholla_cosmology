@@ -23,7 +23,23 @@
 #include"h_correction_3D_cuda.h"
 #include"cooling_cuda.h"
 #include"subgrid_routines_3D.h"
+#include"io.h"
 
+bool gpu_data_allocated;
+int block;
+
+// conserved variables
+Real *dev_conserved, *dev_conserved_half;
+// input states and associated interface fluxes (Q* and F* from Stone, 2008)
+Real *Q_Lx, *Q_Rx, *Q_Ly, *Q_Ry, *Q_Lz, *Q_Rz, *F_x, *F_y, *F_z;
+// arrays to hold the eta values for the H correction
+Real *eta_x, *eta_y, *eta_z, *etah_x, *etah_y, *etah_z;
+// array of inverse timesteps for dt calculation
+Real *dev_dti_array;
+#ifdef COOLING_GPU
+// array of timesteps for dt calculation (cooling restriction)
+Real *dev_dt_array;
+#endif
 
 __global__ void Update_Conserved_Variables_3D_half(Real *dev_conserved, Real *dev_conserved_half, Real *dev_F_x, Real *dev_F_y,  Real *dev_F_z, int nx, int ny, int nz, int n_ghost, Real dx, Real dy, Real dz, Real dt, Real gamma, int n_fields, Real dens_floor );
 
@@ -38,7 +54,6 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
   //host_conserved0 contains the values at time n,
   //host_conserved1 will contain the values at time n+1
 
-
   // dimensions of subgrid blocks
   int nx_s, ny_s, nz_s;
   // x, y, and z offsets for subgrid blocks
@@ -51,7 +66,9 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
   int remainder1, remainder2, remainder3;
 
   // counter for which block we're on
-  int block = 0;
+  // int block = 0;
+  block = 0;
+
 
   // calculate the dimensions for the subgrid blocks
   sub_dimensions_3D(nx, ny, nz, n_ghost, &nx_s, &ny_s, &nz_s, &block1_tot, &block2_tot, &block3_tot, &remainder1, &remainder2, &remainder3, n_fields);
@@ -99,41 +116,45 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
   #endif
 
   // allocate GPU arrays
-  // conserved variables
-  Real *dev_conserved, *dev_conserved_half;
-  // input states and associated interface fluxes (Q* and F* from Stone, 2008)
-  Real *Q_Lx, *Q_Rx, *Q_Ly, *Q_Ry, *Q_Lz, *Q_Rz, *F_x, *F_y, *F_z;
-  // arrays to hold the eta values for the H correction
-  Real *eta_x, *eta_y, *eta_z, *etah_x, *etah_y, *etah_z;
-  // array of inverse timesteps for dt calculation
-  Real *dev_dti_array;
-  #ifdef COOLING_GPU
-  // array of timesteps for dt calculation (cooling restriction)
-  Real *dev_dt_array;
-  #endif
+  // // conserved variables
+  // Real *dev_conserved, *dev_conserved_half;
+  // // input states and associated interface fluxes (Q* and F* from Stone, 2008)
+  // Real *Q_Lx, *Q_Rx, *Q_Ly, *Q_Ry, *Q_Lz, *Q_Rz, *F_x, *F_y, *F_z;
+  // // arrays to hold the eta values for the H correction
+  // Real *eta_x, *eta_y, *eta_z, *etah_x, *etah_y, *etah_z;
+  // // array of inverse timesteps for dt calculation
+  // Real *dev_dti_array;
+  // #ifdef COOLING_GPU
+  // // array of timesteps for dt calculation (cooling restriction)
+  // Real *dev_dt_array;
+  // #endif
 
-  // allocate memory on the GPU
-  CudaSafeCall( cudaMalloc((void**)&dev_conserved, n_fields*BLOCK_VOL*sizeof(Real)) );
-  CudaSafeCall( cudaMalloc((void**)&dev_conserved_half, n_fields*BLOCK_VOL*sizeof(Real)) );
-  CudaSafeCall( cudaMalloc((void**)&Q_Lx,  n_fields*BLOCK_VOL*sizeof(Real)) );
-  CudaSafeCall( cudaMalloc((void**)&Q_Rx,  n_fields*BLOCK_VOL*sizeof(Real)) );
-  CudaSafeCall( cudaMalloc((void**)&Q_Ly,  n_fields*BLOCK_VOL*sizeof(Real)) );
-  CudaSafeCall( cudaMalloc((void**)&Q_Ry,  n_fields*BLOCK_VOL*sizeof(Real)) );
-  CudaSafeCall( cudaMalloc((void**)&Q_Lz,  n_fields*BLOCK_VOL*sizeof(Real)) );
-  CudaSafeCall( cudaMalloc((void**)&Q_Rz,  n_fields*BLOCK_VOL*sizeof(Real)) );
-  CudaSafeCall( cudaMalloc((void**)&F_x,   n_fields*BLOCK_VOL*sizeof(Real)) );
-  CudaSafeCall( cudaMalloc((void**)&F_y,   n_fields*BLOCK_VOL*sizeof(Real)) );
-  CudaSafeCall( cudaMalloc((void**)&F_z,   n_fields*BLOCK_VOL*sizeof(Real)) );
-  CudaSafeCall( cudaMalloc((void**)&eta_x,  BLOCK_VOL*sizeof(Real)) );
-  CudaSafeCall( cudaMalloc((void**)&eta_y,  BLOCK_VOL*sizeof(Real)) );
-  CudaSafeCall( cudaMalloc((void**)&eta_z,  BLOCK_VOL*sizeof(Real)) );
-  CudaSafeCall( cudaMalloc((void**)&etah_x, BLOCK_VOL*sizeof(Real)) );
-  CudaSafeCall( cudaMalloc((void**)&etah_y, BLOCK_VOL*sizeof(Real)) );
-  CudaSafeCall( cudaMalloc((void**)&etah_z, BLOCK_VOL*sizeof(Real)) );
-  CudaSafeCall( cudaMalloc((void**)&dev_dti_array, ngrid*sizeof(Real)) );
-  #ifdef COOLING_GPU
-  CudaSafeCall( cudaMalloc((void**)&dev_dt_array, ngrid*sizeof(Real)) );
-  #endif
+  if ( !gpu_data_allocated ){
+    chprintf( " VL_3D: Allocating GPU memory \n");
+    // allocate memory on the GPU
+    CudaSafeCall( cudaMalloc((void**)&dev_conserved, n_fields*BLOCK_VOL*sizeof(Real)) );
+    CudaSafeCall( cudaMalloc((void**)&dev_conserved_half, n_fields*BLOCK_VOL*sizeof(Real)) );
+    CudaSafeCall( cudaMalloc((void**)&Q_Lx,  n_fields*BLOCK_VOL*sizeof(Real)) );
+    CudaSafeCall( cudaMalloc((void**)&Q_Rx,  n_fields*BLOCK_VOL*sizeof(Real)) );
+    CudaSafeCall( cudaMalloc((void**)&Q_Ly,  n_fields*BLOCK_VOL*sizeof(Real)) );
+    CudaSafeCall( cudaMalloc((void**)&Q_Ry,  n_fields*BLOCK_VOL*sizeof(Real)) );
+    CudaSafeCall( cudaMalloc((void**)&Q_Lz,  n_fields*BLOCK_VOL*sizeof(Real)) );
+    CudaSafeCall( cudaMalloc((void**)&Q_Rz,  n_fields*BLOCK_VOL*sizeof(Real)) );
+    CudaSafeCall( cudaMalloc((void**)&F_x,   n_fields*BLOCK_VOL*sizeof(Real)) );
+    CudaSafeCall( cudaMalloc((void**)&F_y,   n_fields*BLOCK_VOL*sizeof(Real)) );
+    CudaSafeCall( cudaMalloc((void**)&F_z,   n_fields*BLOCK_VOL*sizeof(Real)) );
+    CudaSafeCall( cudaMalloc((void**)&eta_x,  BLOCK_VOL*sizeof(Real)) );
+    CudaSafeCall( cudaMalloc((void**)&eta_y,  BLOCK_VOL*sizeof(Real)) );
+    CudaSafeCall( cudaMalloc((void**)&eta_z,  BLOCK_VOL*sizeof(Real)) );
+    CudaSafeCall( cudaMalloc((void**)&etah_x, BLOCK_VOL*sizeof(Real)) );
+    CudaSafeCall( cudaMalloc((void**)&etah_y, BLOCK_VOL*sizeof(Real)) );
+    CudaSafeCall( cudaMalloc((void**)&etah_z, BLOCK_VOL*sizeof(Real)) );
+    CudaSafeCall( cudaMalloc((void**)&dev_dti_array, ngrid*sizeof(Real)) );
+    #ifdef COOLING_GPU
+    CudaSafeCall( cudaMalloc((void**)&dev_dt_array, ngrid*sizeof(Real)) );
+    #endif
+    gpu_data_allocated = true;
+  }
 
   // START LOOP OVER SUBGRID BLOCKS
   while (block < block_tot) {
@@ -286,7 +307,7 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
       max_dti = C_cfl/min_dt;
     }
     #endif
-  
+
     // add one to the counter
     block++;
 
@@ -299,28 +320,28 @@ Real VL_Algorithm_3D_CUDA(Real *host_conserved0, Real *host_conserved1, int nx, 
   free(host_dt_array);
   #endif
 
-  // free the GPU memory
-  cudaFree(dev_conserved);
-  cudaFree(dev_conserved_half);
-  cudaFree(Q_Lx);
-  cudaFree(Q_Rx);
-  cudaFree(Q_Ly);
-  cudaFree(Q_Ry);
-  cudaFree(Q_Lz);
-  cudaFree(Q_Rz);
-  cudaFree(F_x);
-  cudaFree(F_y);
-  cudaFree(F_z);
-  cudaFree(eta_x);
-  cudaFree(eta_y);
-  cudaFree(eta_z);
-  cudaFree(etah_x);
-  cudaFree(etah_y);
-  cudaFree(etah_z);
-  cudaFree(dev_dti_array);
-  #ifdef COOLING_GPU
-  cudaFree(dev_dt_array);
-  #endif
+  // // free the GPU memory
+  // cudaFree(dev_conserved);
+  // cudaFree(dev_conserved_half);
+  // cudaFree(Q_Lx);
+  // cudaFree(Q_Rx);
+  // cudaFree(Q_Ly);
+  // cudaFree(Q_Ry);
+  // cudaFree(Q_Lz);
+  // cudaFree(Q_Rz);
+  // cudaFree(F_x);
+  // cudaFree(F_y);
+  // cudaFree(F_z);
+  // cudaFree(eta_x);
+  // cudaFree(eta_y);
+  // cudaFree(eta_z);
+  // cudaFree(etah_x);
+  // cudaFree(etah_y);
+  // cudaFree(etah_z);
+  // cudaFree(dev_dti_array);
+  // #ifdef COOLING_GPU
+  // cudaFree(dev_dt_array);
+  // #endif
 
   // return the maximum inverse timestep
   return max_dti;
