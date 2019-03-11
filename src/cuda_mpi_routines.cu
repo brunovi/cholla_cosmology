@@ -15,6 +15,9 @@ int initialize_cuda_mpi(int myid, int nprocs)
 
   //get the number of cuda devices    
   flag_error = cudaGetDeviceCount(&n_device);
+  
+  // Set n_device = 6 for summit testing
+  n_device = 6;
 
   //check for errors
   if(flag_error!=cudaSuccess)
