@@ -207,13 +207,14 @@ void InitializeChollaMPI(int *pargc, char **pargv[])
   #ifndef ONLY_PM
   //initialize cuda for use with mpi
   #ifdef CUDA
-  if(initialize_cuda_mpi(procID_node,nproc_node))
+  // if(initialize_cuda_mpi(procID_node,nproc_node))
+  if(initialize_cuda_mpi(procID,nproc_node))
   {
     chprintf("Error initializing cuda with mpi.\n");
     chexit(-10);
   }
   #endif /*CUDA*/
-  #endif
+  #endif //ONLY_PM
 
   #ifdef ONLY_PM
   chprintf("ONLY_PM: Initializing without CUDA support.\n");

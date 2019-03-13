@@ -18,8 +18,8 @@ int initialize_cuda_mpi(int myid, int nprocs)
   
   #ifdef N_DEVICE_PER_NODE
   // Override the number of devices per Node, solve gpu errors on summit
-  // n_device = N_DEVICE_PER_NODE;
-  // chprintf( "N CUDA devices per Node: %d \n", n_device );
+  n_device = N_DEVICE_PER_NODE;
+  chprintf( "N CUDA devices per Node: %d \n", n_device );
   #endif
   
 
