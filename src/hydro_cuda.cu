@@ -812,5 +812,19 @@ __global__ void Calc_dt_3D(Real *dev_conserved, int nx, int ny, int nz, int n_gh
 
 }
 
+#ifdef DE
+__device__ Real Get_Pressure_Dual_Energy( Real E, Real U_total, Real U_advected, Real gamma ){
+  
+  Real U, P;
+  Real eta = 0.001;
+  
+  if( U_total / E > eta ) U = U_total;
+  else U = U_advected;
+
+  P = U * (gamma - 1.0);
+  return P;
+}
+#endif //DE
+
 
 #endif //CUDA
