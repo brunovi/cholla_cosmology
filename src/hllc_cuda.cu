@@ -8,6 +8,7 @@
 #include"global.h"
 #include"global_cuda.h"
 #include"hllc_cuda.h"
+#include"hydro_cuda.h"
 
 
 
@@ -38,7 +39,7 @@ __global__ void Calculate_HLLC_Fluxes_CUDA(Real *dev_bounds_L, Real *dev_bounds_
   Real f_d, f_mx, f_my, f_mz, f_E;
   Real Sl, Sr, Sm, cfl, cfr, ps;
   #ifdef DE
-  Real dgel, dger, gel, ger, gels, gers, f_ge_l, f_ge_r, f_ge;
+  Real dgel, dger, gel, ger, gels, gers, f_ge_l, f_ge_r, f_ge, E, E_kin;;
   #endif
   #ifdef SCALAR
   Real dscl[NSCALARS], dscr[NSCALARS], scl[NSCALARS], scr[NSCALARS], scls[NSCALARS], scrs[NSCALARS], f_sc_l[NSCALARS], f_sc_r[NSCALARS], f_sc[NSCALARS];
@@ -95,7 +96,13 @@ __global__ void Calculate_HLLC_Fluxes_CUDA(Real *dev_bounds_L, Real *dev_bounds_
     vxl = mxl / dl;
     vyl = myl / dl;
     vzl = mzl / dl;
+    // Get pressure_l
+    #ifdef DE
+    E_kin = 0.5 * dl * ( vxl*vxl + vyl*vyl + vzl*vzl );
+    pl = Get_Pressure_Dual_Energy( El, El - E_kin, dgel, gamma ); 
+    #else
     pl  = (El - 0.5*dl*(vxl*vxl + vyl*vyl + vzl*vzl)) * (gamma - 1.0);
+    #endif
     pl  = fmax(pl, (Real) TINY_NUMBER);
     #ifdef SCALAR
     for (int i=0; i<NSCALARS; i++) {
@@ -108,7 +115,13 @@ __global__ void Calculate_HLLC_Fluxes_CUDA(Real *dev_bounds_L, Real *dev_bounds_
     vxr = mxr / dr;
     vyr = myr / dr;
     vzr = mzr / dr;
+    // Get pressure_r
+    #ifdef DE
+    E_kin = 0.5 * dr * ( vxr*vxr + vyr*vyr + vzr*vzr );
+    pr = Get_Pressure_Dual_Energy( Er, Er - E_kin, dger, gamma ); 
+    #else
     pr  = (Er - 0.5*dr*(vxr*vxr + vyr*vyr + vzr*vzr)) * (gamma - 1.0);
+    #endif
     pr  = fmax(pr, (Real) TINY_NUMBER);    
     #ifdef SCALAR
     for (int i=0; i<NSCALARS; i++) {
