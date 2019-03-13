@@ -202,7 +202,7 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
   Real d, d_inv, vx, vy, vz;
   #endif
   #ifdef DE
-  Real vx_imo, vx_ipo, vy_jmo, vy_jpo, vz_kmo, vz_kpo, P;
+  Real vx_imo, vx_ipo, vy_jmo, vy_jpo, vz_kmo, vz_kpo, P, E, GE, E_kin;
   int ipo, jpo, kpo;
   #endif
 
@@ -255,13 +255,15 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
     vx =  dev_conserved[1*n_cells + id] * d_inv;
     vy =  dev_conserved[2*n_cells + id] * d_inv;
     vz =  dev_conserved[3*n_cells + id] * d_inv;
-    // E = dev_conserved[4*n_cells + id];
-    // GE = fmin(dev_conserved[(n_fields-1)*n_cells + id], 1e-6);
+    E = dev_conserved[4*n_cells + id];
+    GE = fmin(dev_conserved[(n_fields-1)*n_cells + id], 1e-6);
     #endif
     #ifdef DE
-    P  = (dev_conserved[4*n_cells + id] - 0.5*d*(vx*vx + vy*vy + vz*vz)) * (gamma - 1.0);
+    // P  = (dev_conserved[4*n_cells + id] - 0.5*d*(vx*vx + vy*vy + vz*vz)) * (gamma - 1.0);
+    // if (P < 0.0) P  = dev_conserved[(n_fields-1)*n_cells + id] * (gamma - 1.0);
+    E_kin = 0.5 * d * ( vx*vx + vy*vy + vz*vz );
+    P = Get_Pressure_Dual_Energy( E, E - E_kin, GE, gamma );    
     if (d < 0.0 || d != d) printf("Negative density before final update.\n");
-    if (P < 0.0) P  = dev_conserved[(n_fields-1)*n_cells + id] * (gamma - 1.0);
     if (P < 0.0) printf("%d Negative pressure before final update.\n", id);
     ipo = xid+1 + yid*nx + zid*nx*ny;
     jpo = xid + (yid+1)*nx + zid*nx*ny;
@@ -363,35 +365,7 @@ __global__ void Update_Conserved_Variables_3D(Real *dev_conserved, Real *dev_F_x
     #endif //GRAVITY_CPU
     #endif //GRAVITY
 
-    // Real u, u_floor, delta_u, E;
-    //
-    // #ifdef DE
-    // // Real phi_0_gas = 0.01;                           //Unit Conversion
-    // u = dev_conserved[(n_fields-1)*n_cells + id];
-    // // u = u / current_a / current_a * phi_0_gas;  //convert to physical km^2/s^2
-    // // u_floor = 0.00001;
-    // u_floor = 1e-5;
-    // if ( u < u_floor ) {
-    //   delta_u = u_floor - u;
-    //   // printf("###Thread GasEnergy change  %f -> %f \n", u, u_floor );
-    //   u = u_floor;
-    //   // u = u_floor * current_a * current_a / phi_0_gas;  //convert back to comuving units
-    //   dev_conserved[(n_fields-1)*n_cells + id] = u;
-    //   dev_conserved[4*n_cells + id] += delta_u ;
-    // }
-    // #endif
-    //
-    // u_floor = 1e-5;
-    // E = dev_conserved[4*n_cells + id];
-    // if ( E < u_floor ){
-    //   delta_u = u_floor - E;
-    //   printf("###Thread Energy change  %f -> %f \n", E, u_floor );
-    //   #ifdef DE
-    //   dev_conserved[(n_fields-1)*n_cells + id] += delta_u;
-    //   #endif
-    //   dev_conserved[4*n_cells + id] += delta_u;
-    // }
-    //
+
     #ifndef TEMPERATURE_FLOOR
     if (dev_conserved[id] < 0.0 || dev_conserved[id] != dev_conserved[id] || dev_conserved[4*n_cells + id] < 0.0 || dev_conserved[4*n_cells+id] != dev_conserved[4*n_cells+id]) {
       printf("%3d %3d %3d Thread crashed in final update. %e %e %e %e %e\n", xid+x_off, yid+y_off, zid+z_off, dev_conserved[id], dtodx*(dev_F_x[imo]-dev_F_x[id]), dtody*(dev_F_y[jmo]-dev_F_y[id]), dtodz*(dev_F_z[kmo]-dev_F_z[id]), dev_conserved[4*n_cells+id]);

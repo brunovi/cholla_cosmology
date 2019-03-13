@@ -39,7 +39,7 @@ __global__ void Apply_Temperature_Floor(Real *dev_conserved, int nx, int ny, int
 #endif
 
 #ifdef DE
-__device__ Real Get_Pressure_Dual_Energy( );
+__device__ Real Get_Pressure_Dual_Energy( Real E, Real U_total, Real U_advected, Real gamma );
 #endif
 
 
