@@ -130,17 +130,17 @@ void Sync_Energies_3D_Host_Function(Grid3D &G, int g_start, int g_end ){
         ge1 = G.C.GasEnergy[id];
         ge2 = E - 0.5*d*(vx*vx + vy*vy + vz*vz);
 
-        #ifdef DE_EKINETIC_LIMIT
-        if (ge2 > 0.0 && E > 0.0 && ge2/E > 0.02 && Ek/G.H.Ekin_mean > 0.4 ) {
-        // if (ge2 > 0.0 && E > 0.0 && ge2/E > 0.02  ) {
-        // if (ge2 > 0.0 && E > 0.0 && ge2/E > 0.075  ) {
-        #else
-        if (ge2 > 0.0 && E > 0.0 && ge2/E > 0.001 ) {
-        #endif //DE_EKINETIC_LIMIT
-
-          G.C.GasEnergy[id] = ge2;
-          ge1 = ge2;
-        }
+        // #ifdef DE_EKINETIC_LIMIT
+        // if (ge2 > 0.0 && E > 0.0 && ge2/E > 0.02 && Ek/G.H.Ekin_mean > 0.4 ) {
+        // // if (ge2 > 0.0 && E > 0.0 && ge2/E > 0.02  ) {
+        // // if (ge2 > 0.0 && E > 0.0 && ge2/E > 0.075  ) {
+        // #else
+        // if (ge2 > 0.0 && E > 0.0 && ge2/E > 0.001 ) {
+        // #endif //DE_EKINETIC_LIMIT
+        // 
+        //   G.C.GasEnergy[id] = ge2;
+        //   ge1 = ge2;
+        // }
 
         //find the max nearby total energy
         Emax = E;
@@ -155,10 +155,10 @@ void Sync_Energies_3D_Host_Function(Grid3D &G, int g_start, int g_end ){
           G.C.GasEnergy[id] = ge2;
         }
         // sync the total energy with the internal energy
-        else {
-          if (ge1 > 0.0) G.C.Energy[id] += ge1 - ge2;
-          else G.C.GasEnergy[id] = ge2;
-        }
+        // else {
+        //   if (ge1 > 0.0) G.C.Energy[id] += ge1 - ge2;
+        //   else G.C.GasEnergy[id] = ge2;
+        // }
         // G.C.Energy[id] = Ek + G.C.GasEnergy[id];
         // if ( fabs(( G.C.Energy[id] - (Ek + G.C.GasEnergy[id]) )  / G.C.Energy[id] ) > 1e-5 ) std::cout << "##Energy Error: " << G.C.Energy[id] << "  " << Ek + G.C.GasEnergy[id] << std::endl;
         // if (G.C.Energy[id] < 0 ) std::cout << "##Negative Energy after E_sync: " <<  G.C.Energy[id] << "  " << G.C.GasEnergy[id] << " " << d << " " << Ek << std::endl;
@@ -240,14 +240,21 @@ void Apply_Temperature_Floor_Host( Grid3D &G, int g_start, int g_end ){
         if ( fabs(( E - (Ekin + u) )  / E ) > 1e-5 ) std::cout << "##Energy Error: " << E << "  " << Ekin + u << std::endl;
 
         temp = u / d;
-
         if ( temp < temp_floor ){
           temp = temp_floor;
           u_new = temp * d  ;
           delta_u = u_new - u;
           G.C.GasEnergy[id] += delta_u;
+        }
+        
+        temp = (E - Ekin) / d;
+        if ( temp < temp_floor ){
+          temp = temp_floor;
+          u_new = temp * d  ;
+          delta_u = u_new - u;
           G.C.Energy[id] += delta_u;
         }
+        
         E = G.C.Energy[id];
         u = G.C.GasEnergy[id];
         if ( fabs(( E - (Ekin + u) )  / E ) > 1e-5 ) std::cout << "##Energy Error: " << E << "  " << Ekin + u << std::endl;
