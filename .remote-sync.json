@@ -7,7 +7,7 @@
   "deleteLocal": false,
   "hostname": "shamrock.ucsc.edu",
   "port": "22",
-  "target": "/home/bruno/cholla",
+  "target": "/home/bruno/cholla_cosmology",
   "ignore": [
     ".remote-sync.json",
     ".git/**"
