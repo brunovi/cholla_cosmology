@@ -13,19 +13,19 @@
 /*! \fn void calc_eta_x(Real *dev_bounds_L, Real *dev_bounds_R, Real *eta_x, int nx, int ny, int nz, int n_ghost, Real gamma)
  *  \brief When passed the left and right boundary values at an interface, calculates
            the eta value for the interface according to the forumulation in Sanders et al, 1998. */
-__global__ void calc_eta_x_3D(Real *dev_bounds_L, Real *dev_bounds_R, Real *eta_x, int nx, int ny, int nz, int n_ghost, Real gamma);
+__global__ void calc_eta_x_3D(Real *dev_bounds_L, Real *dev_bounds_R, Real *eta_x, int nx, int ny, int nz, int n_ghost, Real gamma, int n_fields);
 
 
 /*! \fn void calc_eta_y(Real *dev_bounds_L, Real *dev_bounds_R, Real *eta_y, int nx, int ny, int nz, int n_ghost, Real gamma)
  *  \brief When passed the left and right boundary values at an interface, calculates
            the eta value for the interface according to the forumulation in Sanders et al, 1998. */
-__global__ void calc_eta_y_3D(Real *dev_bounds_L, Real *dev_bounds_R, Real *eta_y, int nx, int ny, int nz, int n_ghost, Real gamma);
+__global__ void calc_eta_y_3D(Real *dev_bounds_L, Real *dev_bounds_R, Real *eta_y, int nx, int ny, int nz, int n_ghost, Real gamma, int n_fields);
 
 
 /*! \fn void calc_eta_z(Real *dev_bounds_L, Real *dev_bounds_R, Real *eta_z, int nx, int ny, int nz, int n_ghost, Real gamma)
  *  \brief When passed the left and right boundary values at an interface, calculates
            the eta value for the interface according to the forumulation in Sanders et al, 1998. */
-__global__ void calc_eta_z_3D(Real *dev_bounds_L, Real *dev_bounds_R, Real *eta_z, int nx, int ny, int nz, int n_ghost, Real gamma);
+__global__ void calc_eta_z_3D(Real *dev_bounds_L, Real *dev_bounds_R, Real *eta_z, int nx, int ny, int nz, int n_ghost, Real gamma, int n_fields);
 
 
 /*! \fn void calc_etah_x_3D(Real *eta_x, Real *eta_y, Real *eta_z, Real *etah_x, int nx, int ny, int nz, int n_ghost)
