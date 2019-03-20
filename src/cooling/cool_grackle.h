@@ -41,6 +41,8 @@ class Cool_GK
   Real *cooling_rate;
   #endif
 
+  bool *flags_DE;
+
   Real tiny_number;
 
   Real a_UVB_on;

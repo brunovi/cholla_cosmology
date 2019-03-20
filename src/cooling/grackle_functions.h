@@ -23,6 +23,8 @@ void Set_Initial_Fields_Grackle( Grid3D &G );
 
 void Update_Internal_Energy( Grid3D &G );
 
+bool Select_Internal_Energy( Real E, Real U_total, Real U_advected, Real gamma );
+
 #endif
 #endif
 #endif
