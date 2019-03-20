@@ -899,10 +899,13 @@ Real Grid3D::Update_Hydro_Grid( void ){
   Timer.Start_Timer();
   #endif
   Do_Cooling_Step( *this );
+  Apply_Temperature_Floor_Host( *this, 0, Grav.nz_local );
   #ifdef CPU_TIME
   Timer.End_and_Record_Time(10);
   #endif
   #endif
+  
+  
 
 
   return dti;
