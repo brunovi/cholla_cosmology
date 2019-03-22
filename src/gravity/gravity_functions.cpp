@@ -800,7 +800,7 @@ void Set_dt( Grid3D &G, bool &output_now, int n_step ){
   dt_hydro = G.Cosmo.Get_Cosmology_dt( G.Cosmo.delta_a );
   G.H.dt = dt_hydro;
 
-  chprintf( " Current_a: %f    delta_a: %f     da_courant: %f  dt:  %f\n", G.Cosmo.current_a, G.Cosmo.delta_a, da_courant, dt  );
+  chprintf( " Current_a: %f    delta_a: %f     da_courant: %f  dt:  %f\n", G.Cosmo.current_a, G.Cosmo.delta_a, da_courant, dt_hydro  );
   chprintf( " t_physical: %f Myr   dt_physical: %f Myr\n", G.Cosmo.t_secs/MYR, G.Cosmo.dt_secs/MYR );
 
   #else //COSMOLOGY
